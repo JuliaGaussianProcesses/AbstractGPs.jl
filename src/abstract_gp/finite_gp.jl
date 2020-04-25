@@ -111,7 +111,7 @@ julia> x1 = randn(11);
 
 julia> x2 = randn(13);
 
-julia> cov(f(x1), f(x2)) == pw(Matern32Kernel(), x1, x2)
+julia> cov(f(x1), f(x2)) == kernelmatrix(Matern32Kernel(), x1, x2)
 true
 ```
 """
