@@ -32,7 +32,7 @@ using KernelFunctions
 
     # Check that mean-function specialisations work as expected.
     @testset "sugar" begin
-        @test GP(5, Matern32Kernel()).m isa ConstMean
-        @test GP(Matern32Kernel()).m isa ZeroMean
+        @test GP(5, Matern32Kernel()).mean isa ConstMean
+        @test GP(Matern32Kernel()).mean isa ZeroMean
     end
 end

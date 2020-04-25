@@ -1,7 +1,7 @@
 """
     GP{Tm<:MeanFunction, Tk<:Kernel}
 
-A Gaussian Process (GP) with known mean `m` and kernel `k`.
+A Gaussian Process (GP) with known `mean` and `kernel`.
 
 # Zero Mean
 If only one argument is provided, assume the mean to be zero everywhere:
@@ -49,13 +49,13 @@ true
 ```
 """
 struct GP{Tm<:MeanFunction, Tk<:Kernel} <: AbstractGP
-    m::Tm
-    k::Tk 
+    mean::Tm
+    kernel::Tk 
 end
 
-GP(m, k::Kernel) = GP(CustomMean(m), k)
-GP(m::Real, k::Kernel) = GP(ConstMean(m), k)
-GP(k::Kernel) = GP(ZeroMean(), k)
+GP(mean, kernel::Kernel) = GP(CustomMean(mean), kernel)
+GP(mean::Real, kernel::Kernel) = GP(ConstMean(mean), kernel)
+GP(kernel::Kernel) = GP(ZeroMean(), kernel)
 
 (f::GP)(x...) = FiniteGP(f, x...)
 
@@ -64,13 +64,13 @@ GP(k::Kernel) = GP(ZeroMean(), k)
 # Implementation of the AbstractGP API.
 #
 
-Statistics.mean(f::GP, x::AbstractVector) = map(f.m, x)
+Statistics.mean(f::GP, x::AbstractVector) = map(f.mean, x)
 
-Statistics.cov(f::GP, x::AbstractVector) = kernelmatrix(f.k, x)
+Statistics.cov(f::GP, x::AbstractVector) = kernelmatrix(f.kernel, x)
 
-cov_diag(f::GP, x::AbstractVector) = kerneldiagmatrix(f.k, x)
+cov_diag(f::GP, x::AbstractVector) = kerneldiagmatrix(f.kernel, x)
 
-Statistics.cov(f::GP, x::AbstractVector, x′::AbstractVector) = kernelmatrix(f.k, x, x′)
+Statistics.cov(f::GP, x::AbstractVector, x′::AbstractVector) = kernelmatrix(f.kernel, x, x′)
 
 mean_and_cov(f::GP, x::AbstractVector) = (mean(f, x), cov(f, x))
 
