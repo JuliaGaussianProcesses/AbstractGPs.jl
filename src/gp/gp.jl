@@ -13,7 +13,7 @@ julia> x = randn(5);
 julia> mean(f(x)) == zeros(5)
 true
 
-julia> cov(f(x)) == pw(Matern32Kernel(), x)
+julia> cov(f(x)) == kernelmatrix(Matern32Kernel(), x)
 true
 ```
 
