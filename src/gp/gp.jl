@@ -44,7 +44,7 @@ julia> x = randn(5);
 julia> mean(f(x)) == sin.(x) .+ cos.(x ./ 2)
 true
 
-julia> cov(f(x)) == Stheno.pw(RationalQuadraticKernel(3.2), x)
+julia> cov(f(x)) == kernelmatrix(RationalQuadraticKernel(3.2), x)
 true
 ```
 """
