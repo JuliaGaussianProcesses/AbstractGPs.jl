@@ -23,13 +23,13 @@ include("test_util.jl")
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
     end
-    # @testset "doctests" begin
-    #     DocMeta.setdocmeta!(
-    #         AbstractGPs,
-    #         :DocTestSetup,
-    #         :(using AbstractGPs, Random, Documenter, LinearAlgebra);
-    #         recursive=true,
-    #     )
-    #     doctest(AbstractGPs)
-    # end
+    @testset "doctests" begin
+        DocMeta.setdocmeta!(
+            AbstractGPs,
+            :DocTestSetup,
+            :(using AbstractGPs, Random, Documenter, LinearAlgebra, KernelFunctions);
+            recursive=true,
+        )
+        doctest(AbstractGPs)
+    end
 end

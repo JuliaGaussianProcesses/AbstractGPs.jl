@@ -22,14 +22,14 @@ true
 If a `Real` is provided as the first argument, assume the mean function is constant with
 that value
 ```jldoctest
-julia> f = GP(5.0, RationalQuadraticKernel());
+julia> f = GP(5.0, Matern32Kernel());
 
 julia> x = randn(5);
 
 julia> mean(f(x)) == 5.0 .* ones(5)
 true
 
-julia> cov(f(x)) == kernelmatrix(RationalQuadraticKernel(), x)
+julia> cov(f(x)) == kernelmatrix(Matern32Kernel(), x)
 true
 ```
 
@@ -37,14 +37,14 @@ true
 
 Provide an arbitrary function to compute the mean:
 ```jldoctest
-julia> f = GP(x -> sin(x) + cos(x / 2), RationalQuadraticKernel(3.2));
+julia> f = GP(x -> sin(x) + cos(x / 2), Matern32Kernel());
 
 julia> x = randn(5);
 
 julia> mean(f(x)) == sin.(x) .+ cos.(x ./ 2)
 true
 
-julia> cov(f(x)) == kernelmatrix(RationalQuadraticKernel(3.2), x)
+julia> cov(f(x)) == kernelmatrix(Matern32Kernel(), x)
 true
 ```
 """

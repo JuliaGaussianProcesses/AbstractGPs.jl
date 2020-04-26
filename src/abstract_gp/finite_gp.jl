@@ -105,7 +105,7 @@ end
 Compute the cross-covariance matrix between `fx` and `gx`.
 
 ```jldoctest
-julia> f = GP(Matern32());
+julia> f = GP(Matern32Kernel());
 
 julia> x1 = randn(11);
 
