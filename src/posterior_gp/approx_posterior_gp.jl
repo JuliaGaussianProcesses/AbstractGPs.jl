@@ -9,6 +9,13 @@ end
 
 LinearAlgebra.Symmetric(X::Diagonal) = X
 
+
+"""
+    approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
+
+Compute the optimal approximate posterior [1] over the process `f`, given observations `y`
+of `f` at `x`, and inducing points `u`, where `u = f(z)` for some inducing inputs `z`.
+"""
 function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     U_y = cholesky(Symmetric(fx.Σy)).U
     U = cholesky(Symmetric(cov(u))).U

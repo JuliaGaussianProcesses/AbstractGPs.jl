@@ -1,6 +1,3 @@
-"""
-    PosteriorGP{Tprior, Tdata} <: AbstractGP
-"""
 struct PosteriorGP{Tprior, Tdata} <: AbstractGP
     prior::Tprior
     data::Tdata
