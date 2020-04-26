@@ -7,9 +7,6 @@ struct ApproxPosteriorGP{Tapprox, Tprior, Tdata} <: AbstractGP
     data::Tdata
 end
 
-LinearAlgebra.Symmetric(X::Diagonal) = X
-
-
 """
     approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
 
@@ -25,6 +22,13 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
     m_ε = Λ_ε \ (B_εf * b_y)
     return ApproxPosteriorGP(VFE(), fx.f, (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, z=u.x))
 end
+
+# Blatant act of type piracy against LinearAlgebra.
+LinearAlgebra.Symmetric(X::Diagonal) = X
+
+
+
+# AbstractGP API implementation.
 
 function Statistics.mean(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     return mean(f.prior, x) + cov(f.prior, x, f.data.z) * f.data.α

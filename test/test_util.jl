@@ -138,71 +138,65 @@ end
 """
     abstractgp_interface_tests(
         f::AbstractGP,
-        f′::AbstractGP,
-        x0::AbstractVector,
-        x1::AbstractVector,
-        x2::AbstractVector,
-        x3::AbstractVector;
-        atol=1e-9, rtol=1e-9,
+        x::AbstractVector,
+        z::AbstractVector;
+        atol=1e-12,
     )
 
 Check that the `AbstractGP` interface is at least implemented for `f` and is
-self-consistent. `x0` and `x1` must be valid inputs for `f`. `x2` and `x3` must be a valid
-input for `f′`.
+self-consistent. `x` and `z` must be valid inputs for `f`. For tests to pass, the minimum
+eigenvalue of `cov(f, x)` must be greater than `-eig_tol`.
 """
 function abstractgp_interface_tests(
     f::AbstractGP,
-    f′::AbstractGP,
-    x0::AbstractVector,
-    x1::AbstractVector,
-    x2::AbstractVector,
-    x3::AbstractVector;
-    atol=1e-9, rtol=1e-9,
+    x::AbstractVector,
+    z::AbstractVector;
+    eig_tol=1e-12,
 )
-    m = mean_vector(f, x0)
+    @assert length(x) ≠ length(z)
+
+    # Verify that `mean` works and is the correct length and type.
+    m = mean(f, x)
     @test m isa AbstractVector{<:Real}
-    @test length(m) == length(x0)
+    @test length(m) == length(x)
 
-    @assert length(x0) ≠ length(x1)
-    @assert length(x0) ≠ length(x2)
-    @assert length(x0) == length(x3)
+    # Verify that cov(f, x, z) works, is the correct size and type.
+    C_xy = cov(f, x, z)
+    @test C_xy isa AbstractMatrix{<:Real}
+    @test size(C_xy) == (length(x), length(z))
 
-    # Check that binary cov conforms to the API
-    K_ff′_x0_x2 = cov(f, f′, x0, x2)
-    @test K_ff′_x0_x2 isa AbstractMatrix{<:Real}
-    @test size(K_ff′_x0_x2) == (length(x0), length(x2))
-    @test K_ff′_x0_x2 ≈ cov(f′, f, x2, x0)'
+    # Reversing arguments transposes the return.
+    @test C_xy ≈ cov(f, z, x)'
 
-    # Check that unary cov is consistent with binary cov and conforms to the API
-    K_x0 = cov(f, x0)
-    @test K_x0 isa AbstractMatrix{<:Real}
-    @test size(K_x0) == (length(x0), length(x0))
-    @test K_x0 ≈ cov(f, f, x0, x0) atol=atol rtol=rtol
-    @test minimum(eigvals(K_x0)) > -atol
-    @test K_x0 ≈ K_x0' atol=atol rtol=rtol
+    # Verify cov(f, x) works, is the correct size and type.
+    C_xx = cov(f, x)
+    @test size(C_xx) == (length(x), length(x))
 
-    # Check that single-process binary cov is consistent with binary-process binary-cov
-    K_x0_x1 = cov(f, x0, x1)
-    @test K_x0_x1 isa AbstractMatrix{<:Real}
-    @test size(K_x0_x1) == (length(x0), length(x1))
-    @test K_x0_x1 ≈ cov(f, f, x0, x1)
+    # Check that C_xx is positive definite.
+    @test minimum(eigvals(Symmetric(C_xx))) > -eig_tol
 
-    # Check that binary cov_diag conforms to the API and is consistent with binary cov
-    K_x0_x3_diag = cov_diag(f, f′, x0, x3)
-    @test K_x0_x3_diag isa AbstractVector{<:Real}
-    @test length(K_x0_x3_diag) == length(x0)
-    @test K_x0_x3_diag ≈ diag(cov(f, f′, x0, x3)) atol=atol rtol=rtol
-    @test K_x0_x3_diag ≈ cov_diag(f′, f, x3, x0) atol=atol rtol=rtol
+    # Check that C_xx is consistent with cov(f, x, x).
+    @test C_xx ≈ cov(f, x, x)
 
-    # Check that unary-binary cov_diag is consistent.
-    K_x0_x0_diag = cov_diag(f, x0, x0)
-    @test K_x0_x0_diag isa AbstractVector{<:Real}
-    @test length(K_x0_x0_diag) == length(x0)
-    @test K_x0_x0_diag ≈ diag(cov(f, x0, x0)) atol=atol rtol=rtol
+    # Check that cov_diag works, is the correct size and type.
+    C_xx_diag = cov_diag(f, x)
+    @test C_xx_diag isa AbstractVector{<:Real}
+    @test length(C_xx_diag) == length(x)
 
-    # Check that unary cov_diag conforms to the API and is consistent with unary cov
-    K_x0_diag = cov_diag(f, x0)
-    @test K_x0_diag isa AbstractVector{<:Real}
-    @test length(K_x0_diag) == length(x0)
-    @test K_x0_diag ≈ diag(cov(f, x0)) atol=atol rtol=rtol
+    # Check C_xx_diag is consistent with cov(f, x).
+    @test C_xx_diag ≈ diag(C_xx)
+
+    # Check that mean_and_cov is consistent.
+    let
+        m, C = mean_and_cov(f, x)
+        @test m ≈ mean(f, x)
+        @test C ≈ cov(f, x)
+    end
+
+    # Check that mean_and_cov_diag is consistent.
+    let
+        m, c = mean_and_cov_diag(f, x)
+        @test m ≈ mean(f, x)
+        @test c ≈ cov_diag(f, x)
+    end
 end

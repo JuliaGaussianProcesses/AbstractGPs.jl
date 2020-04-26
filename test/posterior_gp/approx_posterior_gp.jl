@@ -25,21 +25,8 @@
     @test mean(f_post, x_test) ≈ mean(f_approx_post, x_test)
     @test cov(f_post, x_test) ≈ cov(f_approx_post, x_test)
 
-    # Verify that appoximate posterior is self-consistent.
+    # Verify that AbstractGP interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))
     b = randn(rng, N_b)
-    @test cov_diag(f_approx_post, a) ≈ diag(cov(f_approx_post, a))
-    @test cov(f_approx_post, a) ≈ cov(f_approx_post, a, a)
-    @test cov(f_approx_post, a, b) ≈ cov(f_approx_post, b, a)'
-
-    let
-        m, C = mean_and_cov(f_approx_post, a)
-        @test m ≈ mean(f_approx_post, a)
-        @test C ≈ cov(f_approx_post, a)
-    end
-    let
-        m, c = mean_and_cov_diag(f_approx_post, a)
-        @test m ≈ mean(f_approx_post, a)
-        @test c ≈ cov_diag(f_approx_post, a)
-    end
+    abstractgp_interface_tests(f_approx_post, a, b)
 end

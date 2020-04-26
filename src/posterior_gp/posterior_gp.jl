@@ -17,9 +17,8 @@ end
 
 
 
-#
-# Implementation of the AbstractGP API.
-#
+
+# AbstractGP API implementation.
 
 function Statistics.mean(f::PosteriorGP, x::AbstractVector)
     return mean(f.prior, x) + cov(f.prior, x, f.data.x) * f.data.α

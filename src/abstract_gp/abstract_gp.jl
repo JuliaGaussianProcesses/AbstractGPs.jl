@@ -36,7 +36,7 @@ Statistics.cov(::AbstractGP, x::AbstractVector, y::AbstractVector)
 Compute both `mean(f(x))` and `cov(f(x))`. Sometimes more efficient than separately
 computation, particularly for posteriors.
 """
-mean_and_cov(::PosteriorGP, ::AbstractVector)
+mean_and_cov(::AbstractGP, ::AbstractVector)
 
 """
     mean_and_cov_diag(f::AbstractGP, x::AbstractVector)
@@ -44,4 +44,4 @@ mean_and_cov(::PosteriorGP, ::AbstractVector)
 Compute both `mean(f(x))` and the diagonal elements of `cov(f(x))`. Sometimes more efficient
 than separately computation, particularly for posteriors.
 """
-mean_and_cov_diag(f::PosteriorGP, x::AbstractVector)
+mean_and_cov_diag(f::AbstractGP, x::AbstractVector)
