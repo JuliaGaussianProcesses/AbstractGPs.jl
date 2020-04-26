@@ -210,8 +210,8 @@ end
 """
    elbo(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
 
-The saturated Titsias Evidence LOwer Bound (ELBO) [1]. `y` are observations of `f`, and `u`
-are pseudo-points.
+The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `f`, and `u`
+are pseudo-points, where `u = f(z)` for some `z`.
 
 ```jldoctest
 julia> f = GP(Matern52Kernel());
