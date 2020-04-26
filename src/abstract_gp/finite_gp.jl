@@ -49,9 +49,6 @@ Compute the covariance matrix of `fx`.
 julia> f = GP(Matern52Kernel());
 
 julia> x = randn(11);
-
-julia> # Noise-free
-
 julia> cov(f(x)) == kernelmatrix(Matern52Kernel(), x)
 true
 ```

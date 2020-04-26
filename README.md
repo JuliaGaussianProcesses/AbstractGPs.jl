@@ -16,6 +16,8 @@ using AbstractGPs, KernelFunctions, Random
 # Construct a zero-mean Gaussian process with a matern-3/2 kernel.
 f = GP(Matern32Kernel())
 
+rng = MersenneTwister(0)
+
 # Specify some input locations.
 x = randn(rng, 10)
 
