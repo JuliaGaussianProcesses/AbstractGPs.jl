@@ -57,8 +57,6 @@ GP(mean, kernel::Kernel) = GP(CustomMean(mean), kernel)
 GP(mean::Real, kernel::Kernel) = GP(ConstMean(mean), kernel)
 GP(kernel::Kernel) = GP(ZeroMean(), kernel)
 
-(f::GP)(x...) = FiniteGP(f, x...)
-
 
 
 # AbstractGP interface implementation.

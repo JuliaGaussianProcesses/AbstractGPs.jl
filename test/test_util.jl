@@ -151,7 +151,8 @@ function abstractgp_interface_tests(
     f::AbstractGP,
     x::AbstractVector,
     z::AbstractVector;
-    eig_tol=1e-12,
+    eig_tol::Real=1e-12,
+    σ²::Real=1e-9,
 )
     @assert length(x) ≠ length(z)
 
@@ -199,4 +200,22 @@ function abstractgp_interface_tests(
         @test m ≈ mean(f, x)
         @test c ≈ cov_diag(f, x)
     end
+
+    # Construct a FiniteGP, and check that all standard methods defined on it at least run.
+    fx = f(x, σ²)
+    fz = f(z, σ²)
+    @test mean(fx) ≈ mean(f, x)
+    @test cov(fx) ≈ cov(f, x) + fx.Σy
+    @test cov(fx, fz) ≈ cov(f, x, z)
+    @test first(mean_and_cov(fx)) ≈ mean(f, x)
+    @test last(mean_and_cov(fx)) ≈ cov(f, x)
+    @test mean.(marginals(fx)) ≈ mean(f, x)
+    @test var.(marginals(fx)) ≈ cov_diag(f, x) .+ diag(fx.Σy)
+
+    # Generate, compute logpdf, compare against VFE and DTC.
+    y = rand(fx)
+    @test length(y) == length(x)
+    @test logpdf(fx, y) isa Real
+    @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
+    @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
 end

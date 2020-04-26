@@ -20,6 +20,8 @@ FiniteGP(f::AbstractGP, x::AbstractVector) = FiniteGP(f, x, 1e-18)
 
 Base.length(f::FiniteGP) = length(f.x)
 
+(f::AbstractGP)(x...) = FiniteGP(f, x...)
+
 """
     mean(fx::FiniteGP)
 
