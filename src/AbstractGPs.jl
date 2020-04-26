@@ -8,7 +8,7 @@ module AbstractGPs
     using Statistics
 
     export GP, mean, cov, cov_diag, mean_and_cov, mean_and_cov_diag, marginals, rand,
-        logpdf, elbo, dtc, posterior, approx_posterior
+        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))
