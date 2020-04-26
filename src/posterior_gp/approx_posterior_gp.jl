@@ -28,7 +28,7 @@ LinearAlgebra.Symmetric(X::Diagonal) = X
 
 
 
-# AbstractGP API implementation.
+# AbstractGP interface implementation.
 
 function Statistics.mean(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     return mean(f.prior, x) + cov(f.prior, x, f.data.z) * f.data.α

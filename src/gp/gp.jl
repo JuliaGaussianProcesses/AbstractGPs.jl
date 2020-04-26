@@ -61,7 +61,7 @@ GP(kernel::Kernel) = GP(ZeroMean(), kernel)
 
 
 
-# AbstractGP API implementation.
+# AbstractGP interface implementation.
 
 Statistics.mean(f::GP, x::AbstractVector) = map(f.mean, x)
 
