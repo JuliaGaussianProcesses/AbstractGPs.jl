@@ -12,6 +12,10 @@ end
 
 Compute the optimal approximate posterior [1] over the process `f`, given observations `y`
 of `f` at `x`, and inducing points `u`, where `u = f(z)` for some inducing inputs `z`.
+
+[1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
+processes". In: Proceedings of the Twelfth International Conference on Artificial
+Intelligence and Statistics. 2009.
 """
 function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     U_y = cholesky(Symmetric(fx.Σy)).U
