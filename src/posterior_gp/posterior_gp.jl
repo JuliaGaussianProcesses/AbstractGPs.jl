@@ -7,7 +7,10 @@ end
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
 
 Constructs the posterior distribution over `fx.f` given observations `y` at `x` made under
-noise `fx.Σ`. This is another `AbstractGP` object.
+noise `fx.Σ`. This is another `AbstractGP` object. See chapter 2 of [1] for a recap on
+exact inference in GPs.
+
+
 """
 function posterior(fx::FiniteGP, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(fx)
