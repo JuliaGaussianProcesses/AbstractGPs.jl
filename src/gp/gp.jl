@@ -1,7 +1,7 @@
 """
     GP{Tm<:MeanFunction, Tk<:Kernel}
 
-A Gaussian Process (GP) with known `mean` and `kernel`.
+A Gaussian Process (GP) with known `mean` and `kernel`. See e.g. [1] for an introduction.
 
 # Zero Mean
 If only one argument is provided, assume the mean to be zero everywhere:
@@ -47,6 +47,9 @@ true
 julia> cov(f(x)) == kernelmatrix(Matern32Kernel(), x)
 true
 ```
+
+[1] - C. E. Rasmussen and C. Williams. "Gaussian processes for machine learning". MIT Press.
+2006.
 """
 struct GP{Tm<:MeanFunction, Tk<:Kernel} <: AbstractGP
     mean::Tm

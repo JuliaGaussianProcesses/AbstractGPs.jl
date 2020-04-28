@@ -6,7 +6,8 @@ end
 """
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
 
-Return the posterior over the process `f` produced by conditioning `f` at `x` on `y`.
+Constructs the posterior distribution over `fx.f` given observations `y` at `x` made under
+noise `fx.Σ`. This is another `AbstractGP` object.
 """
 function posterior(fx::FiniteGP, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(fx)
@@ -14,7 +15,6 @@ function posterior(fx::FiniteGP, y::AbstractVector{<:Real})
     α = C \ (y - m)
     return PosteriorGP(fx.f, (α=α, C=C, x=fx.x))
 end
-
 
 
 
