@@ -24,5 +24,5 @@ module AbstractGPs
     # Efficient exact and approximate posterior GP implementations.
     include(joinpath("posterior_gp", "posterior_gp.jl"))
     include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
-
+    include(joinpath("posterior_gp", "sequential_conditioning.jl"))
 end # module
