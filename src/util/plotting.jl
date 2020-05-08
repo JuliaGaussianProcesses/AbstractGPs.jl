@@ -1,9 +1,9 @@
 using RecipesBase
 
-@recipe f(gp::AbstractGPs.AbstractGP, x::Array) = gp(x)
-@recipe f(gp::AbstractGPs.AbstractGP, x::AbstractRange) = gp(x)
-@recipe f(gp::AbstractGPs.AbstractGP, xmin::Number, xmax::Number) = (gp, range(xmin, xmax, length=1000))
-@recipe function f(gp::AbstractGPs.FiniteGP; samples=0, sample_seriestype=:line)
+@recipe f(gp::AbstractGP, x::Array) = gp(x)
+@recipe f(gp::AbstractGP, x::AbstractRange) = gp(x)
+@recipe f(gp::AbstractGP, xmin::Number, xmax::Number) = (gp, range(xmin, xmax, length=1000))
+@recipe function f(gp::FiniteGP; samples=0, sample_seriestype=:line)
     x = gp.x
     f = gp.f
     ms = marginals(gp)

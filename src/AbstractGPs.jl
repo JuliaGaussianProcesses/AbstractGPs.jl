@@ -12,7 +12,6 @@ module AbstractGPs
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))
-    include(joinpath("util", "plotting.jl"))
 
     # AbstractGP interface and FiniteGP interface.
     include(joinpath("abstract_gp", "abstract_gp.jl"))
@@ -26,4 +25,6 @@ module AbstractGPs
     include(joinpath("posterior_gp", "posterior_gp.jl"))
     include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
 
+    # Plotting utilities.
+    include(joinpath("util", "plotting.jl"))
 end # module
