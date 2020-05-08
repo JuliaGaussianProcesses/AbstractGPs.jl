@@ -3,13 +3,19 @@ function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(fx)
     C1 = cholesky(Symmetric(C_mat))
     C2 = cholesky(Symmetric(cov(fx.f, fx.f.data.x)))
+
+    #TODO: CHeck if we always need to take covariance w.r.t to previous posterior.
     C_new = update_chol(C2.U, C_mat, cov(fx.f, fx.x, fx.f.data.x))
+    #TODO: Better way to get Cholesky struct from the decomposition.
     C_new = cholesky(C_new * C_new')
     α = fx.f.data.α
     α1 = C1 \ (y - m)
+    #TODO: Is it right to append old alphas with new?
     append!(α, α1)
     x = fx.f.data.x
     append!(x, fx.x)
+
+    #TODO: Should we create a fresh PosteriorGP or keep the chain?
     return PosteriorGP(fx.f.prior , (α=α, C=C_new, x=x))
 end
 
