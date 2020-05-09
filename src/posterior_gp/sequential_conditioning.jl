@@ -8,14 +8,6 @@ function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
     C22 = cov(fx.f.prior, fx.x)
     #TODO: Check if we always need to take covariance w.r.t to previous posterior
 
-    # TEST START
-    Base.show(stdout, "text/plain", C11)
-    println()
-    Base.show(stdout, "text/plain", C22)
-    println()
-
-    # TEST END
-
     U = update_chol(U11, C12, C22)
     #TODO: Better way to get Cholesky struct from the decomposition.
     chol = cholesky(U' * U)
@@ -25,15 +17,6 @@ function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
     α = chol \ y_m
     x = vcat(fx.f.data.x, fx.x)
     return PosteriorGP(fx.f.prior , (α=α, C=chol, x=x))
-    # α = fx.f.data.α
-    # α1 = C1 \ (y - m)
-    # #TODO: Is it right to append old alphas with new?
-    # append!(α, α1)
-    # x = fx.f.data.x
-    # append!(x, fx.x)
-
-    # #TODO: Should we create a fresh PosteriorGP or keep the chain?
-    # return PosteriorGP(fx.f.prior , (α=α, C=C_new, x=x))
 end
 
 """
