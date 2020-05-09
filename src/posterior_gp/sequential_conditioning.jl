@@ -5,10 +5,9 @@ function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
     C11 = fx.f.data.C.U' * fx.f.data.C.U
     U11 = fx.f.data.C.U
     C12 = cov(fx.f.prior, fx.f.data.x, fx.x)
-    C22 = cov(fx.f.prior, fx.x)
-    #TODO: Check if we always need to take covariance w.r.t to previous posterior
-
+    C22 = cov(fx.f.prior, fx.x) + fx.Σy
     U = update_chol(U11, C12, C22)
+
     #TODO: Better way to get Cholesky struct from the decomposition.
     chol = cholesky(U' * U)
 
