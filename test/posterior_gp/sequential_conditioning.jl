@@ -6,13 +6,11 @@
         # Tests on posterior
 
         f1 = GP(SqExponentialKernel())
-        fx1 = f1(X[1:3])
-        p_fx1 = posterior(fx1, y[1:3])
-        p_p_fx1 = posterior(p_fx1(X[4:5]), y[4:5])
+        p_fx1 = posterior(f1(X[1:3], 0.1), y[1:3])
+        p_p_fx1 = posterior(p_fx1(X[4:5], 0.1), y[4:5])
 
         f2 = GP(SqExponentialKernel())
-        fx2 = f2(X)
-        p_fx2 = posterior(fx2, y)
+        p_fx2 = posterior(f2(X, 0.1), y)
 
         @test p_p_fx1.data.C.U ≈ p_fx2.data.C.U atol=1e-5
         @test p_p_fx1.data.α ≈ p_fx2.data.α atol=1e-5
