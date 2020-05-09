@@ -1,6 +1,6 @@
 
 function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
-    m2, C22 = mean_and_cov(fx)
+    m2 = mean(fx.f.prior, fx.x)
     y2_m2 = y - m2
     C11 = fx.f.data.C.U' * fx.f.data.C.U
     U11 = fx.f.data.C.U

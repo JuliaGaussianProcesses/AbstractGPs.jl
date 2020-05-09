@@ -3,7 +3,7 @@
     y = rand(5)
 
     f1 = GP(SqExponentialKernel())
-    fx1 = f(X[1:3], 0.1)
+    fx1 = f1(X[1:3], 0.1)
     p_fx1 = posterior(fx1, y[1:3])
     p_p_fx1 = posterior(p_fx1(X[4:5]), y[4:5])
 
@@ -16,7 +16,7 @@
 
 
     f2 = GP(SqExponentialKernel())
-    fx2 = f(X, 0.1)
+    fx2 = f2(X, 0.1)
     p_fx2 = posterior(fx2, y)
     Base.show(stdout, "text/plain", p_fx2.data.C.U)
     println()
