@@ -22,7 +22,7 @@ include("test_util.jl")
     @testset "posterior_gp" begin
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
-        include(joinpath("posterior_gp", "sequential_conditioning.jl.jl"))
+        include(joinpath("posterior_gp", "sequential_conditioning.jl"))
     end
     @testset "doctests" begin
         DocMeta.setdocmeta!(
