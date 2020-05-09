@@ -20,23 +20,29 @@ function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
 end
 
 """
-     update_chol!(chol, Kttq, Ktt0)
+     update_chol(U11::UpperTriangular, C12::AbstractMatrix, C22::AbstractMatrix)
+
+Let `C` be the positive definite matrix comprising blocks
+```julia
+C = [C11 C12;
+     C21 C22]
+```
+with upper-triangular cholesky factorisation comprising blocks
+```julia
+U = [U11 U12;
+     0   U22]
+```
+where `U11` and `U22` are themselves upper-triangular, and `U11 = cholesky(C11).U`.
+update_chol computes the UpperTriangular matrix `U` given `U11`, `C12`, and `C22`.
 
 ## Arguments
-
-     - chol::UpperTriangular:    The cholesky decomposition of K_{0:t-1}+  I*Q
-     - Kttq::AbstractMatrix:     The covariance matrix K_tt + I*Q
-     - Ktt0::AbstractMatrix:     The covariance matrix Kt,0:t-1
-
-
-Returns the updated cholesky decomposition of K_{0:t} + I*Q
-
+     - U11::UpperTriangular: The cholesky decomposition C11
+     - C12::AbstractMatrix: matrix of size (size(U11, 1), size(C22, 1))
+     - C22::AbstractMatrix: positive-definite matrix
 """
-
-## Function for the update of the Cholesky decomposition - only increasing
-function update_chol(chol::UpperTriangular, Kttq::AbstractMatrix, Ktt0::AbstractMatrix)
-    S21 = Ktt0/chol
-    S12 = S21'
-    S22 = cholesky(Kttq - S21*S12).U
-    return UpperTriangular([ chol S12; S21 S22])
+function update_chol(U11::UpperTriangular, C12::AbstractMatrix, C22::AbstractMatrix)
+    U12 = U11' \ C12
+    U22 = cholesky(Symmetric(C22 - U12'U12)).U
+    return UpperTriangular([U11 U12; zero(U12') U22])
 end
+
