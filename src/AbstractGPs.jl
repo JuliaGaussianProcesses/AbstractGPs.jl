@@ -12,6 +12,7 @@ module AbstractGPs
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))
+    include(joinpath("util", "update_chol.jl"))
 
     # AbstractGP interface and FiniteGP interface.
     include(joinpath("abstract_gp", "abstract_gp.jl"))
@@ -24,5 +25,5 @@ module AbstractGPs
     # Efficient exact and approximate posterior GP implementations.
     include(joinpath("posterior_gp", "posterior_gp.jl"))
     include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
-    include(joinpath("posterior_gp", "sequential_conditioning.jl"))
+
 end # module
