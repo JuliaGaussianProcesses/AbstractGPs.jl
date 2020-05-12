@@ -29,7 +29,8 @@ end
 """
     posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
 
-Constructs the posterior distribution over `fx.f` when f is itself a `PosteriorGP`.
+Constructs the posterior distribution over `fx.f` when `f` is itself a `PosteriorGP` by updating the cholesky factorisation of the covariance matrix and avoiding recomputing it from original covariance matrix. It does this by using `update_chol` functionality.
+
 Other aspects are similar to a regular posterior.
 """
 function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
