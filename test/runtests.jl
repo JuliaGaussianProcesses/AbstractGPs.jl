@@ -10,6 +10,7 @@ include("test_util.jl")
 @testset "AbstractGPs" begin
     @testset "util" begin
         include(joinpath("util", "common_covmat_ops.jl"))
+        include(joinpath("util", "plotting.jl"))
     end
     @testset "abstract_gp" begin
         include(joinpath("abstract_gp", "abstract_gp.jl"))

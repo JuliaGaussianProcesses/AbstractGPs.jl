@@ -16,23 +16,49 @@ using RecipesBase
         linewidth --> 2
         x, μ
     end
+end
 
-    if samples>0
-        @series begin
-            samples = rand(f(x, 1e-9), samples)
+"""
+    f(
+        gp::FiniteGP;
+        samples = 1,
+        sample_seriestype = :line,
+        linealpha=0.2,
+        markershape=:circle,
+        markerstrokewidth=0.0,
+        markersize=0.5,
+        markeralpha=0.3,
+        seriescolor="red"
+    )
+"""
+sampleplot
 
-            seriestype --> sample_seriestype
+@userplot SamplePlot
+@recipe function f(sp::SamplePlot;
+        samples = 1,
+        sample_seriestype = :line,
+        linealpha=0.2,
+        markershape=:circle,
+        markerstrokewidth=0.0,
+        markersize=0.5,
+        markeralpha=0.3,
+        seriescolor="red"
+    )
+    x = sp.args[1].x
+    f = sp.args[1].f
+    @series begin
+        samples = rand(f(x, 1e-9), samples)
 
-            linealpha := 0.2
+        seriestype --> sample_seriestype
+        linealpha := linealpha
+        markershape --> markershape
+        markerstrokewidth --> markerstrokewidth
+        markersize --> markersize
+        markeralpha --> markeralpha
+        seriescolor --> seriescolor
+        label := ""
 
-            markershape --> :circle
-            markerstrokewidth --> 0.0
-            markersize --> 0.5
-            markeralpha --> 0.3
-            seriescolor --> "red"
-            label := ""
-
-            x, samples
-        end
+        x, samples
     end
 end
+
