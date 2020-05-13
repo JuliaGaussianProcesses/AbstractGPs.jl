@@ -3,6 +3,8 @@ using Documenter
 using KernelFunctions
 using LinearAlgebra
 using Random
+using RecipesBase
+using Plots
 using Test
 
 include("test_util.jl")
