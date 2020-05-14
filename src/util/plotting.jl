@@ -18,13 +18,26 @@ using RecipesBase
     end
 end
 
+"""
+    sampleplot(GP::FiniteGP, samples)
+
+Plot samples from the given `FiniteGP`.
+
+# Example
+```julia
+f = GP(SqExponentialKernel())
+sampleplot(f(rand(10), 10; markersize=5)
+```
+The given example plots 10 samples from the given `FiniteGP`. The `markersize` is modified from default of 0.5 to 10.
+"""
 @userplot SamplePlot
 @recipe function f(sp::SamplePlot)
     x = sp.args[1].x
     f = sp.args[1].f
+    samples = sp.args[2]
     @series begin
         samples = rand(f(x, 1e-9), samples)
-        seriestype --> sample_seriestype
+        seriestype --> :line
         linealpha --> 0.2
         markershape --> :circle
         markerstrokewidth --> 0.0
