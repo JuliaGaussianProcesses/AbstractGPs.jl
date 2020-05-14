@@ -22,15 +22,34 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
     U = cholesky(Symmetric(cov(u))).U
     B_εf = U' \ (U_y' \ cov(fx, u))'
     b_y = U_y' \ (y - mean(fx))
-    Λ_ε = cholesky(Symmetric(B_εf * B_εf' + I))
+    D = B_εf * B_εf' + I
+    Λ_ε = cholesky(Symmetric(D))
     m_ε = Λ_ε \ (B_εf * b_y)
-    return ApproxPosteriorGP(VFE(), fx.f, (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, z=u.x))
+    return ApproxPosteriorGP(VFE(), fx.f, (m_ε=m_ε, D=D, U=U, α=U \ m_ε, z=u.x, b_y=b_y, B_εf=B_εf))
+end
+
+function update_approx_posterior(f_post_approx::ApproxPosteriorGP, fx::FiniteGP, y::AbstractVector{<:Real})
+    U_y₂ = cholesky(Symmetric(fx.Σy)).U
+    b_y = vcat(f_post_approx.data.b_y, U_y₂ \ (y - mean(fx)))
+    U = f_post_approx.data.U
+    z = f_post_approx.data.z
+    B_εf₂ = U' \ (U_y₂' \ cov(fx.f, fx.x, z))'
+    B_εf = hcat(f_post_approx.data.B_εf, B_εf₂)
+    D = f_post_approx.data.D +  B_εf₂ * B_εf₂'
+    Λ_ε = cholesky(Symmetric(D))
+    m_ε = Λ_ε \ (B_εf * b_y)
+
+    return ApproxPosteriorGP(VFE(), fx.f,
+                             (m_ε=m_ε,
+                              D=D,
+                              U=f_post_approx.data.U,
+                              α=f_post_approx.data.U \ m_ε,
+                              z=f_post_approx.data.z,
+                              b_y=b_y, B_εf=B_εf))
 end
 
 # Blatant act of type piracy against LinearAlgebra.
 LinearAlgebra.Symmetric(X::Diagonal) = X
-
-
 
 # AbstractGP interface implementation.
 
