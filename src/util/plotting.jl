@@ -3,7 +3,7 @@ using RecipesBase
 @recipe f(gp::AbstractGP, x::Array) = gp(x)
 @recipe f(gp::AbstractGP, x::AbstractRange) = gp(x)
 @recipe f(gp::AbstractGP, xmin::Number, xmax::Number) = (gp, range(xmin, xmax, length=1000))
-@recipe function f(gp::FiniteGP; samples=0, sample_seriestype=:line)
+@recipe function f(gp::FiniteGP)
     x = gp.x
     f = gp.f
     ms = marginals(gp)
@@ -17,21 +17,6 @@ using RecipesBase
         x, μ
     end
 end
-
-"""
-    f(
-        gp::FiniteGP;
-        samples = 1,
-        sample_seriestype = :line,
-        linealpha=0.2,
-        markershape=:circle,
-        markerstrokewidth=0.0,
-        markersize=0.5,
-        markeralpha=0.3,
-        seriescolor="red"
-    )
-"""
-sampleplot
 
 @userplot SamplePlot
 @recipe function f(sp::SamplePlot;
