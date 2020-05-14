@@ -46,11 +46,14 @@
         p_fx2 = approx_posterior(VFE(), f(X, 0.1), y, f(Z))
 
 
+        @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol=1e-5
+        @test u_p_fx1.data.Λ_ε ≈ p_fx2.data.Λ_ε atol=1e-5
+        @test u_p_fx1.data.U ≈ p_fx2.data.U atol=1e-5
+        @test u_p_fx1.data.α ≈ p_fx2.data.α atol=1e-5
+        @test u_p_fx1.data.z ≈ p_fx2.data.z atol=1e-5
         @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol=1e-5
         @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol=1e-5
-        @test u_p_fx1.data.U ≈ p_fx2.data.U atol=1e-5
-        @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol=1e-5
         @test u_p_fx1.data.D ≈ p_fx2.data.D atol=1e-5
-        @test u_p_fx1.data.α ≈ p_fx2.data.α atol=1e-5
+
     end
 end

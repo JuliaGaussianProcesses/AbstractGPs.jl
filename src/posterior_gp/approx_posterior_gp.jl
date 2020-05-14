@@ -25,9 +25,25 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
     D = B_εf * B_εf' + I
     Λ_ε = cholesky(Symmetric(D))
     m_ε = Λ_ε \ (B_εf * b_y)
-    return ApproxPosteriorGP(VFE(), fx.f, (m_ε=m_ε, D=D, U=U, α=U \ m_ε, z=u.x, b_y=b_y, B_εf=B_εf))
+    return ApproxPosteriorGP(VFE(), fx.f,
+                             (m_ε=m_ε,
+                              Λ_ε=Λ_ε,
+                              U=U,
+                              α=U \ m_ε,
+                              z=u.x,
+                              b_y=b_y,
+                              B_εf=B_εf,
+                              D=D))
 end
 
+"""
+    update_approx_posterior(f_post_approx::ApproxPosteriorGP,
+                            fx::FiniteGP,
+                            y::AbstractVector{<:Real})
+
+#TODO
+
+"""
 function update_approx_posterior(f_post_approx::ApproxPosteriorGP, fx::FiniteGP, y::AbstractVector{<:Real})
     U_y₂ = cholesky(Symmetric(fx.Σy)).U
     b_y = vcat(f_post_approx.data.b_y, U_y₂ \ (y - mean(fx)))
@@ -38,14 +54,16 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP, fx::FiniteGP,
     D = f_post_approx.data.D +  B_εf₂ * B_εf₂'
     Λ_ε = cholesky(Symmetric(D))
     m_ε = Λ_ε \ (B_εf * b_y)
-
+    α = U \ m_ε
     return ApproxPosteriorGP(VFE(), fx.f,
                              (m_ε=m_ε,
-                              D=D,
-                              U=f_post_approx.data.U,
-                              α=f_post_approx.data.U \ m_ε,
-                              z=f_post_approx.data.z,
-                              b_y=b_y, B_εf=B_εf))
+                              Λ_ε=Λ_ε,
+                              U=U,
+                              α=α,
+                              z=z,
+                              b_y=b_y,
+                              B_εf=B_εf,
+                              D=D))
 end
 
 # Blatant act of type piracy against LinearAlgebra.
