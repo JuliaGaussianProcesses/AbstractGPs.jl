@@ -47,7 +47,7 @@
 
 
         @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol=1e-5
-        @test u_p_fx1.data.Λ_ε ≈ p_fx2.data.Λ_ε atol=1e-5
+        @test u_p_fx1.data.Λ_ε.U ≈ p_fx2.data.Λ_ε.U atol=1e-5
         @test u_p_fx1.data.U ≈ p_fx2.data.U atol=1e-5
         @test u_p_fx1.data.α ≈ p_fx2.data.α atol=1e-5
         @test u_p_fx1.data.z ≈ p_fx2.data.z atol=1e-5
