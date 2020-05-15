@@ -33,7 +33,10 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
                               z=u.x,
                               b_y=b_y,
                               B_εf=B_εf,
-                              D=D))
+                              D=D,
+                              y=y,
+                              Σy=fx.Σy,
+                              ))
 end
 
 """
@@ -44,8 +47,12 @@ end
 #TODO
 
 """
-function update_approx_posterior(f_post_approx::ApproxPosteriorGP, fx::FiniteGP, y::AbstractVector{<:Real})
+function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
+                                 fx::FiniteGP,
+                                 y::AbstractVector{<:Real})
     U_y₂ = cholesky(Symmetric(fx.Σy)).U
+    temp = zeros(size(f_post_approx.data.Σy, 1), size(fx.Σy, 2))
+    Σy = [f_post_approx.data.Σy temp; temp' fx.Σy]
     b_y = vcat(f_post_approx.data.b_y, U_y₂ \ (y - mean(fx)))
     U = f_post_approx.data.U
     z = f_post_approx.data.z
@@ -55,6 +62,7 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP, fx::FiniteGP,
     Λ_ε = cholesky(Symmetric(D))
     m_ε = Λ_ε \ (B_εf * b_y)
     α = U \ m_ε
+    y = vcat(f_post_approx.data.y, y)
     return ApproxPosteriorGP(VFE(), fx.f,
                              (m_ε=m_ε,
                               Λ_ε=Λ_ε,
@@ -63,9 +71,52 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP, fx::FiniteGP,
                               z=z,
                               b_y=b_y,
                               B_εf=B_εf,
-                              D=D))
+                              D=D,
+                              y=y,
+                              Σy=Σy,
+                              ))
 end
 
+function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
+                                 u::FiniteGP)
+    U11 = f_post_approx.data.U
+    C12 = cov(u.f, f_post_approx.data.z, u.x)
+    C22 = Symmetric(cov(u))
+    U = update_chol(Cholesky(U11,'U', 0), C12, C22).U
+    Base.show(stdout, "text/plain", U); println()
+    U22 = U[end-length(u)+1:end, end-length(u)+1:end]
+    Base.show(stdout, "text/plain", U22); println()
+    U12 = U[1:length(f_post_approx.data.z), end-length(u)+1:end]
+    Base.show(stdout, "text/plain", U12); println()
+    B_εf₁ = f_post_approx.data.B_εf
+    Cu1f = cov(u.f, f_post_approx.data.z, f_post_approx.data.y)
+    Cu2f = cov(u.f, u.x, f_post_approx.data.y)
+    U_y = cholesky(Symmetric(f_post_approx.data.Σy)).U
+    @info size(U_y)
+    @info size(Cu1f)
+    @info size(Cu2f)
+    #B_εf₂ = U22' \ (Cu2f * inv(U_y)   - U12' * B_εf₁)
+    B_εf₂ = (U12 \ Cu1f * inv(U_y) + U22' \ Cu2f * inv(U_y))
+    B_εf = vcat(B_εf₁, B_εf₂)
+    D = B_εf * B_εf' + I
+    Λ_ε = cholesky(Symmetric(D))
+    m_ε = Λ_ε \ (B_εf * f_post_approx.data.b_y)
+    α = U \ m_ε
+    z = vcat(f_post_approx.data.z, u.x)
+    return ApproxPosteriorGP(VFE(), f_post_approx.prior,
+                             (
+                              m_ε=m_ε,
+                              Λ_ε=Λ_ε,
+                              U=U,
+                              α=α,
+                              z=z,
+                              b_y=f_post_approx.data.b_y,
+                              B_εf=B_εf,
+                              D=D,
+                              y=f_post_approx.data.y,
+                              Σy=f_post_approx.data.Σy,   
+                             ))
+end
 # Blatant act of type piracy against LinearAlgebra.
 LinearAlgebra.Symmetric(X::Diagonal) = X
 
