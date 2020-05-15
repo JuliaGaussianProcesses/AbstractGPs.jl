@@ -3,7 +3,6 @@ using Documenter
 using KernelFunctions
 using LinearAlgebra
 using Random
-using RecipesBase
 using Plots
 using Test
 

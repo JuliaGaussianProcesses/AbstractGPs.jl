@@ -21,10 +21,11 @@ end
 """
     sampleplot(GP::FiniteGP, samples)
 
-Plot samples from the given `FiniteGP`.
+Plot samples from the given `FiniteGP`. Make sure to run `using Plots` before using this function. 
 
 # Example
 ```julia
+using Plots
 f = GP(SqExponentialKernel())
 sampleplot(f(rand(10), 10; markersize=5)
 ```
