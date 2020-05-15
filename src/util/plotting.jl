@@ -35,9 +35,9 @@ The given example plots 10 samples from the given `FiniteGP`. The `markersize` i
 @recipe function f(sp::SamplePlot)
     x = sp.args[1].x
     f = sp.args[1].f
-    samples = sp.args[2]
+    num_samples = sp.args[2]
     @series begin
-        samples = rand(f(x, 1e-9), samples)
+        samples = rand(f(x, 1e-9), num_samples)
         seriestype --> :line
         linealpha --> 0.2
         markershape --> :circle
