@@ -86,17 +86,12 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
     U22 = U[end-length(u)+1:end, end-length(u)+1:end]
     U12 = U[1:length(f_post_approx.data.z), end-length(u)+1:end]
     B_εf₁ = f_post_approx.data.B_εf
-    
     Cu1f = cov(f_post_approx.prior, f_post_approx.data.z, f_post_approx.data.x)
     Cu2f = cov(f_post_approx.prior, u.x, f_post_approx.data.x)
     U_y = cholesky(Symmetric(f_post_approx.data.Σy)).U
     B_εf₂ = U22' \ (Cu2f * inv(U_y)   - U12' * B_εf₁)
     B_εf = vcat(B_εf₁, B_εf₂)
-    D₁ = f_post_approx.data.D
-    D₂ = B_εf₂ * B_εf₂' + I
-    temp = B_εf₁ * B_εf₂'
-    D = [D₁  temp; temp' D₂]
-    Λ_ε = cholesky(Symmetric(D))
+    Λ_ε = update_chol(f_post_approx.data.Λ_ε, B_εf₁ * B_εf₂', B_εf₂ * B_εf₂' + I)
     m_ε = Λ_ε \ (B_εf * f_post_approx.data.b_y)
     α = U \ m_ε
     z = vcat(f_post_approx.data.z, u.x)
@@ -109,7 +104,7 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
                               z=z,
                               b_y=f_post_approx.data.b_y,
                               B_εf=B_εf,
-                              D=D,
+                              D=Λ_ε.U' * Λ_ε.U,
                               x=f_post_approx.data.x,
                               Σy=f_post_approx.data.Σy,   
                              ))
