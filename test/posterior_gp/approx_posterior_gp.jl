@@ -38,7 +38,7 @@
 
         f = GP(SqExponentialKernel())
 
-        # minibatch learning
+        # online learning
         p_fx1 = approx_posterior(VFE(), f(X[1:7], 0.1), y[1:7], f(Z))
         u_p_fx1 = update_approx_posterior(p_fx1, f(X[8:10], 0.1), y[8:10])
 

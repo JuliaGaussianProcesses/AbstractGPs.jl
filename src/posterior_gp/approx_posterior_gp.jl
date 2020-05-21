@@ -25,31 +25,36 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
     D = B_εf * B_εf' + I
     Λ_ε = cholesky(Symmetric(D))
     m_ε = Λ_ε \ (B_εf * b_y)
-    return ApproxPosteriorGP(VFE(), fx.f,
-                             (m_ε=m_ε,
-                              Λ_ε=Λ_ε,
-                              U=U,
-                              α=U \ m_ε,
-                              z=u.x,
-                              b_y=b_y,
-                              B_εf=B_εf,
-                              D=D,
-                              x=fx.x,
-                              Σy=fx.Σy,
-                              ))
+    cache = (
+        m_ε=m_ε,
+        Λ_ε=Λ_ε,
+        U=U,
+        α=U \ m_ε,
+        z=u.x,
+        b_y=b_y,
+        B_εf=B_εf,
+        D=D,
+        x=fx.x,
+        Σy=fx.Σy,
+    )
+    return ApproxPosteriorGP(VFE(), fx.f, cache)
 end
 
 """
-    update_approx_posterior(f_post_approx::ApproxPosteriorGP,
-                            fx::FiniteGP,
-                            y::AbstractVector{<:Real})
+    function update_approx_posterior(
+        f_post_approx::ApproxPosteriorGP,
+        fx::FiniteGP,
+        y::AbstractVector{<:Real}
+    )
 
 #TODO
 
 """
-function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
-                                 fx::FiniteGP,
-                                 y::AbstractVector{<:Real})
+function update_approx_posterior(
+    f_post_approx::ApproxPosteriorGP,
+    fx::FiniteGP,
+    y::AbstractVector{<:Real}
+)
     U_y₂ = cholesky(Symmetric(fx.Σy)).U
     temp = zeros(size(f_post_approx.data.Σy, 1), size(fx.Σy, 2))
     Σy = [f_post_approx.data.Σy temp; temp' fx.Σy]
@@ -63,22 +68,34 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
     m_ε = Λ_ε \ (B_εf * b_y)
     α = U \ m_ε
     x = vcat(f_post_approx.data.x, fx.x)
-    return ApproxPosteriorGP(VFE(), fx.f,
-                             (m_ε=m_ε,
-                              Λ_ε=Λ_ε,
-                              U=U,
-                              α=α,
-                              z=z,
-                              b_y=b_y,
-                              B_εf=B_εf,
-                              D=D,
-                              x=x,
-                              Σy=Σy,
-                              ))
+    cache = (
+        m_ε=m_ε,
+        Λ_ε=Λ_ε,
+        U=U,
+        α=α,
+        z=z,
+        b_y=b_y,
+        B_εf=B_εf,
+        D=D,
+        x=x,
+        Σy=Σy,
+    )
+    return ApproxPosteriorGP(VFE(), fx.f, cache)
 end
 
-function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
-                                 u::FiniteGP)
+"""
+    function update_approx_posterior(
+        f_post_approx::ApproxPosteriorGP,
+        u::FiniteGP
+    )
+
+#TODO
+
+"""
+function update_approx_posterior(
+    f_post_approx::ApproxPosteriorGP,
+    u::FiniteGP
+)
     U11 = f_post_approx.data.U
     C12 = cov(u.f, f_post_approx.data.z, u.x)
     C22 = Symmetric(cov(u))
@@ -95,19 +112,19 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP,
     m_ε = Λ_ε \ (B_εf * f_post_approx.data.b_y)
     α = U \ m_ε
     z = vcat(f_post_approx.data.z, u.x)
-    return ApproxPosteriorGP(VFE(), f_post_approx.prior,
-                             (
-                              m_ε=m_ε,
-                              Λ_ε=Λ_ε,
-                              U=U,
-                              α=α,
-                              z=z,
-                              b_y=f_post_approx.data.b_y,
-                              B_εf=B_εf,
-                              D=Λ_ε.U' * Λ_ε.U,
-                              x=f_post_approx.data.x,
-                              Σy=f_post_approx.data.Σy,   
-                             ))
+    cache = (
+        m_ε=m_ε,
+        Λ_ε=Λ_ε,
+        U=U,
+        α=α,
+        z=z,
+        b_y=f_post_approx.data.b_y,
+        B_εf=B_εf,
+        D=Λ_ε.U' * Λ_ε.U,
+        x=f_post_approx.data.x,
+        Σy=f_post_approx.data.Σy,   
+    )
+    return ApproxPosteriorGP(VFE(), f_post_approx.prior, cache)
 end
 # Blatant act of type piracy against LinearAlgebra.
 LinearAlgebra.Symmetric(X::Diagonal) = X
