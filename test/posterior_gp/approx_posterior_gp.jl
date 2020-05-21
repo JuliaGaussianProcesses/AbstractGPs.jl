@@ -53,7 +53,6 @@
         @test u_p_fx1.data.z ≈ p_fx2.data.z atol=1e-5
         @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol=1e-5
         @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol=1e-5
-        @test u_p_fx1.data.D ≈ p_fx2.data.D atol=1e-5
         @test u_p_fx1.data.x ≈ p_fx2.data.x atol=1e-5
         @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol=1e-5
         
@@ -82,7 +81,6 @@
         @test u_p_fx1.data.z ≈ p_fx2.data.z atol=1e-5
         @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol=1e-5
         @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol=1e-5
-        @test u_p_fx1.data.D ≈ p_fx2.data.D atol=1e-5
         @test u_p_fx1.data.x ≈ p_fx2.data.x atol=1e-5
         @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol=1e-5        
     end
