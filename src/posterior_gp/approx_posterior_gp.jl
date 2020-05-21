@@ -51,7 +51,7 @@ end
         y::AbstractVector{<:Real}
     )
 
-#TODO
+Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain the same of pseudo-points.
 
 """
 function update_approx_posterior(
@@ -102,7 +102,7 @@ end
         u::FiniteGP
     )
 
-#TODO
+Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing set of pseudo points. 
 
 """
 function update_approx_posterior(
