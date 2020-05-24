@@ -29,7 +29,7 @@ using Plots
 f = GP(SqExponentialKernel())
 sampleplot(f(rand(10), 10; markersize=5)
 ```
-The given example plots 10 samples from the given `FiniteGP`. The `markersize` is modified from default of 0.5 to 10.
+The given example plots 10 samples from the given `FiniteGP`. The `markersize` is modified from default of 0.5 to 5.
 """
 @userplot SamplePlot
 @recipe function f(sp::SamplePlot)
