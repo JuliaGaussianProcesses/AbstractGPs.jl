@@ -2,6 +2,24 @@ using AbstractGPs: Xt_A_X, Xt_A_Y, Xt_invA_Y, Xt_invA_X, diag_At_A, diag_At_B, d
     diag_Xt_A_Y, diag_Xt_invA_X, diag_Xt_invA_Y, Xtinv_A_Xinv, tr_At_A
 
 @testset "common_covmat_ops" begin
+    @testset "update_chol" begin
+        X = rand(5)
+        y = rand(5)
+
+        k = SqExponentialKernel()
+
+        C = kernelmatrix(k, X, X)
+        U = cholesky(C).U
+        C11 = kernelmatrix(k, X[1:3], X[1:3])
+        chol1 = cholesky(C11)
+        C22 = kernelmatrix(k, X[4:5], X[4:5])
+        C12 = kernelmatrix(k, X[1:3], X[4:5])
+        chol = AbstractGPs.update_chol(chol1, C12, C22)
+
+        @test U ≈ chol.U atol=1e-5
+        @test chol1.U ≈ chol.U[1:3, 1:3] atol=1e-5
+    end
+
 
     # Set up some matrices and factorisations.
     rng, N, N′, P, Q = MersenneTwister(123456), 5, 3, 6, 2

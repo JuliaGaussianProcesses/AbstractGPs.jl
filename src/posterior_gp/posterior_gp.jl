@@ -7,7 +7,7 @@ end
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
 
 Constructs the posterior distribution over `fx.f` given observations `y` at `x` made under
-noise `fx.Σ`. This is another `AbstractGP` object. See chapter 2 of [1] for a recap on
+noise `fx.Σy`. This is another `AbstractGP` object. See chapter 2 of [1] for a recap on
 exact inference in GPs. This posterior process has mean function
 ```julia
 m_posterior(x) = m(x) + k(x, fx.x) inv(cov(fx)) (y - mean(fx))
@@ -21,11 +21,31 @@ where `m` and `k` are the mean function and kernel of `fx.f` respectively.
 function posterior(fx::FiniteGP, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(fx)
     C = cholesky(Symmetric(C_mat))
-    α = C \ (y - m)
-    return PosteriorGP(fx.f, (α=α, C=C, x=fx.x))
+    δ = y - m
+    α = C \ δ
+    return PosteriorGP(fx.f, (α=α, C=C, x=fx.x, δ=δ))
 end
 
+"""
+    posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
 
+Constructs the posterior distribution over `fx.f` when `f` is itself a `PosteriorGP` by
+updating the cholesky factorisation of the covariance matrix and avoiding recomputing it
+from original covariance matrix. It does this by using `update_chol` functionality.
+
+Other aspects are similar to a regular posterior.
+"""
+function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
+    m2 = mean(fx.f.prior, fx.x)
+    δ2 = y - m2
+    C12 = cov(fx.f.prior, fx.f.data.x, fx.x)
+    C22 = cov(fx.f.prior, fx.x) + fx.Σy
+    chol = update_chol(fx.f.data.C, C12, C22)
+    δ = vcat(fx.f.data.δ, δ2)
+    α = chol \ δ
+    x = vcat(fx.f.data.x, fx.x)
+    return PosteriorGP(fx.f.prior , (α=α, C=chol, x=x, δ=δ))
+end
 
 # AbstractGP interface implementation.
 
