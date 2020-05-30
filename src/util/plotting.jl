@@ -2,7 +2,7 @@ using RecipesBase
 
 @recipe f(gp::AbstractGP, x::AbstractArray) = gp(x)
 @recipe f(gp::AbstractGP, x::AbstractRange) = gp(x)
-@recipe f(gp::AbstractGP, xmin::Real, xmax::Real) = (gp, range(xmin, xmax, length=1000))
+@recipe f(gp::AbstractGP, xmin::Real, xmax::Real) = gp(collect(range(xmin, xmax, length=1000)))
 @recipe function f(gp::FiniteGP)
     x = gp.x
     f = gp.f
