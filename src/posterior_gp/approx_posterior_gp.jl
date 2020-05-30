@@ -51,8 +51,8 @@ end
         y::AbstractVector{<:Real}
     )
 
-Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain the same of pseudo-points.
-
+Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain the same 
+of pseudo-points.
 """
 function update_approx_posterior(
     f_post_approx::ApproxPosteriorGP,
@@ -99,15 +99,15 @@ end
 """
     function update_approx_posterior(
         f_post_approx::ApproxPosteriorGP,
-        u::FiniteGP
+        u::FiniteGP,
     )
 
-Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing set of pseudo points. 
-
+Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
+set of pseudo points. 
 """
 function update_approx_posterior(
     f_post_approx::ApproxPosteriorGP,
-    u::FiniteGP
+    u::FiniteGP,
 )
     U11 = f_post_approx.data.U
     C12 = cov(u.f, f_post_approx.data.z, u.x)
@@ -147,7 +147,7 @@ function update_approx_posterior(
     )
     return ApproxPosteriorGP(VFE(), f_post_approx.prior, cache)
 end
-# Blatant act of type piracy against LinearAlgebra.
+
 LinearAlgebra.Symmetric(X::Diagonal) = X
 
 # AbstractGP interface implementation.
