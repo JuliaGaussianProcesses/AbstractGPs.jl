@@ -18,6 +18,7 @@ FillArrays = "0.7, 0.8"
 FiniteDifferences = "0.9.6"
 KernelFunctions = "0.4"
 Plots = "1"
+RecipesBase = "1"
 Zygote = "0.4.6"
 julia = "1.3"
 
