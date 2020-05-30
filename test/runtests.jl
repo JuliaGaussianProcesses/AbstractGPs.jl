@@ -11,7 +11,6 @@ include("test_util.jl")
 @testset "AbstractGPs" begin
     @testset "util" begin
         include(joinpath("util", "common_covmat_ops.jl"))
-        include(joinpath("util", "plotting.jl"))
     end
     @testset "abstract_gp" begin
         include(joinpath("abstract_gp", "abstract_gp.jl"))
@@ -25,6 +24,9 @@ include("test_util.jl")
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
     end
+
+    include(joinpath("util", "plotting.jl"))
+    
     @testset "doctests" begin
         DocMeta.setdocmeta!(
             AbstractGPs,
