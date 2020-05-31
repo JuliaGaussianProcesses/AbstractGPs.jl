@@ -6,4 +6,4 @@
 /dev/
 /docs/build/
 /docs/site/
-/.ipynb_checkpoints
+*/.ipynb_checkpoints
