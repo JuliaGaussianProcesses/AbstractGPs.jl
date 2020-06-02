@@ -57,21 +57,20 @@ sampleplot!(plt, p_fx(sort(x), 0.001), 100, alph=0.1)
 
 # # Elliptical Slice Sampler
 
-# Previously, we computed the the exact posterior GP without tuning the kernel parameters and achieved a loglikelihood on exact posterior of $-1.285$. We now attempt get a better posterior by sampling for kernel parameters using Elliptical Slice Sampler provided by [EllipticalSliceSampling.jl](https://github.com/TuringLang/EllipticalSliceSampling.jl/)
+# Previously, we computed the the exact posterior GP without tuning the kernel parameters and achieved a loglikelihood on exact posterior of $-1.285$. We now attempt get a better posterior by tuning for kernel parameters using Elliptical Slice Sampler provided by [EllipticalSliceSampling.jl](https://github.com/TuringLang/EllipticalSliceSampling.jl/) instead of computing the exact posterior.
 
 # We start of by loading necessary packages.
 
 using EllipticalSliceSampling, Distributions
 
-# We define a function which returns log-likelihood of of data w.r.t an exact posterior with given set of kernel parameters.
+# We define a function which returns log-likelihood of of data w.r.t a GP with the given set of kernel parameters.
 
 function logp(params)
     exp_params = exp.(params)
     kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_params[1])), exp_params[2])
     f = GP(kernel)
     fx = f(x, 0.1)
-    p_fx = posterior(fx, y)
-    return logpdf(p_fx(x, 0.1), y)
+    return logpdf(fx, y)
 end
 
 # We define a Gaussian prior over the joint distribution on kernel parameters space. Since we have only two parameters, we define a multi-variate Gaussian of dimension two.
@@ -96,7 +95,7 @@ vline!(plt, mean(samples_mat, dims=1), layout=2, label="Mean")
 
 mean_params = mean(samples_mat, dims=1)
 
-# Conditional log-probability of exact posterior with kernel's parameters tuned using ESS. We can observe that there is significant improvement over exact posterior with default kernel parameters. 
+# Conditional log-probability of GP with kernel's parameters tuned using ESS. We can observe that there is significant improvement over exact posterior with default kernel parameters. 
 
 logp(mean_params)
 
