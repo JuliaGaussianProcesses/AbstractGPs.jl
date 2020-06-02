@@ -1,9 +1,11 @@
 *.jl.*.cov
 *.jl.cov
 *.jl.mem
+*.ipynb
 .DS_Store
-/Manifest.toml
+Manifest.toml
 /dev/
 /docs/build/
+/docs/generated/
 /docs/site/
 */.ipynb_checkpoints
