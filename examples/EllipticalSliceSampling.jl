@@ -18,7 +18,6 @@
 # Loading the necessary packages.
 
 using AbstractGPs, KernelFunctions, Plots
-include("utils.jl")
 
 # Loading [toy regression dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv) taken from GPFlow examples.
 
@@ -53,7 +52,7 @@ logpdf(p_fx(x), y)
 # Plotting the functions sampled from the exact posterior `p_fx` along with the data points.
 
 plt = scatter(x, y, label = "Data")
-sampleplot!(plt, p_fx(sort(x), 0.001), 100, alph=0.1)
+sampleplot!(plt, p_fx(sort(x), 0.001), 100; alpha=0.1)
 
 # # Elliptical Slice Sampler
 
@@ -101,7 +100,6 @@ logp(mean_params)
 
 # Plotting sampled functions from posterior with tuned parameters
 
-# +
 
 plt = scatter(x, y, label="data")
 
@@ -112,6 +110,5 @@ fx = f(x, 0.1)
 p_fx = posterior(fx, y)
 sampleplot!(plt, p_fx(sort(x), 0.001), 100, alph=0.1)
 plt
-# -
 
 

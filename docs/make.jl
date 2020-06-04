@@ -1,9 +1,16 @@
-using Documenter, AbstractGPs, KernelFunctions
+using Documenter, AbstractGPs
 
 using Literate
 using Plots # to not capture precompilation output
 
 Literate.markdown(joinpath(@__DIR__, "..", "examples/EllipticalSliceSampling.jl"), joinpath(@__DIR__, "src/generated"); name = "EllipticalSliceSampling")
+
+DocMeta.setdocmeta!(
+    AbstractGPs,
+    :DocTestSetup,
+    :(using AbstractGPs, KernelFunctions, LinearAlgebra, Random);
+    recursive=true,
+)
 
 makedocs(;
     modules=[AbstractGPs],
