@@ -6,6 +6,6 @@
 Manifest.toml
 /dev/
 /docs/build/
-/docs/generated/
+/docs/src/generated/
 /docs/site/
 */.ipynb_checkpoints
