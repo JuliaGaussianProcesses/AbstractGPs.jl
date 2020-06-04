@@ -1,7 +1,3 @@
-using AbstractGPs: FiniteGP, ConstMean, GP
-using Statistics
-using Distributions: MvNormal, PDMat
-
 _rng() = MersenneTwister(123456)
 
 function generate_noise_matrix(rng::AbstractRNG, N::Int)
