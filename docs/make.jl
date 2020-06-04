@@ -7,7 +7,7 @@ function preprocessing(str)
     return replace(str, r"# ---[a-zA-Z0-9 #:,.'-_\n]*# ---\n" => ""; count=1)
 end
 
-Literate.markdown(joinpath(@__DIR__, "..", "examples/EllipticalSliceSampling.jl"), joinpath(@__DIR__, "src/generated"); name = "EllipticalSliceSampling", preprocess = preprocess)
+Literate.markdown(joinpath(@__DIR__, "..", "examples/EllipticalSliceSampling.jl"), joinpath(@__DIR__, "src/generated"); name = "EllipticalSliceSampling", preprocess=preprocessing)
 
 DocMeta.setdocmeta!(
     AbstractGPs,
