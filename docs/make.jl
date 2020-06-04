@@ -3,7 +3,11 @@ using Documenter, AbstractGPs
 using Literate
 using Plots # to not capture precompilation output
 
-Literate.markdown(joinpath(@__DIR__, "..", "examples/EllipticalSliceSampling.jl"), joinpath(@__DIR__, "src/generated"); name = "EllipticalSliceSampling")
+function preprocessing(str)
+    return replace(str, r"# ---[a-zA-Z0-9 #:,.'-_\n]*# ---\n" => ""; count=1)
+end
+
+Literate.markdown(joinpath(@__DIR__, "..", "examples/EllipticalSliceSampling.jl"), joinpath(@__DIR__, "src/generated"); name = "EllipticalSliceSampling", preprocess = preprocess)
 
 DocMeta.setdocmeta!(
     AbstractGPs,
