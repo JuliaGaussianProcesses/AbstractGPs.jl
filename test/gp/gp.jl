@@ -1,6 +1,3 @@
-using AbstractGPs: ZeroMean, ConstMean, CustomMean
-using KernelFunctions
-
 @testset "gp" begin
 
     # Ensure that GP implements the AbstractGP API consistently.

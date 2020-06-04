@@ -1,9 +1,21 @@
 using AbstractGPs
+using AbstractGPs: AbstractGP, MeanFunction, FiniteGP, ConstMean, GP, ZeroMean, 
+ConstMean, CustomMean, Xt_A_X, Xt_A_Y, Xt_invA_Y, Xt_invA_X, diag_At_A, diag_At_B, 
+diag_Xt_A_X, diag_Xt_A_Y, diag_Xt_invA_X, diag_Xt_invA_Y, Xtinv_A_Xinv, tr_At_A
 using Documenter
+using Distributions: MvNormal, PDMat
 using KernelFunctions
+using KernelFunctions: Kernel
 using LinearAlgebra
+using LinearAlgebra: AbstractTriangular
 using Random
+using Plots
 using Test
+using FiniteDifferences
+using FiniteDifferences: j′vp, to_vec
+using Statistics
+using Zygote
+
 
 include("test_util.jl")
 
@@ -23,6 +35,9 @@ include("test_util.jl")
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
     end
+
+    include(joinpath("util", "plotting.jl"))
+    
     @testset "doctests" begin
         DocMeta.setdocmeta!(
             AbstractGPs,

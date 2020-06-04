@@ -1,5 +1,3 @@
-using AbstractGPs: CustomMean, ZeroMean, ConstMean
-
 @testset "mean_functions" begin
     @testset "CustomMean" begin
         rng, N, D = MersenneTwister(123456), 11, 2
