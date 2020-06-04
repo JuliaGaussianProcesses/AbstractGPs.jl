@@ -1,10 +1,3 @@
-using LinearAlgebra, FiniteDifferences, Zygote, Random
-using AbstractGPs: AbstractGP, MeanFunction
-using LinearAlgebra: AbstractTriangular
-using FiniteDifferences: j′vp
-import FiniteDifferences: to_vec
-using KernelFunctions: Kernel
-
 const _rtol = 1e-10
 const _atol = 1e-10
 
