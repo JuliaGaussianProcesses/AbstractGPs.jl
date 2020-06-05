@@ -13,7 +13,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [compat]
 Distributions = "0.19, 0.20, 0.21, 0.22, 0.23"
 Documenter = "0.24"
-FiniteDifferences = "0.9.6"
+FiniteDifferences = "0.9.6, 0.10"
 KernelFunctions = "0.4"
 Plots = "1"
 Zygote = "0.4.6"
