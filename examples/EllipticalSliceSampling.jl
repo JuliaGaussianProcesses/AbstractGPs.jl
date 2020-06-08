@@ -49,10 +49,10 @@ p_fx = posterior(fx, y)
 
 logpdf(p_fx(x), y)
 
-# Plotting the functions sampled from the exact posterior `p_fx` along with the data points.
+# Plotting the posterior `p_fx` along with the data points.
 
 plt = scatter(x, y, label = "Data")
-sampleplot!(plt, p_fx(sort(x), 0.001), 100; alpha=0.1)
+plot!(plt, p_fx, 0:0.001:1, label="Posterior")
 
 # # Elliptical Slice Sampler
 
@@ -102,13 +102,9 @@ logp(mean_params)
 
 
 plt = scatter(x, y, label="data")
-
 exp_mean_params = exp.(mean_params)
-kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_mean_params[1])), exp_mean_params[2])
-f = GP(kernel)
-fx = f(x, 0.1)
-p_fx = posterior(fx, y)
-sampleplot!(plt, p_fx(sort(x), 0.001), 100, alph=0.1)
-plt
+opt_kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_mean_params[1])), exp_mean_params[2])
+f = GP(opt_kernel)
+plot!(plt, f, 0:0.001:1)
 
 
