@@ -102,9 +102,13 @@ logp(mean_params)
 
 
 plt = scatter(x, y, label="data")
-exp_mean_params = exp.(mean_params)
-opt_kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_mean_params[1])), exp_mean_params[2])
-f = GP(opt_kernel)
-plot!(plt, f, 0:0.001:1)
+for params in eachrow(samples_mat[end-100:end,:])
+    exp_params = exp.(params)
+    opt_kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_params[1])), exp_params[2])
+    f = GP(opt_kernel)
+    p_fx = posterior(f(x, 0.1), y)
+    sampleplot!(plt, p_fx(collect(0:0.02:1)), 1)
+end
+plt
 
 
