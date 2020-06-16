@@ -12,7 +12,7 @@ scatter(x, y, xlabel="x", ylabel="y")
 
 # Making a custom kernel with two parameters.
 
-k = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(1.0)), 1.0)
+k = Matern52Kernel()
 
 # Instantiating a Gaussian Process with the given kernel `k`.
 
