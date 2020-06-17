@@ -10,19 +10,19 @@ x = [0.8658165855998895, 0.6661700880180962, 0.8049218148148531, 0.7714303440386
 y = [1.5255314337144372, 3.6434202968230003, 3.010885733911661, 3.774442382979625, 3.3687639483798324, 1.5506452040608503, 3.790447985799683, 3.8689707574953, 3.4933565751758713, 1.4284538820635841, 3.8715350915692364, 3.7045949061144983];
 scatter(x, y, xlabel="x", ylabel="y")
 
-# Making a custom kernel with two parameters.
+# Instantiate the kernel.
 
-k = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(1.0)), 1.0)
+k = Matern52Kernel()
 
-# Instantiating a Gaussian Process with the given kernel `k`.
+# Instantiate a Gaussian Process with the given kernel `k`.
 
 f = GP(k);
 
-# Instantiating a `FiniteGP`, a finite dimentional projection at the inputs of the dataset observed under Gaussian Noise with $\sigma = 0.001$ .
+# Instantiate a `FiniteGP`, a finite dimentional projection at the inputs of the dataset observed under Gaussian Noise with $\sigma = 0.001$ .
 
 fx = f(x, 0.001);
 
-# Sanity checking the Evidence Lower BOund (ELBO) implemented according to M. K. Titsias. _Variational learning of inducing variables in sparse Gaussian processes_
+# Sanity check for the Evidence Lower BOund (ELBO) implemented according to M. K. Titsias. _Variational learning of inducing variables in sparse Gaussian processes_
 
 elbo(fx, y, f(rand(7)))
 
@@ -30,7 +30,7 @@ elbo(fx, y, f(rand(7)))
 
 using Optim
 
-# Creatign a helper function which would be used for optimization. It takes in the parameters (both variational and model parameters) and returns the negative of the ELBO.  
+# Create a helper function for optimization. It takes in the parameters (both variational and model parameters) and returns the negative of the ELBO.  
 
 function optim_function(params)
     kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp.(params[1]))), exp.(params[2]))
@@ -39,23 +39,26 @@ function optim_function(params)
     return -elbo(fx, y, f(params[3:end]))
 end
 
-# Initializing the parameters
-
+# Initialize the parameters (Varitational and Model parameters)
 x0 = rand(7)
 
-# Sanity testing the helper function.
+# Sanity check for the helper function. We intend to minimize the result of this function.
 
 optim_function(x0)
 
-# Optimizing using `Optim.jl` package's `LBFGS` algorithm.
+# Optimize using `Optim.jl` package's `LBFGS` algorithm.
 
 opt = optimize(optim_function, x0, LBFGS())
+
+# Optimal parameters:
+
+opt.minimizer
 
 # Optimal negative ELBO:
 
 optim_function(opt.minimizer)
 
-# Visualizing the posterior.
+# Visualize the posterior.
 
 opt_kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp.(opt.minimizer[1]))), exp.(opt.minimizer[2]))
 opt_f = GP(opt_kernel)

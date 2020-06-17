@@ -40,7 +40,7 @@ plt = scatter(x, y; label = "Observations")
 plot!(plt, p_fx, 0:0.001:1; label="Posterior")
 
 # # Elliptical Slice Sampler
-# Previously, we computed the the exact posterior GP without tuning the kernel parameters and achieved a loglikelihood on exact posterior of $-1.285$. We now attempt get a better posterior by tuning for kernel parameters using Elliptical Slice Sampler provided by [EllipticalSliceSampling.jl](https://github.com/TuringLang/EllipticalSliceSampling.jl/) instead of computing the exact posterior.Previously, we computed the posterior for a GP model with kernel having no parameters. We will now use Elliptical Slice Sampling(ESS) to perform Bayesian inference over the parameters of the length scale and variance parameters of the kernel.
+# Previously we computed the log likelihood of the untuned kernel parameters of the GP, $-1.285$. We now also perform approximate inference over said kernel parameters using the [Elliptical Slice Sampling](http://proceedings.mlr.press/v9/murray10a/murray10a.pdf) provided by [EllipticalSliceSampling.jl](https://github.com/TuringLang/EllipticalSliceSampling.jl/).
 # We start of by loading necessary packages.
 
 using EllipticalSliceSampling, Distributions
