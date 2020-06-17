@@ -1,4 +1,4 @@
-# # Using Variational Inference for inferring on pseudo pseudo-points of a Sparse Gaussian Process 
+# # Example: Approximate Inference on Sparse GPs using VI
 
 # Loading necessary packages.
 

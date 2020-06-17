@@ -1,4 +1,4 @@
-# # An example showcasing the usage of EllipticalSliceSampling.jl with AbstractGPs.jl
+# # Example: Approximate Inference using ESS
 
 # Loading the necessary packages.
 
