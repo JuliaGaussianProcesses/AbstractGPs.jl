@@ -10,7 +10,7 @@ x = [0.8658165855998895, 0.6661700880180962, 0.8049218148148531, 0.7714303440386
 y = [1.5255314337144372, 3.6434202968230003, 3.010885733911661, 3.774442382979625, 3.3687639483798324, 1.5506452040608503, 3.790447985799683, 3.8689707574953, 3.4933565751758713, 1.4284538820635841, 3.8715350915692364, 3.7045949061144983];
 scatter(x, y, xlabel="x", ylabel="y")
 
-# Making a custom kernel with two parameters.
+# Instantiating the kernel.
 
 k = Matern52Kernel()
 
@@ -26,28 +26,26 @@ fx = f(x, 0.001)
 
 logpdf(fx, y)
 
-# Calculating the exact posterior with the given expected output `y` and `FiniteGP`. THe GP's kernel currently has fixed parameters. 
+# Calculating the exact posterior over `f` given `y`. The GP's kernel currently has some arbitrary fixed parameters. 
 
 p_fx = posterior(fx, y)
 
-# Data's log-likelihood w.r.t exact posterior `GP`. We see that it drastically increases.
+# Data's log-likelihood under the posterior `GP`. We see that it drastically increases.
 
 logpdf(p_fx(x), y)
 
-# Plotting the posterior `p_fx` along with the data points.
+# Plot the posterior `p_fx` along with the observations.
 
-plt = scatter(x, y, label = "Data")
-plot!(plt, p_fx, 0:0.001:1, label="Posterior")
+plt = scatter(x, y; label = "Observations")
+plot!(plt, p_fx, 0:0.001:1; label="Posterior")
 
 # # Elliptical Slice Sampler
-
-# Previously, we computed the the exact posterior GP without tuning the kernel parameters and achieved a loglikelihood on exact posterior of $-1.285$. We now attempt get a better posterior by tuning for kernel parameters using Elliptical Slice Sampler provided by [EllipticalSliceSampling.jl](https://github.com/TuringLang/EllipticalSliceSampling.jl/) instead of computing the exact posterior.
-
+# Previously, we computed the the exact posterior GP without tuning the kernel parameters and achieved a loglikelihood on exact posterior of $-1.285$. We now attempt get a better posterior by tuning for kernel parameters using Elliptical Slice Sampler provided by [EllipticalSliceSampling.jl](https://github.com/TuringLang/EllipticalSliceSampling.jl/) instead of computing the exact posterior.Previously, we computed the posterior for a GP model with kernel having no parameters. We will now use Elliptical Slice Sampling(ESS) to perform Bayesian inference over the parameters of the length scale and variance parameters of the kernel.
 # We start of by loading necessary packages.
 
 using EllipticalSliceSampling, Distributions
 
-# We define a function which returns log-likelihood of of data w.r.t a GP with the given set of kernel parameters.
+# We define a function which returns log-probability of the data under the GP / log-likelihood of the parameters of the GP.
 
 function logp(params)
     exp_params = exp.(params)
@@ -57,7 +55,7 @@ function logp(params)
     return logpdf(fx, y)
 end
 
-# We define a Gaussian prior over the joint distribution on kernel parameters space. Since we have only two parameters, we define a multi-variate Gaussian of dimension two.
+# WE define a Gaussian prior over the joint distribution on kernel parameters space. Since we have only two parameters, we define a multi-variate Gaussian of dimension two.
 
 prior = MvNormal(2, 1)
 
@@ -65,28 +63,28 @@ prior = MvNormal(2, 1)
 
 logp(rand(prior))
 
-# Sampling 2,000 samples using `ESS_mcmc` provided by `EllipticalSliceSampling.jl`. 
+# Sample 2,000 samples using `ESS_mcmc` provided by `EllipticalSliceSampling.jl`. 
 
 samples = ESS_mcmc(prior, logp, 2_000);
 samples_mat = hcat(samples...)';
-
-# Plotting a histogram of the samples for the two parameters. The vertical line in each graph indicates the mean of the samples.
-
-plt = histogram(samples_mat, layout=2, labels= "Param")
-vline!(plt, mean(samples_mat, dims=1), layout=2, label="Mean")
 
 # Mean of samples of both the parameters.
 
 mean_params = mean(samples_mat, dims=1)
 
-# Conditional log-probability of GP with kernel's parameters tuned using ESS. We can observe that there is significant improvement over exact posterior with default kernel parameters. 
+# Plot a histogram of the samples for the two parameters. The vertical line in each graph indicates the mean of the samples. We can observe that 
+
+plt = histogram(samples_mat; layout=2, labels="Param")
+vline!(plt, mean_params; layout=2, label="Mean")
+
+# Conditional log-probability of data with posterior mean kernel parameters sampled using ESS. We can observe that there is significant improvement over exact posterior with default kernel parameters.
 
 logp(mean_params)
 
-# Plotting sampled functions from posterior with tuned parameters
+# Plot sampled functions from posterior with tuned parameters
 
 
-plt = scatter(x, y, label="data")
+plt = scatter(x, y; label="Observations")
 for params in eachrow(samples_mat[end-100:end,:])
     exp_params = exp.(params)
     opt_kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_params[1])), exp_params[2])
