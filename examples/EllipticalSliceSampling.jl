@@ -10,6 +10,11 @@ x = [0.8658165855998895, 0.6661700880180962, 0.8049218148148531, 0.7714303440386
 y = [1.5255314337144372, 3.6434202968230003, 3.010885733911661, 3.774442382979625, 3.3687639483798324, 1.5506452040608503, 3.790447985799683, 3.8689707574953, 3.4933565751758713, 1.4284538820635841, 3.8715350915692364, 3.7045949061144983];
 scatter(x, y, xlabel="x", ylabel="y")
 
+# Split the observations into train and test set.
+
+(x_train, y_train) = (x[begin:8], y[begin:8]);
+(x_test, y_test) = (x[9:end], y[9:end]);
+
 # Instantiating the kernel.
 
 k = Matern52Kernel()
@@ -20,23 +25,24 @@ f = GP(k)
 
 # Instantiating a `FiniteGP`, a finite dimentional projection at the inputs of the dataset observed under Gaussian Noise with $\sigma = 0.001$ .
 
-fx = f(x, 0.001)
+fx = f(x_train, 0.001)
 
 # Data's log-likelihood w.r.t prior `GP`. 
 
-logpdf(fx, y)
+logpdf(fx, y_train)
 
 # Calculating the exact posterior over `f` given `y`. The GP's kernel currently has some arbitrary fixed parameters. 
 
-p_fx = posterior(fx, y)
+p_fx = posterior(fx, y_train)
 
 # Data's log-likelihood under the posterior `GP`. We see that it drastically increases.
 
-logpdf(p_fx(x), y)
+logpdf(p_fx(x_test), y_test)
 
 # Plot the posterior `p_fx` along with the observations.
 
-plt = scatter(x, y; label = "Observations")
+plt = scatter(x_train, y_train; label = "Train data")
+scatter!(plt, x_test, y_test; label = "Test data")
 plot!(plt, p_fx, 0:0.001:1; label="Posterior")
 
 # # Elliptical Slice Sampler
@@ -47,7 +53,7 @@ using EllipticalSliceSampling, Distributions
 
 # We define a function which returns log-probability of the data under the GP / log-likelihood of the parameters of the GP.
 
-function logp(params)
+function logp(params; x=x_train, y=y_train)
     exp_params = exp.(params)
     kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_params[1])), exp_params[2])
     f = GP(kernel)
@@ -77,14 +83,15 @@ mean_params = mean(samples_mat, dims=1)
 plt = histogram(samples_mat; layout=2, labels="Param")
 vline!(plt, mean_params; layout=2, label="Mean")
 
-# Conditional log-probability of data with posterior mean kernel parameters sampled using ESS. We can observe that there is significant improvement over exact posterior with default kernel parameters.
+# Average log-marginal-probability of data with posterior kernel parameter samples sampled using ESS. We can observe that there is significant improvement over exact posterior with default kernel parameters.
 
-logp(mean_params)
+mean([logp(param; x=x_test, y=y_test) for param in samples])
 
 # Plot sampled functions from posterior with tuned parameters
 
 
-plt = scatter(x, y; label="Observations")
+plt = scatter(x_train, y_train; label="Train data")
+scatter!(plt, x_train, y_train; label="Test data")
 for params in eachrow(samples_mat[end-100:end,:])
     exp_params = exp.(params)
     opt_kernel = ScaledKernel(transform(Matern52Kernel(), ScaleTransform(exp_params[1])), exp_params[2])
