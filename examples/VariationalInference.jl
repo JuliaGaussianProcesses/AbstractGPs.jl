@@ -1,10 +1,9 @@
 # # Example: Approximate Inference on Sparse GPs using VI
 
-# Loading necessary packages.
+# Loading the necessary packages and setting seed.
 
-]activate ../docs
-
-using AbstractGPs, Plots, KernelFunctions
+using AbstractGPs, KernelFunctions, Plots, Random
+Random.seed!(1234);
 
 # Loading toy regression 
 # [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv) 

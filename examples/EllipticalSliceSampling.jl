@@ -1,8 +1,9 @@
 # # Example: Approximate Inference using ESS
 
-# Loading the necessary packages.
+# Loading the necessary packages and setting seed.
 
-using AbstractGPs, KernelFunctions, Plots
+using AbstractGPs, KernelFunctions, Plots, Random
+Random.seed!(1234);
 
 # Loading toy regression 
 # [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv) 
@@ -68,13 +69,12 @@ using EllipticalSliceSampling, Distributions
 # GP / log-likelihood of the parameters of the GP.
 
 function logp(params; x=x_train, y=y_train)
-    exp_params = exp.(params)
     kernel = ScaledKernel(
         transform(
             Matern52Kernel(), 
-            ScaleTransform(exp_params[1])
-            ), 
-        exp_params[2]
+            ScaleTransform(exp(params[1]))
+        ), 
+        exp(params[2])
     )
     f = GP(kernel)
     fx = f(x, 0.1)
@@ -94,7 +94,7 @@ logp(rand(prior))
 # Generate 2,000 samples using `ESS_mcmc` provided by `EllipticalSliceSampling.jl`. 
 
 samples = ESS_mcmc(prior, logp, 2_000);
-samples_mat = hcat(samples...)';
+samples_mat = reduce(hcat, samples)';
 
 # Mean of samples of both the parameters.
 
@@ -110,21 +110,20 @@ vline!(plt, mean_params; layout=2, label="Mean")
 # sampled using ESS. We can observe that there is significant improvement over 
 # exact posterior with default kernel parameters.
 
-mean([logp(param; x=x_test, y=y_test) for param in samples])
+mean(logp(param; x=x_test, y=y_test) for param in samples)
 
 # Plot sampled functions from posterior with tuned parameters
 
 
 plt = scatter(x_train, y_train; label="Train data")
 scatter!(plt, x_train, y_train; label="Test data")
-for params in eachrow(samples_mat[end-100:end,:])
-    exp_params = exp.(params)
+for params in @view(samples[(end-100):end,:])
     opt_kernel = ScaledKernel(
         transform(
             Matern52Kernel(), 
-            ScaleTransform(exp_params[1])
-            ), 
-        exp_params[2]
+            ScaleTransform(exp(params[1]))
+        ), 
+        exp(params[2])
     )
     f = GP(opt_kernel)
     p_fx = posterior(f(x, 0.1), y)
