@@ -61,7 +61,7 @@ function logp(params; x=x_train, y=y_train)
     return logpdf(fx, y)
 end
 
-# WE define a Gaussian prior over the joint distribution on kernel parameters space. Since we have only two parameters, we define a multi-variate Gaussian of dimension two.
+# We define a Gaussian prior over the joint distribution on kernel parameters space. Since we have only two parameters, we define a multi-variate Gaussian of dimension two.
 
 prior = MvNormal(2, 1)
 
@@ -69,7 +69,7 @@ prior = MvNormal(2, 1)
 
 logp(rand(prior))
 
-# Sample 2,000 samples using `ESS_mcmc` provided by `EllipticalSliceSampling.jl`. 
+# Generate 2,000 samples using `ESS_mcmc` provided by `EllipticalSliceSampling.jl`. 
 
 samples = ESS_mcmc(prior, logp, 2_000);
 samples_mat = hcat(samples...)';

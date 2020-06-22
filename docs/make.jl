@@ -13,7 +13,7 @@ Literate.markdown(
     joinpath(@__DIR__, "src/generated"); 
     name = "EllipticalSliceSampling", 
     preprocess=preprocessing
-    )
+)
 
 DocMeta.setdocmeta!(
     AbstractGPs,
