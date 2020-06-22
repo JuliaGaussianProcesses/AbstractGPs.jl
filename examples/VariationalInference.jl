@@ -2,9 +2,11 @@
 
 # Loading necessary packages.
 
+]activate ../docs
+
 using AbstractGPs, Plots, KernelFunctions
 
-# Loading toy regression  
+# Loading toy regression 
 # [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv) 
 # taken from GPFlow examples.
 
@@ -106,6 +108,7 @@ ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(opt.minimizer[3:end]));
 logpdf(ap(x_test), y_test)
 
 plt = plot(ap, 0:0.001:1, label="Approx Posterior")
+plot!(plt, p_fx, 0:0.001:1, label="Exact Posterior")
 scatter!(
     plt, 
     opt.minimizer[3:end], 
