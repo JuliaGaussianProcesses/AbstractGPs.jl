@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # # Example: Approximate Inference with NUTS-HMC
 
 # Loading the necessary packages and setting seed.
@@ -77,7 +78,7 @@ function logp(params; x=x_train, y=y_train)
         exp(params[2])
     )
     f = GP(kernel)
-    fx = f(x, 0.001)
+    fx = f(x, 0.0001)
     return logpdf(fx, y)
 end
 
