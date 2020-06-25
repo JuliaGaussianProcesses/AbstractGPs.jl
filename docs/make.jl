@@ -6,9 +6,7 @@ using Plots # to not capture precompilation output
 example_files = filter(x->occursin(r".jl$",x), readdir(joinpath(@__DIR__, "..", "examples")))
 generated_examples = Array{String}(undef, length(example_files))
 
-println(example_files)
 for (i, example) in enumerate(example_files)
-    println(joinpath(@__DIR__, "..", "examples", example))
     Literate.markdown(
         joinpath(@__DIR__, "..", "examples", example),
         joinpath(@__DIR__, "src/generated");
@@ -37,7 +35,6 @@ makedocs(;
         generated_examples...
     ],
     authors="willtebbutt <wt0881@my.bristol.ac.uk>",
-    assets=String[],
 )
 
 deploydocs(;
