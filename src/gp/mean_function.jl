@@ -7,7 +7,12 @@ Returns `zero(T)` everywhere.
 """
 struct ZeroMean{T<:Real} <: MeanFunction end
 
-Base.map(::ZeroMean{T}, x::AbstractVector) where T = zeros(T, length(x))
+Base.map(::ZeroMean{T}, x::AbstractVector) where {T} = zeros(T, length(x))
+
+function ChainRulesCore.rrule(::typeof(Base.map), m::ZeroMean, x::AbstractVector)
+    map_ZeroMean_pullback(Δ) = (NO_FIELDS, NO_FIELDS, Zero())
+    return map(m, x), map_ZeroMean_pullback
+end
 
 ZeroMean() = ZeroMean{Float64}()
 

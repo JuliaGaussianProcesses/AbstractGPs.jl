@@ -1,23 +1,27 @@
 @testset "mean_functions" begin
-    @testset "CustomMean" begin
-        rng, N, D = MersenneTwister(123456), 11, 2
-        x = randn(rng, N)
-        foo_mean = x->sum(abs2, x)
-        f = CustomMean(foo_mean)
-
-        @test map(f, x) == map(foo_mean, x)
-        # differentiable_mean_function_tests(f, randn(rng, N), x)
-    end
     @testset "ZeroMean" begin
-        rng, P, Q, D = MersenneTwister(123456), 3, 2, 4
+        P = 3
+        Q = 2
+        D = 4
         # X = ColVecs(randn(rng, D, P))
-        x = randn(rng, P)
+        x = randn(P)
+        x̄ = randn(P)
         f = ZeroMean{Float64}()
 
         for x in [x]
             @test map(f, x) == zeros(size(x))
             # differentiable_mean_function_tests(f, randn(rng, P), x)
         end
+
+        # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
+        # currently ChainRulesTestUtils isn't up to handling this, so this will have to do
+        # for now.
+        y, pb = rrule(map, f, x)
+        @test y == map(f, x)
+        Δmap, Δf, Δx = pb(randn(P))
+        @test iszero(Δmap)
+        @test iszero(Δf)
+        @test iszero(Δx)
     end
     @testset "ConstMean" begin
         rng, D, N = MersenneTwister(123456), 5, 3
@@ -30,5 +34,14 @@
             @test map(m, x) == fill(c, N)
             # differentiable_mean_function_tests(m, randn(rng, N), x)
         end
+    end
+    @testset "CustomMean" begin
+        rng, N, D = MersenneTwister(123456), 11, 2
+        x = randn(rng, N)
+        foo_mean = x->sum(abs2, x)
+        f = CustomMean(foo_mean)
+
+        @test map(f, x) == map(foo_mean, x)
+        # differentiable_mean_function_tests(f, randn(rng, N), x)
     end
 end

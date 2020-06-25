@@ -4,6 +4,7 @@ authors = ["willtebbutt <wt0881@my.bristol.ac.uk>"]
 version = "0.1.1"
 
 [deps]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
 KernelFunctions = "ec8451be-7e33-11e9-00cf-bbf324bd1392"
