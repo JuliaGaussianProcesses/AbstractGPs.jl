@@ -7,7 +7,7 @@ module AbstractGPs
     using Random
     using Statistics
 
-    export GP, mean, cov, std, cov_diag, mean_and_cov, mean_and_cov_diag, marginals, rand,
+    export GP, mean, cov, std, cov_diag, mean_and_cov, marginals, rand,
         logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, AbstractGP, sampleplot, 
         update_approx_posterior
 
