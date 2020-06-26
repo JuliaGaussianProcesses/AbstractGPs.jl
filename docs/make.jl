@@ -3,20 +3,24 @@ using Documenter, AbstractGPs
 using Literate
 using Plots # to not capture precompilation output
 
-example_files = filter(x->occursin(r".jl$",x), readdir(joinpath(@__DIR__, "..", "examples")))
-generated_examples = Array{String}(undef, length(example_files))
-
-for (i, example) in enumerate(example_files)
-    Literate.markdown(
-        joinpath(@__DIR__, "..", "examples", example),
-        joinpath(@__DIR__, "src/generated");
-        name = example[begin:end-3],
-    )
-    generated_examples[i] = joinpath("generated", string(split(example, ".jl")[1], ".md"))
+if haskey(ENV, "GITHUB_ACTIONS")
+    ENV["JULIA_DEBUG"] = "Documenter"
 end
 
+Documenter.post_status(; type="pending", repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git")
 
+for filename in readdir(joinpath(@__DIR__, "..", "examples"))
+    endswith(filename, ".jl") || continue
+	name = splitext(filename)[1]
+    Literate.markdown(
+        joinpath(@__DIR__, "..", "examples", filename),
+        joinpath(@__DIR__, "src/generated");
+        name = name,
+        documenter=true,
+    )
+end
 
+generated_examples = joinpath.("generated", filter(x -> endswith(x, ".md"), readdir(joinpath(@__DIR__, "src", "generated"))))
 
 DocMeta.setdocmeta!(
     AbstractGPs,
@@ -34,7 +38,7 @@ makedocs(;
         "index.md",
         generated_examples...
     ],
-    authors="willtebbutt <wt0881@my.bristol.ac.uk>",
+
 )
 
 deploydocs(;
