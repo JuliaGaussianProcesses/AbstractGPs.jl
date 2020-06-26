@@ -12,7 +12,7 @@ AbstractGPs.jl is a package that defines a low-level API for working with Gaussi
 ![GP](gp.gif)
 
 
-## Examples demonstrating its capabilities
+## Features
 
 ### Setup
 ```julia
