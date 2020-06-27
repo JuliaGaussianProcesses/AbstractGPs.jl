@@ -2,8 +2,7 @@
 
 # Loading the necessary packages and setting seed.
 
-using AbstractGPs, KernelFunctions, Plots, Random, PyPlot
-pyplot()
+using AbstractGPs, KernelFunctions, Plots, Random
 Random.seed!(1234);
 
 # Loading toy regression 
