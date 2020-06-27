@@ -3,8 +3,7 @@
 
 # Loading the necessary packages and setting seed.
 
-using AbstractGPs, KernelFunctions, Plots, Random
-ENV["PYTHON"] = ""
+using AbstractGPs, KernelFunctions, Plots, Random, PyPlot
 pyplot()
 Random.seed!(1234);
 
