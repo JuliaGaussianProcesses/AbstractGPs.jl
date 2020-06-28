@@ -3,6 +3,7 @@ module AbstractGPs
     using Distributions
     using FillArrays
     using LinearAlgebra
+    using Reexport
     @reexport using KernelFunctions
     using Random
     using Statistics
