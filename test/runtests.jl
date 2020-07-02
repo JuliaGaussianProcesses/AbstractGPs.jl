@@ -6,7 +6,7 @@ using AbstractGPs: AbstractGP, MeanFunction, FiniteGP, ConstMean, GP, ZeroMean,
 using Documenter
 using Distributions: MvNormal, PDMat
 using KernelFunctions
-using KernelFunctions: Kernel
+using KernelFunctions: Kernel, ColVecs, RowVecs
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
 using Random
