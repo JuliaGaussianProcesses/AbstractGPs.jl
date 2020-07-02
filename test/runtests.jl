@@ -5,7 +5,7 @@ diag_Xt_A_X, diag_Xt_A_Y, diag_Xt_invA_X, diag_Xt_invA_Y, Xtinv_A_Xinv, tr_At_A
 using Documenter
 using Distributions: MvNormal, PDMat
 using KernelFunctions
-using KernelFunctions: Kernel
+using KernelFunctions: Kernel, ColVecs, RowVecs
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
 using Random
