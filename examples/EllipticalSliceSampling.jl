@@ -93,7 +93,7 @@ logp(rand(prior))
 
 # Generate 2,000 samples using `ESS_mcmc` provided by `EllipticalSliceSampling.jl`. 
 
-samples = ESS_mcmc(prior, logp, 2_000);
+samples = sample(ESSModel(prior, logp), ESS(), 2_000; progress=false)
 samples_mat = reduce(hcat, samples)';
 
 # Mean of samples of both the parameters.

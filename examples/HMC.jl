@@ -78,7 +78,7 @@ function logp(params; x=x_train, y=y_train)
         exp(params[2])
     )
     f = GP(kernel)
-    fx = f(x, 0.0001)
+    fx = f(x, 0.01)
     return logpdf(fx, y)
 end
 
@@ -117,7 +117,7 @@ samples, stats = sample(
     n_samples, 
     adaptor, 
     n_adapts; 
-    progress=true
+    progress=false
 )
 samples_mat = reduce(hcat, samples)'; 
 
