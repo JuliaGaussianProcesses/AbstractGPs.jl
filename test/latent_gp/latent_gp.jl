@@ -3,10 +3,8 @@
     x = rand(10)
     y = rand(10)
     fx = gp(x, 1e-5)
-
-    lik = GaussianLikelihood(1e-5)
     
-    lgp = LatentGP(fx, lik)
+    lgp = LatentGP(fx, x -> MvNormal(x, 0.1))
     @test typeof(lgp) <: LatentGP
     @test typeof(lgp.fx) <: AbstractGPs.FiniteGP
     f = rand(10)
