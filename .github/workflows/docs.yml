@@ -21,6 +21,8 @@ jobs:
       - uses: julia-actions/setup-julia@latest
         with:
           version: ${{ matrix.julia-version }}
+      - name: Instantiate AbstractGPs.jl
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
       - name: Install dependencies
         run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
       - name: Build and deploy
