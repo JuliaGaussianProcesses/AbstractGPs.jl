@@ -22,7 +22,7 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
       - name: Instantiate AbstractGPs.jl
-        run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
       - name: Install dependencies
         run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
       - name: Build and deploy
