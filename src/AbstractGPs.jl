@@ -27,6 +27,9 @@ module AbstractGPs
     include(joinpath("posterior_gp", "posterior_gp.jl"))
     include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
 
+    # LatentGP object to accomodate GPs with non-gaussian likelihoods.
+    include(joinpath("latent_gp", "latent_gp.jl"))
+
     # Plotting utilities.
     include(joinpath("util", "plotting.jl"))
 end # module
