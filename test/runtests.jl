@@ -37,6 +37,8 @@ include("test_util.jl")
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
     end
 
+    include(joinpath("latent_gp", "latent_gp.jl"))
+
     include(joinpath("util", "plotting.jl"))
     
     @testset "doctests" begin
