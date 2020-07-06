@@ -9,9 +9,12 @@ end
     @testset "statistics" begin
         rng, N, N′ = MersenneTwister(123456), 1, 9
         x, x′, Σy, Σy′ = randn(rng, N), randn(rng, N′), zeros(N, N), zeros(N′, N′)
+        Xmat = randn(rng, N, N′)
         f = GP(sin, SqExponentialKernel())
         fx, fx′ = FiniteGP(f, x, Σy), FiniteGP(f, x′, Σy′)
 
+        @test FiniteGP(f, Xmat, obsdim=1) == FiniteGP(f, RowVecs(Xmat))
+        @test FiniteGP(f, Xmat, obsdim=2) == FiniteGP(f, ColVecs(Xmat))
         @test mean(fx) == mean(f, x)
         @test cov(fx) == cov(f, x)
         @test cov(fx, fx′) == cov(f, x, x′)
@@ -268,7 +271,7 @@ end
 #             (Exp(), "Exp", 1e-6, 1e-6),
 #         ],
 #         [(
-#             k(α=α, β=β, l=l), 
+#             k(α=α, β=β, l=l),
 #             "$k_name(α=$(__foo(α)), β=$(__foo(β)), l=$(__foo(l)))",
 #             1e-6,
 #             1e-6,
