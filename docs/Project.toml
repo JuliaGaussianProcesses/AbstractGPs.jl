@@ -14,7 +14,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 [compat]
 AdvancedHMC = "0.2"
 Distributions = "0.19, 0.20, 0.21, 0.22, 0.23"
-Documenter = "0.24"
+Documenter = "0.25"
 EllipticalSliceSampling = "0.3"
 ForwardDiff = "0.10"
 KernelFunctions = "0.4"
