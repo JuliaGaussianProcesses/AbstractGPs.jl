@@ -2,12 +2,16 @@
     gp = GP(SqExponentialKernel())
     x = rand(10)
     y = rand(10)
-    fx = gp(x, 1e-5)
     
-    lgp = LatentGP(fx, x -> MvNormal(x, 0.1))
+    lgp = LatentGP(gp, x -> MvNormal(x, 0.1), 1e-5)
     @test typeof(lgp) <: LatentGP
-    @test typeof(lgp.fx) <: AbstractGPs.FiniteGP
+    @test typeof(lgp.f) <: AbstractGPs.AbstractGP
+    @test typeof(lgp.Σy) <: Real
+
+    lfgp = lgp(x)
+    @test typeof(lfgp) <: AbstractGPs.LatentFiniteGP
+    @test typeof(lfgp.fx) <: AbstractGPs.FiniteGP
     f = rand(10)
-    @test typeof(logpdf(lgp, (f=f, y=y))) <: Real
-    @test typeof(rand(lgp)) <: NamedTuple{(:f, :y)}
+    @test typeof(logpdf(lfgp, (f=f, y=y))) <: Real
+    @test typeof(rand(lfgp)) <: NamedTuple{(:f, :y)}
 end
