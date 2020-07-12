@@ -32,6 +32,11 @@ include("test_util.jl")
         include(joinpath("gp", "mean_functions.jl"))
         include(joinpath("gp", "gp.jl"))
     end
+
+    @test_set "multi_gp" begin
+        include(joinpath("multi_gp", "multi_gp.jl"))    
+    end
+
     @testset "posterior_gp" begin
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))

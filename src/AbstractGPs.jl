@@ -10,7 +10,8 @@ module AbstractGPs
 
     export GP, mean, cov, std, cov_diag, mean_and_cov, marginals, rand,
         logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, AbstractGP, sampleplot,
-        update_approx_posterior, LatentGP
+        update_approx_posterior, LatentGP, MultiGP, MultiGPInput, length, size, lastindex,
+        firstindex, getindex, iterate 
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))
@@ -22,6 +23,9 @@ module AbstractGPs
     # Basic GP object.
     include(joinpath("gp", "mean_function.jl"))
     include(joinpath("gp", "gp.jl"))
+
+    # Multi-output GP object and input datatype
+    include(joinpath("multi_gp", "multi_gp.jl"))
 
     # Efficient exact and approximate posterior GP implementations.
     include(joinpath("posterior_gp", "posterior_gp.jl"))
