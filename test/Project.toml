@@ -12,11 +12,11 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
-ChainRulesCore = "0.8"
+ChainRulesCore = "0.9"
 Distributions = "0.19, 0.20, 0.21, 0.22, 0.23"
 Documenter = "0.24"
 FiniteDifferences = "0.9.6, 0.10"
 KernelFunctions = "0.4"
 Plots = "1"
-Zygote = "0.4.6, 0.5"
+Zygote = "0.5"
 julia = "1.3"
