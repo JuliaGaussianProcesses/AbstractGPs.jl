@@ -1,7 +1,9 @@
 using AbstractGPs
 using AbstractGPs: AbstractGP, MeanFunction, FiniteGP, ConstMean, GP, ZeroMean, 
     ConstMean, CustomMean, Xt_A_X, Xt_A_Y, Xt_invA_Y, Xt_invA_X, diag_At_A, diag_At_B, 
-    diag_Xt_A_X, diag_Xt_A_Y, diag_Xt_invA_X, diag_Xt_invA_Y, Xtinv_A_Xinv, tr_At_A
+    diag_Xt_A_X, diag_Xt_A_Y, diag_Xt_invA_X, diag_Xt_invA_Y, Xtinv_A_Xinv, tr_At_A,
+    mean_and_cov_diag
+
 using Documenter
 using ChainRulesCore
 using Distributions: MvNormal, PDMat
@@ -36,6 +38,8 @@ include("test_util.jl")
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
     end
+
+    include(joinpath("latent_gp", "latent_gp.jl"))
 
     include(joinpath("util", "plotting.jl"))
     
