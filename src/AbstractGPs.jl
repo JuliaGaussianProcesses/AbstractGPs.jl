@@ -4,13 +4,14 @@ module AbstractGPs
     using Distributions
     using FillArrays
     using LinearAlgebra
-    using KernelFunctions
+    using Reexport
+    @reexport using KernelFunctions
     using Random
     using Statistics
 
     export GP, mean, cov, std, cov_diag, mean_and_cov, mean_and_cov_diag, marginals, rand,
-        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, AbstractGP, sampleplot, 
-        update_approx_posterior, ColVecs, RowVecs
+        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, AbstractGP, sampleplot,
+        update_approx_posterior
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))

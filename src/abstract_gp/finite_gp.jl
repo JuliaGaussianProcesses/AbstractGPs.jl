@@ -6,7 +6,7 @@ Gaussian noise with zero mean and covariance matrix `Σ`
 """
 struct FiniteGP{Tf<:AbstractGP, Tx<:AbstractVector, TΣ} <: ContinuousMultivariateDistribution
     f::Tf
-    x::Tx 
+    x::Tx
     Σy::TΣ
 end
 
@@ -17,6 +17,14 @@ end
 FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real) = FiniteGP(f, x, Fill(σ², length(x)))
 
 FiniteGP(f::AbstractGP, x::AbstractVector) = FiniteGP(f, x, 1e-18)
+
+function FiniteGP(
+    f::AbstractGP,
+    X::AbstractMatrix;
+    obsdim::Int = KernelFunctions.defaultobs,
+)
+    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim))
+end
 
 Base.length(f::FiniteGP) = length(f.x)
 

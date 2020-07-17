@@ -8,7 +8,7 @@ using Distributions: MvNormal, PDMat
 using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
 using KernelFunctions
-using KernelFunctions: Kernel
+using KernelFunctions: Kernel, ColVecs, RowVecs
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
 using Plots
