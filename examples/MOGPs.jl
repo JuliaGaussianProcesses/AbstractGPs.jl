@@ -9,9 +9,9 @@ Random.seed!(1234);
 
 N = 100
 x = rand(Uniform(-1, 1), N) # 1-dim input 
-y = [[sin(xi) + exp(xi) , cos(xi)] .+ 0.1 * randn(2) for xi in x]  # 2-dim input 
+y = [[sin(xi) + exp(xi) , cos(xi)] .+ 0.1 * randn(2) for xi in x]  # 2-dim output 
 plt = scatter(
-    [xi[1] for xi in x], 
+    x, 
     [yi[1] for yi in y], 
     [yi[2] for yi in y]; 
     label="Data Points",
