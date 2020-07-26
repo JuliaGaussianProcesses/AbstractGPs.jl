@@ -14,6 +14,8 @@ module AbstractGPs
     export GP, mean, cov, std, cov_diag, mean_and_cov, marginals, rand,
         logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, AbstractGP, sampleplot,
         update_approx_posterior, LatentGP, ColVecs, RowVecs
+    
+    export mo_transform, mo_inverse_transform
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))
@@ -35,4 +37,6 @@ module AbstractGPs
 
     # Plotting utilities.
     include(joinpath("util", "plotting.jl"))
+    include(joinpath("util", "mogps.jl"))
+
 end # module

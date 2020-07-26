@@ -20,18 +20,9 @@ plt = scatter(
     zlabel="y[2]",
     )
 
-# Create input for multi-output GPs.
+# Make inputs and outputs compatible with multi-output GPs.
 
-X = MOInput(x, 2)
-
-# Utility function to transform back flattened outputs to original form
-
-transform_back(y) = [y[[i, i+Int(length(y)/2)]] for i in 1:Int(length(y)/2)]
-
-
-# Flatten outputs
-
-Y = vcat([yi[1] for yi in y], [yi[2] for yi in y])
+X, Y = mo_transform(x, y, 2)
 
 # Define a multi-output kernel which assumes the outputs are independent of each other.
 
@@ -60,7 +51,7 @@ p_fx = posterior(fx, Y)
 logpdf(p_fx(X, 0.1), Y)
 
 mean_y = mean(p_fx(MOInput(collect(-1:0.01:1),2), 0.01))
-mean_y = transform_back(mean_y)
+mean_y = mo_inverse_transform(mean_y, 2)
 plot!(
     plt,
     collect(-1:0.01:1), 
@@ -68,25 +59,17 @@ plot!(
     [yi[2] for yi in mean_y]; 
     c="black",
     label="Mean Posterior",
-    smooth=false,
-    xlabel="x",
-    ylabel="y[1]",
-    zlabel="y[2]",
     )
 for i = 1:10
-    sample = transform_back(rand(p_fx(MOInput(collect(-1:0.01:1),2), 0.001)))
+    sample = mo_inverse_transform(rand(p_fx(MOInput(collect(-1:0.01:1),2), 0.001)), 2)
     plot!(
     plt,
     collect(-1:0.01:1), 
     [yi[1] for yi in sample], 
     [yi[2] for yi in sample]; 
-    smooth=false,
     alpha=0.2,
     c="red",
     label="",
-    xlabel="x",
-    ylabel="y[1]",
-    zlabel="y[2]",
     )    
 end
 plt

@@ -41,7 +41,11 @@ include("test_util.jl")
 
     include(joinpath("latent_gp", "latent_gp.jl"))
 
-    include(joinpath("util", "plotting.jl"))
+    @testset "util" begin
+        include(joinpath("util", "plotting.jl"))
+        include(joinpath("util", "mogps.jl"))    
+    end
+    
     
     @testset "doctests" begin
         DocMeta.setdocmeta!(
