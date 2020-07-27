@@ -4,7 +4,10 @@ if haskey(ENV, "GITHUB_ACTIONS")
     ENV["JULIA_DEBUG"] = "Documenter"
 end
 
-Documenter.post_status(; type="pending", repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git")
+Documenter.post_status(; 
+    type="pending", 
+    repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git"
+)
 
 
 using Literate, AbstractGPs
@@ -24,7 +27,11 @@ for filename in readdir(joinpath(@__DIR__, "..", "examples"))
     )
 end
 
-# generated_examples = joinpath.("generated", filter(x -> endswith(x, ".md"), readdir(joinpath(@__DIR__, "src", "generated"))))
+generated_examples = joinpath.("examples", filter(
+    x -> endswith(x, ".md"), 
+    readdir(joinpath(@__DIR__, "src", "examples"))
+    )
+)
 
 DocMeta.setdocmeta!(
     AbstractGPs,
@@ -38,9 +45,17 @@ makedocs(;
     format=Documenter.HTML(),
     repo="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/{commit}{path}#L{line}",
     sitename="AbstractGPs.jl",
+    pages = [
+        "Home" => "index.md",
+        "API" => "api.md",
+        "Examples" => [
+            generated_examples...
+        ]
+    ]
 )
 
 deploydocs(;
     repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
-    target="build"
+    target="build",
+    versions = ["dev" => "dev", "v#.#.#"],
 )
