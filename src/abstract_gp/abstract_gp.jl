@@ -6,8 +6,8 @@
 Supertype for various Gaussian process (GP) types. A common interface is provided for
 interacting with each of these objects. See [1] for an overview of GPs.
 
-[1] - C. E. Rasmussen and C. Williams. "Gaussian processes for machine learning". MIT Press.
-2006.
+[1] - C. E. Rasmussen and C. Williams. "Gaussian processes for machine learning". 
+MIT Press. 2006.
 """
 abstract type AbstractGP end
 
