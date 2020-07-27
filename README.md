@@ -12,10 +12,10 @@ AbstractGPs.jl is a package that defines a low-level API for working with Gaussi
 
 ## Installation 
 
-AbstractGPs is an officially registered Julia package, so the following will install AbstractGPs while inside Julia’s package manager (press ] from the REPL):
+AbstractGPs is an officially registered Julia package, so the following will install AbstractGPs using the Julia's package manager:
 
 ```julia
-add AbstractGPs
+] add AbstractGPs
 ```
 
 ## Example
