@@ -4,7 +4,10 @@ if haskey(ENV, "GITHUB_ACTIONS")
     ENV["JULIA_DEBUG"] = "Documenter"
 end
 
-Documenter.post_status(; type="pending", repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git")
+Documenter.post_status(; 
+    type="pending", 
+    repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git"
+)
 
 
 using Literate, AbstractGPs
