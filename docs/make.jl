@@ -41,6 +41,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl",
-    push_preview=true
+    repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
+    target="build"
 )
