@@ -1,4 +1,4 @@
-# # Example: Approximate Inference using ESS
+# # Approximate Inference using ESS
 
 # Loading the necessary packages and setting seed.
 

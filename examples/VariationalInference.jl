@@ -1,4 +1,4 @@
-# # Example: Approximate Inference on Sparse GPs using VI
+# # Approximate Inference on Sparse GPs using VI
 
 # Loading the necessary packages and setting seed.
 
@@ -41,6 +41,8 @@ fx = f(x_train, 0.001);
 p_fx = posterior(fx, y_train)
 
 logpdf(p_fx(x_test), y_test)
+
+# ## Variational Inference
 
 # Sanity check for the Evidence Lower BOund (ELBO) implemented according to 
 # M. K. Titsias's _Variational learning of inducing variables in sparse Gaussian processes_

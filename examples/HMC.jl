@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# # Example: Approximate Inference with NUTS-HMC
+# # Approximate Inference with NUTS-HMC
 
 # Loading the necessary packages and setting seed.
 
