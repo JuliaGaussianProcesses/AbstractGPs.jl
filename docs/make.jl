@@ -24,7 +24,11 @@ for filename in readdir(joinpath(@__DIR__, "..", "examples"))
     )
 end
 
-generated_examples = joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(joinpath(@__DIR__, "src", "examples"))))
+generated_examples = joinpath.("examples", filter(
+    x -> endswith(x, ".md"), 
+    readdir(joinpath(@__DIR__, "src", "examples"))
+    )
+)
 
 DocMeta.setdocmeta!(
     AbstractGPs,
