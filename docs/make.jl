@@ -50,5 +50,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
     target="build",
-    versions = ["dev" => "dev", "v#.#"],
+    versions = ["dev" => "dev", "v#.#.#"],
 )
