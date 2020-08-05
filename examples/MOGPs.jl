@@ -14,7 +14,7 @@ out_dim = 2
 x = [rand(Uniform(-1, 1), 3) for _ in 1:N] # 1-dim input 
 y = [[sin(xi[1]) + exp(xi[2]) , cos(xi[3])] .+ 0.1 * randn(2) for xi in x];  # 2-dim output 
 plt = multidataplot(x, y, in_dim, out_dim, layout=(1,3))
-plot!(plt, size=(600, 200), label="", )
+plot!(plt, size=(900, 300), label="")
 
 # Make inputs and outputs compatible with multi-output GPs.
 
@@ -51,6 +51,6 @@ logpdf(p_fx(X, 0.1), Y)
 X_Test = MOInput(reshape(collect.(collect(Iterators.product(-1:0.05:1, -1:0.05:1, -1:0.05:1))), :), out_dim)
 p_fx_x = p_fx(X_Test, 0.01)
 plt = multigpplot(p_fx_x, in_dim, out_dim, layout=(1,3))
-plot!(plt, size=(600, 200), label="", )
+plot!(plt, size=(900, 300), label="", )
 
 
