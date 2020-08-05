@@ -52,3 +52,52 @@ from default of 0.5 to 5.
     end
 end
 
+"""
+    multigpplot(GP::FiniteGP, in_dim::Int, out_dim::Int)
+
+"""
+@userplot MultiGPPlot
+@recipe function f(mgp::MultiGPPlot)
+    gp = mgp.args[1]
+    x = gp.x.x
+    f = gp.f
+    in_dim = mgp.args[2]
+    out_dim = mgp.args[3]
+    ms = mo_inverse_transform(marginals(gp), out_dim)
+    x = [[[x[i][j] for i in 1:length(x)] for j in 1:in_dim] for k in 1:out_dim]
+    μ = [[[mean(ms[i][k]) for i in 1:length(ms)] for j in 1:in_dim] for k in 1:out_dim]
+    σ = [[[std(ms[i][k]) for i in 1:length(ms)] for j in 1:in_dim] for k in 1:out_dim]
+    @series begin
+        ribbon := σ
+        layout --> in_dim
+        label --> reshape(["out_dim=$j" for j in 1:out_dim], 1, :)
+        title --> reshape(["in_dim=$j" for j in 1:in_dim], 1, :)
+        fillalpha --> 0.3
+        linewidth --> 2
+        x, μ
+    end
+end
+
+"""
+    multidataplot(x, y, in_dim::Int, out_dim::Int)
+
+"""
+@userplot MultiDataPlot
+@recipe function f(mdp::MultiDataPlot)
+    x = mdp.args[1]
+    y = mdp.args[2]
+    length(x) == length(y) || error("`x` and `y` should be of the same length")
+    
+    in_dim = mdp.args[3]
+    out_dim = mdp.args[4]
+    x = [[[x[i][j] for i in 1:length(x)] for j in 1:in_dim] for k in 1:out_dim]
+    y = [[[y[i][k] for i in 1:length(y)] for j in 1:in_dim] for k in 1:out_dim]
+    
+    @series begin
+        seriestype --> :scatter
+        layout --> in_dim
+        label --> reshape(["out_dim=$j" for j in 1:out_dim], 1, :)
+        title --> reshape(["in_dim=$j" for j in 1:in_dim], 1, :)
+        x, y
+    end
+end
