@@ -1,5 +1,13 @@
 # This file is machine-generated - editing it directly is not advised
 
+
+
+[[AbstractGPs]]
+deps = ["ChainRulesCore", "Distributions", "FillArrays", "KernelFunctions", "LinearAlgebra", "Random", "RecipesBase", "Reexport", "Statistics"]
+path = ".."
+uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
+version = "0.2.4"
+
 [[AbstractMCMC]]
 deps = ["BangBang", "ConsoleProgressMonitor", "Distributed", "Logging", "LoggingExtras", "ProgressLogging", "Random", "StatsBase", "TerminalLoggers", "Transducers"]
 git-tree-sha1 = "74d0752ecdb7b2e707198edbb467c369e5a2615a"
