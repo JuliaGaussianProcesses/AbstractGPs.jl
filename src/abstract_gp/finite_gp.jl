@@ -35,6 +35,7 @@ Base.length(f::FiniteGP) = length(f.x)
 
 Compute the mean vector of `fx`.
 
+
 ```jldoctest
 julia> f = GP(Matern52Kernel());
 
@@ -52,6 +53,7 @@ Statistics.mean(fx::FiniteGP) = mean(fx.f, fx.x)
 Compute the covariance matrix of `fx`.
 
 ## Noise-free observations
+
 
 ```jldoctest cov_finitegp
 julia> f = GP(Matern52Kernel());
@@ -95,6 +97,7 @@ Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 Equivalent to `(mean(f), cov(f))`, but sometimes more efficient to compute them jointly than
 separately.
 
+
 ```jldoctest
 julia> fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
 
@@ -111,6 +114,7 @@ end
     cov(fx::FiniteGP, gx::FiniteGP)
 
 Compute the cross-covariance matrix between `fx` and `gx`.
+
 
 ```jldoctest
 julia> f = GP(Matern32Kernel());
@@ -134,6 +138,7 @@ end
 Compute a vector of Normal distributions representing the marginals of `f` efficiently.
 In particular, the off-diagonal elements of `cov(f(x))` are never computed.
 
+
 ```jldoctest
 julia> f = GP(Matern32Kernel());
 
@@ -155,6 +160,7 @@ marginals(f::FiniteGP) = Normal.(mean(f), sqrt.(cov_diag(f.f, f.x) .+ diag(f.Σy
 
 Obtain `N` independent samples from the marginals `f` using `rng`. Single-sample methods
 produce a `length(f)` vector. Multi-sample methods produce a `length(f)` x `N` `Matrix`.
+
 
 ```jldoctest
 julia> f = GP(Matern32Kernel());
@@ -189,6 +195,7 @@ Random.rand(f::FiniteGP) = vec(rand(f, 1))
 The logpdf of `y` under `f` if is `y isa AbstractVector`. logpdf of each column of `y` if
 `y isa Matrix`.
 
+
 ```jldoctest
 julia> f = GP(Matern32Kernel());
 
@@ -222,6 +229,7 @@ end
 The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `f`, and `u`
 are pseudo-points, where `u = f(z)` for some `z`.
 
+
 ```jldoctest
 julia> f = GP(Matern52Kernel());
 
@@ -249,6 +257,7 @@ end
 
 The Deterministic Training Conditional (DTC) [1]. `y` are observations of `f`, and `u`
 are pseudo-points.
+
 
 ```jldoctest
 julia> f = GP(Matern52Kernel());
