@@ -8,7 +8,7 @@ AbstractGPs.jl is a package that defines a low-level API for working with Gaussi
 
 ### Setup
 ```julia
-using AbstractGPs, KernelFunctions, Random
+using AbstractGPs, Random
 rng = MersenneTwister(0)
 
 # Construct a zero-mean Gaussian process with a matern-3/2 kernel.

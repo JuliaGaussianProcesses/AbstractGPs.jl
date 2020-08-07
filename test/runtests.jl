@@ -9,8 +9,6 @@ using ChainRulesCore
 using Distributions: MvNormal, PDMat
 using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
-using KernelFunctions
-using KernelFunctions: Kernel, ColVecs, RowVecs
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
 using Plots
@@ -47,7 +45,7 @@ include("test_util.jl")
         DocMeta.setdocmeta!(
             AbstractGPs,
             :DocTestSetup,
-            :(using AbstractGPs, Random, Documenter, LinearAlgebra, KernelFunctions);
+            :(using AbstractGPs, Random, Documenter, LinearAlgebra);
             recursive=true,
         )
         doctest(AbstractGPs)
