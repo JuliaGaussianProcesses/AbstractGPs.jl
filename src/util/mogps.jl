@@ -18,7 +18,7 @@ is a input/target for one observation.
 ...
 # Arguments
 - `x`: the input `Vector`.
-- `y`: the outputs `Vector`.
+- `y`: the output `Vector`.
 - `out_dim::Int`: the output dimension.
 ...
 """
@@ -35,7 +35,7 @@ end
 ...
 # Arguments
 - `x`: the input matrix of size `(in_dim, N)`.
-- `y`: the outputs matrix of size `(out_dim, N)`.
+- `y`: the output matrix of size `(out_dim, N)`.
 ...
 """
 function mo_transform(x::AbstractMatrix, y::AbstractMatrix)
