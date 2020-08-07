@@ -10,4 +10,13 @@
     @test (x, y) == mo_inverse_transform(X, Y)
     @test (x, y) == mo_inverse_transform(collect(X), Y, out_dim)
     @test y == mo_inverse_transform(Y, out_dim)
+    
+    # Matrix inputs
+    xm = hcat(x...)
+    ym = hcat(y...)
+    
+    Xm, Ym = mo_transform(xm, ym)
+    @test length(Xm) == length(Ym)
+    @test (X, Y) == (Xm, Ym)
+    @test size(ym) == (out_dim, N)
 end
