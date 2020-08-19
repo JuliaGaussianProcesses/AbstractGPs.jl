@@ -212,3 +212,90 @@ function abstractgp_interface_tests(
     @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
     @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
 end
+
+"""
+    abstractgp_interface_tests_soft(
+        f::AbstractGP,
+        x::AbstractVector,
+        z::AbstractVector;
+        eig_tol=1e-12,
+        σ²::Real=1e-9,
+        ia_tol=1e-9
+    )
+
+Soft version of `abstractgp_interface_tests`, relax ≈ tol requirement.
+`ia_tol` is atol for `isapprox`.
+"""
+function abstractgp_interface_tests_soft(
+    f::AbstractGP,
+    x::AbstractVector,
+    z::AbstractVector;
+    eig_tol::Real=1e-12,
+    σ²::Real=1e-9,
+    ia_tol::Real=1e-8
+)
+    @assert length(x) ≠ length(z)
+
+    # Verify that `mean` works and is the correct length and type.
+    m = mean(f, x)
+    @test m isa AbstractVector{<:Real}
+    @test length(m) == length(x)
+
+    # Verify that cov(f, x, z) works, is the correct size and type.
+    C_xy = cov(f, x, z)
+    @test C_xy isa AbstractMatrix{<:Real}
+    @test size(C_xy) == (length(x), length(z))
+
+    # Reversing arguments transposes the return.
+    @test C_xy ≈ cov(f, z, x)' atol=ia_tol
+
+    # Verify cov(f, x) works, is the correct size and type.
+    C_xx = cov(f, x)
+    @test size(C_xx) == (length(x), length(x))
+
+    # Check that C_xx is positive definite.
+    @test minimum(eigvals(Symmetric(C_xx))) > -eig_tol
+
+    # Check that C_xx is consistent with cov(f, x, x).
+    @test C_xx ≈ cov(f, x, x) atol=ia_tol
+
+    # Check that cov_diag works, is the correct size and type.
+    C_xx_diag = cov_diag(f, x)
+    @test C_xx_diag isa AbstractVector{<:Real}
+    @test length(C_xx_diag) == length(x)
+
+    # Check C_xx_diag is consistent with cov(f, x).
+    @test C_xx_diag ≈ diag(C_xx) atol=ia_tol
+
+    # Check that mean_and_cov is consistent.
+    let
+    m, C = mean_and_cov(f, x)
+    @test m ≈ mean(f, x) atol=ia_tol
+    @test C ≈ cov(f, x)
+    end
+
+    # Check that mean_and_cov_diag is consistent.
+    let
+    m, c = mean_and_cov_diag(f, x)
+    @test m ≈ mean(f, x) atol=ia_tol
+    @test c ≈ cov_diag(f, x) atol=ia_tol
+    end
+
+    # Construct a FiniteGP, and check that all standard methods defined on it at least run.
+    fx = f(x, σ²)
+    fz = f(z, σ²)
+    @test mean(fx) ≈ mean(f, x) atol=ia_tol
+    @test cov(fx) ≈ cov(f, x) + fx.Σy atol=ia_tol
+    @test cov(fx, fz) ≈ cov(f, x, z) atol=ia_tol
+    @test first(mean_and_cov(fx)) ≈ mean(f, x) atol=ia_tol
+    @test last(mean_and_cov(fx)) ≈ cov(f, x) atol=ia_tol
+    @test mean.(marginals(fx)) ≈ mean(f, x) atol=ia_tol
+    @test var.(marginals(fx)) ≈ cov_diag(f, x) .+ diag(fx.Σy) atol=ia_tol
+
+    # Generate, compute logpdf, compare against VFE and DTC.
+    y = rand(fx)
+    @test length(y) == length(x)
+    @test logpdf(fx, y) isa Real
+    @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
+    @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
+end

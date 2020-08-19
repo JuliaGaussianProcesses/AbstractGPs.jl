@@ -42,4 +42,15 @@
     @test p_p_fx1.data.x ≈ p_fx2.data.x atol=1e-5
     @test p_p_fx1.data.δ ≈ p_fx2.data.δ atol=1e-5
 
+    # check whether multidimension input work
+    x = reshape([[0.1*i, 0.1*j] for i=1:10, j=1:10], 1, :)[1,:]
+    kern = SqExponentialKernel()
+    f = GP(kern)
+    fx = f(x, 1e-3)
+    y = zeros(100)
+    fxy = posterior(fx, y)
+
+    x_N_a = reshape([[0.1*i, 0.1*j] for i=1:N_a, j=1:N_a], 1, :)[1,:]
+    z_N_b = reshape([[0.1*i, 0.1*j] for i=1:N_b, j=1:N_b], 1, :)[1,:]
+    abstractgp_interface_tests_soft(fxy, x_N_a, z_N_b)
 end
