@@ -40,7 +40,7 @@ logpdf(fx, Y)
 p_fx = posterior(fx, Y)
 
 # Data's log-likelihood w.r.t posterior GP `p_fx`. 
-logpdf(fx, Y)
+logpdf(p_fx(X), Y)
 
 # Plot posterior.
 plt = scatter(X, Y; label = "Data")
