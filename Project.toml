@@ -1,7 +1,7 @@
 name = "AbstractGPs"
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
 authors = ["willtebbutt <wt0881@my.bristol.ac.uk>"]
-version = "0.2.5"
+version = "0.2.6"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
