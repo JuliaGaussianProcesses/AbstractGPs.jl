@@ -243,6 +243,12 @@ git-tree-sha1 = "94e98e5597e745d9fb3094d89c7b0b754204c9dd"
 uuid = "559328eb-81f9-559d-9380-de523a88c83c"
 version = "1.0.5+4"
 
+[[Functors]]
+deps = ["MacroTools"]
+git-tree-sha1 = "f40adc6422f548176bb4351ebd29e4abf773040a"
+uuid = "d9f16b24-f501-4c13-a1f2-28368ffc5196"
+version = "0.1.0"
+
 [[Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
@@ -309,10 +315,10 @@ uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
 
 [[KernelFunctions]]
-deps = ["Compat", "Distances", "InteractiveUtils", "LinearAlgebra", "Requires", "SpecialFunctions", "StatsBase", "StatsFuns", "ZygoteRules"]
-git-tree-sha1 = "978087edc51d3be14d3c1ac50bf8787398377ae8"
+deps = ["Compat", "Distances", "Functors", "InteractiveUtils", "LinearAlgebra", "Requires", "SpecialFunctions", "StatsBase", "StatsFuns", "ZygoteRules"]
+git-tree-sha1 = "f8135f10205995df605f024604b193dc3505510d"
 uuid = "ec8451be-7e33-11e9-00cf-bbf324bd1392"
-version = "0.6.1"
+version = "0.7.0"
 
 [[LAME_jll]]
 deps = ["Libdl", "Pkg"]
@@ -515,9 +521,9 @@ version = "1.3.2"
 
 [[QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
-git-tree-sha1 = "0ab8a09d4478ebeb99a706ecbf8634a65077ccdc"
+git-tree-sha1 = "12fbe86da16df6679be7521dfb39fbc861e1dc7b"
 uuid = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
-version = "2.4.0"
+version = "2.4.1"
 
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets"]
@@ -665,9 +671,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Transducers]]
 deps = ["ArgCheck", "BangBang", "CompositionsBase", "DefineSingletons", "Distributed", "InitialValues", "Logging", "Markdown", "Requires", "Setfield", "SplittablesBase", "Tables"]
-git-tree-sha1 = "4aad5d3291e667395d14b6c1d8fbcc7fcd145e75"
+git-tree-sha1 = "f504961462ab514f7e654192bb2fc8cba3674c35"
 uuid = "28d57a85-8fef-5791-bfe6-a80928e7c999"
-version = "0.4.47"
+version = "0.4.48"
 
 [[UUIDs]]
 deps = ["Random", "SHA"]
