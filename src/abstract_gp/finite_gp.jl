@@ -14,16 +14,24 @@ function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::AbstractVector{<:Real}
     return FiniteGP(f, x, Diagonal(σ²))
 end
 
+const default_σ² = 1e-18
+
 FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real) = FiniteGP(f, x, Fill(σ², length(x)))
 
-FiniteGP(f::AbstractGP, x::AbstractVector) = FiniteGP(f, x, 1e-18)
+FiniteGP(f::AbstractGP, x::AbstractVector) = FiniteGP(f, x, default_σ²)
 
 function FiniteGP(
-    f::AbstractGP,
-    X::AbstractMatrix;
+    f::AbstractGP, X::AbstractMatrix;
+    obsdim::Int = KernelFunctions.defaultobs
+    )
+    return FiniteGP(f, X, default_σ²; obsdim=obsdim)
+end
+
+function FiniteGP(
+    f::AbstractGP, X::AbstractMatrix, σ²::Real;
     obsdim::Int = KernelFunctions.defaultobs,
 )
-    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim))
+    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
 end
 
 Base.length(f::FiniteGP) = length(f.x)
