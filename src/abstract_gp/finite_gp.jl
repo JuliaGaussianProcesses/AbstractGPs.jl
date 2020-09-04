@@ -16,19 +16,10 @@ end
 
 const default_σ² = 1e-18
 
-FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real) = FiniteGP(f, x, Fill(σ², length(x)))
-
-FiniteGP(f::AbstractGP, x::AbstractVector) = FiniteGP(f, x, default_σ²)
+FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²) = FiniteGP(f, x, Fill(σ², length(x)))
 
 function FiniteGP(
-    f::AbstractGP, X::AbstractMatrix;
-    obsdim::Int = KernelFunctions.defaultobs
-    )
-    return FiniteGP(f, X, default_σ²; obsdim=obsdim)
-end
-
-function FiniteGP(
-    f::AbstractGP, X::AbstractMatrix, σ²::Real;
+    f::AbstractGP, X::AbstractMatrix, σ²=default_σ²;
     obsdim::Int = KernelFunctions.defaultobs,
 )
     return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
