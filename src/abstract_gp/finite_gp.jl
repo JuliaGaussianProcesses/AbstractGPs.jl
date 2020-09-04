@@ -193,7 +193,7 @@ function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(Symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(y))
-    return -((length(y) * T(log(2π)) + logdet(C)) + diag_Xt_invA_X(C, y - m)) / 2
+    return -((length(y) * T(log(2π)) + logdet(C)) + first(diag_Xt_invA_X(C, y - m))) / 2
 end
 
 Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
@@ -203,10 +203,6 @@ function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     C = cholesky(Symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
     return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
-end
-
-function Distributions._logpdf!(r::AbstractArray, f::FiniteGP, Y::AbstractMatrix{<:Real})
-    r .= logpdf(f, Y)
 end
 
 """
