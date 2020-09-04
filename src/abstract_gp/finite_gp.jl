@@ -190,10 +190,7 @@ Random.rand(rng::AbstractRNG, f::FiniteGP) = vec(rand(rng, f, 1))
 Random.rand(f::FiniteGP) = vec(rand(f, 1))
 
 function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
-    m, C_mat = mean_and_cov(f)
-    C = cholesky(Symmetric(C_mat))
-    T = promote_type(eltype(m), eltype(C), eltype(y))
-    return -((length(y) * T(log(2π)) + logdet(C)) + first(diag_Xt_invA_X(C, y - m))) / 2
+    return first(logpdf(f, reshape(y, :, 1)))
 end
 
 Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
