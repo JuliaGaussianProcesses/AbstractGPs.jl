@@ -189,34 +189,11 @@ Random.rand(f::FiniteGP, N::Int) = rand(Random.GLOBAL_RNG, f, N)
 Random.rand(rng::AbstractRNG, f::FiniteGP) = vec(rand(rng, f, 1))
 Random.rand(f::FiniteGP) = vec(rand(f, 1))
 
-"""
-    logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
-
-The logpdf of `y` under `f` if is `y isa AbstractVector`. logpdf of each column of `y` if
-`y isa Matrix`.
-
-
-```jldoctest
-julia> f = GP(Matern32Kernel());
-
-julia> x = randn(11);
-
-julia> y = rand(f(x));
-
-julia> logpdf(f(x), y) isa Real
-true
-
-julia> Y = rand(f(x), 3);
-
-julia> logpdf(f(x), Y) isa AbstractVector{<:Real}
-true
-```
-"""
-function Distributions.logpdf(f::FiniteGP, y::AbstractVector{<:Real})
+function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
     return first(logpdf(f, reshape(y, :, 1)))
 end
 
-function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
+function Distributions._logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(Symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
