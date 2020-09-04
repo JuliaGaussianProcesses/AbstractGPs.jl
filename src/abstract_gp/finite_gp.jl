@@ -189,7 +189,6 @@ Random.rand(f::FiniteGP, N::Int) = rand(Random.GLOBAL_RNG, f, N)
 Random.rand(rng::AbstractRNG, f::FiniteGP) = vec(rand(rng, f, 1))
 Random.rand(f::FiniteGP) = vec(rand(f, 1))
 
-
 """
     logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
