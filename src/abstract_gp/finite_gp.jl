@@ -213,7 +213,7 @@ julia> logpdf(f(x), Y) isa AbstractVector{<:Real}
 true
 ```
 """
-logpdf(f::FiniteGP, y::AbstractVectorMat{<:Real})
+logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
 function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
     return first(logpdf(f, reshape(y, :, 1)))
