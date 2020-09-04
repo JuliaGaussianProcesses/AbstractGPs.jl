@@ -196,7 +196,7 @@ function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
     return -((length(y) * T(log(2π)) + logdet(C)) + diag_Xt_invA_X(C, y - m)) / 2
 end
 
-Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = logpdf(f, Y)
+Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
 
 function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     m, C_mat = mean_and_cov(f)
