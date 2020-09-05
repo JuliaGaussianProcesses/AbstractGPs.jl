@@ -5,21 +5,21 @@
     x = [rand(1) for _ in 1:3]
     @model GPRegression(y, X) = begin
         # Priors.
-        alpha ~ LogNormal(0.0, 0.1)
-        rho ~ LogNormal(0.0, 1.0)
-        sigma ~ LogNormal(0.0, 1.0)
+        α ~ LogNormal(0.0, 0.1)
+        ρ ~ LogNormal(0.0, 1.0)
+        σ² ~ LogNormal(0.0, 1.0)
 
         # Realized covariance function
         kernel = α * transform(SqExponentialKernel(), 1/ρ)
-        f ~ GP(kernel)
+        f = GP(kernel)
 
         # Sampling Distribution.
-        y ~ f(X, sigma)
+        y ~ f(X, σ²)
     end
     # Test for matrices
-    m = GPRegression(y, X)
-    chain = sample(m, HMC(5, 0.5), 5)
+    m = GPRegression(y, RowVecs(X))
+    @test_nowarn sample(m, HMC(0.5, 1), 5)
     # Test for vectors of vector
     m = GPRegression(y, x)
-    chain = sample(m, HMC(5, 0.5), 5)
+    @test_nowarn sample(m, HMC(0.5, 1), 5)
 end
