@@ -205,6 +205,11 @@ end
     end
 end
 
+    @testset "Docs" begin
+        docstring = string(Docs.doc(logpdf, Tuple{FiniteGP, Vector{Float64}}))
+        @test contains(docstring, "logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})")
+    end
+
 # """
 #     simple_gp_tests(rng::AbstractRNG, f::GP, xs::AV{<:AV}, σs::AV{<:Real})
 
