@@ -213,9 +213,13 @@ julia> logpdf(f(x), Y) isa AbstractVector{<:Real}
 true
 ```
 """
-function Distributions.logpdf(f::FiniteGP, y::AbstractVector{<:Real})
+logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
+
+function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
     return first(logpdf(f, reshape(y, :, 1)))
 end
+
+Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
 
 function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     m, C_mat = mean_and_cov(f)
