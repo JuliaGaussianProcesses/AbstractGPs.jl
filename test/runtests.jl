@@ -24,25 +24,33 @@ include("test_util.jl")
 @testset "AbstractGPs" begin
     @testset "util" begin
         include(joinpath("util", "common_covmat_ops.jl"))
+        include(joinpath("util", "plotting.jl"))
     end
+    @info "Ran util tests"
+
     @testset "abstract_gp" begin
         include(joinpath("abstract_gp", "abstract_gp.jl"))
         include(joinpath("abstract_gp", "finite_gp.jl"))
     end
+    @info "Ran abstract_gp tests"
+
     @testset "gp" begin
         include(joinpath("gp", "mean_functions.jl"))
         include(joinpath("gp", "gp.jl"))
     end
+    @info "Ran gp tests"
+
     @testset "posterior_gp" begin
         include(joinpath("posterior_gp", "posterior_gp.jl"))
         include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
     end
+    @info "Ran posterior_gp tests"
 
     include(joinpath("latent_gp", "latent_gp.jl"))
-
-    include(joinpath("util", "plotting.jl"))
+    @info "Ran latent_gp tests"
 
     include("turing.jl")
+    @info "Ran Turing tests"
     
     @testset "doctests" begin
         DocMeta.setdocmeta!(

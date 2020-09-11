@@ -210,7 +210,7 @@ end
 
     @testset "Docs" begin
         docstring = string(Docs.doc(logpdf, Tuple{FiniteGP, Vector{Float64}}))
-        @test contains(docstring, "logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})")
+        @test occursin("logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
     end
 
 # """
