@@ -9,12 +9,15 @@ end
     @testset "statistics" begin
         rng, N, N′ = MersenneTwister(123456), 1, 9
         x, x′, Σy, Σy′ = randn(rng, N), randn(rng, N′), zeros(N, N), zeros(N′, N′)
+        σ² = 1e-3
         Xmat = randn(rng, N, N′)
         f = GP(sin, SqExponentialKernel())
         fx, fx′ = FiniteGP(f, x, Σy), FiniteGP(f, x′, Σy′)
 
         @test FiniteGP(f, Xmat, obsdim=1) == FiniteGP(f, RowVecs(Xmat))
         @test FiniteGP(f, Xmat, obsdim=2) == FiniteGP(f, ColVecs(Xmat))
+        @test FiniteGP(f, Xmat, σ², obsdim=1) == FiniteGP(f, RowVecs(Xmat), σ²)
+        @test FiniteGP(f, Xmat, σ², obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²) 
         @test mean(fx) == mean(f, x)
         @test cov(fx) == cov(f, x)
         @test cov(fx, fx′) == cov(f, x, x′)
@@ -106,7 +109,7 @@ end
     #         )
     #     end
     # end
-    @testset "logpdf / elbo / dtc" begin
+    @testset "logpdf / loglikelihood / elbo / dtc" begin
         rng = MersenneTwister(123456)
         N = 10
         S = 11
@@ -120,12 +123,13 @@ end
         # Check that logpdf returns the correct type and roughly agrees with Distributions.
         @test logpdf(y, ŷ) isa Real
         @test logpdf(y, ŷ) ≈ logpdf(MvNormal(Vector(mean(y)), cov(y)), ŷ)
-
+        @test loglikelihood(y, ŷ) == logpdf(y, ŷ)
         # Check that multi-sample logpdf returns the correct type and is consistent with
         # single-sample logpdf
         Ŷ = rand(rng, y, S)
         @test logpdf(y, Ŷ) isa Vector{Float64}
         @test logpdf(y, Ŷ) ≈ [logpdf(y, Ŷ[:, n]) for n in 1:S]
+        @test loglikelihood(y, Ŷ) == sum(logpdf(y, Ŷ))
 
         # # Check gradient of logpdf at mean is zero for `f`.
         # adjoint_test(ŷ->logpdf(fx, ŷ), 1, ones(size(ŷ)))
@@ -203,6 +207,11 @@ end
         @test elbo(fx, y, u) isa T
     end
 end
+
+    @testset "Docs" begin
+        docstring = string(Docs.doc(logpdf, Tuple{FiniteGP, Vector{Float64}}))
+        @test occursin("logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
+    end
 
 # """
 #     simple_gp_tests(rng::AbstractRNG, f::GP, xs::AV{<:AV}, σs::AV{<:Real})

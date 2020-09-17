@@ -36,7 +36,7 @@ generated_examples = joinpath.("examples", filter(
 DocMeta.setdocmeta!(
     AbstractGPs,
     :DocTestSetup,
-    :(using AbstractGPs, KernelFunctions, LinearAlgebra, Random);
+    :(using AbstractGPs, LinearAlgebra, Random);
     recursive=true,
 )
 
