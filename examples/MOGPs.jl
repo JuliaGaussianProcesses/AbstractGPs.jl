@@ -22,7 +22,7 @@ X, Y = mo_transform(x, y, 2);
 
 # Define a multi-output kernel which assumes the outputs are independent of each other.
 
-k = IndependentMOKernel(MaternKernel())
+k = IndependentMOKernel(Matern32Kernel())
 
 # Instantiate a Gaussian Process with the given kernel.
 
