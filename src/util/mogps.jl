@@ -8,9 +8,6 @@ struct MOutput{T<:AbstractVector} <: AbstractVector{Real}
     out_dim::Integer
 end
 
-Base.length(out::MOutput) = out.out_dim * length(out.x)
-
-Base.size(out::MOutput, d) = d::Integer == 1 ? out.out_dim * size(out.x, 1) : 1 
 Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
 
 function Base.getindex(out::MOutput, ind::Integer)
