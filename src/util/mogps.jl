@@ -14,15 +14,15 @@ Base.size(out::MOutput, d) = d::Integer == 1 ? out.out_dim * size(out.x, 1) : 1
 Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
 
 function Base.getindex(out::MOutput, ind::Integer)
-    if ind > 0
-        len = length(out.x)
-        ind1 = ind % len
-        ind2 = (ind - 1) ÷ len + 1
-        if ind1 == 0 ind1 = len end
-        return out.x[ind1][ind2]
-    else
-        throw(BoundsError(string("Trying to access at ", ind)))
+    @boundscheck if ind <= 0 || ind > length(out)
+        throw(BoundsError(string("Out of bounds. Trying to access at ", ind)))
     end
+
+    len = length(out.x)
+    ind1 = ind % len
+    ind2 = (ind - 1) ÷ len + 1
+    if ind1 == 0 ind1 = len end
+    return out.x[ind1][ind2]
 end
 
 """
