@@ -25,9 +25,6 @@ function Base.getindex(out::MOutput, ind::Integer)
     end
 end
 
-Base.iterate(out::MOutput) = (out[1], 1)
-Base.iterate(out::MOutput, state) = (state<length(out)) ? (out[state + 1], state + 1) : nothing
-
 """
     mo_transform
 
