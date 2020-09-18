@@ -1,4 +1,37 @@
 """
+    MOutput(x::AbstractVector, out_dim::Integer)
+
+A data type to handle multi-dimensional outputs.
+"""
+struct MOutput{T<:AbstractVector} <: AbstractVector{Real}
+    x::T
+    out_dim::Integer
+end
+
+Base.length(out::MOutput) = out.out_dim * length(out.x)
+
+Base.size(out::MOutput, d) = d::Integer == 1 ? out.out_dim * size(out.x, 1) : 1 
+Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
+
+Base.lastindex(out::MOutput) = length(out)
+Base.firstindex(out::MOutput) = 1
+
+function Base.getindex(out::MOutput, ind::Integer)
+    if ind > 0
+        len = length(out.x)
+        ind1 = ind % len
+        ind2 = (ind - 1) ÷ len + 1
+        if ind1 == 0 ind1 = len end
+        return out.x[ind1][ind2]
+    else
+        throw(BoundsError(string("Trying to access at ", ind)))
+    end
+end
+
+Base.iterate(out::MOutput) = (out[1], 1)
+Base.iterate(out::MOutput, state) = (state<length(out)) ? (out[state + 1], state + 1) : nothing
+
+"""
     mo_transform
 
 A utility function to transform multi-dimensional data in the form of Vector of Vectors
@@ -23,10 +56,7 @@ is a input/target for one observation.
 ...
 """
 function mo_transform(x::AbstractVector, y::AbstractVector, out_dim::Int)
-
-    X = MOInput(x, out_dim)
-    Y = vcat(([yi[i] for yi in y] for i in 1:out_dim)...) 
-    return X, Y
+    return MOInput(x, out_dim), MOutput(y, out_dim)
 end
 
 """
@@ -40,11 +70,8 @@ end
 """
 function mo_transform(x::AbstractMatrix, y::AbstractMatrix)
     size(x, 2) == size(y, 2) || error("`x` and `y` are do not have compatible sizes.")
-    out_dim = size(y, 1)
-    X = MOInput(ColVecs(x), out_dim)
-    y_ = ColVecs(y)
-    Y = vcat(([yi[i] for yi in y_] for i in 1:out_dim)...) 
-    return X, Y
+    out_dim = size(y, 1) 
+    return MOInput(ColVecs(x), out_dim), MOutput(ColVecs(y), out_dim)
 end
 
 """
@@ -65,11 +92,19 @@ mo_inverse_transform
 """
     mo_inverse_transform(X::MOInput, Y::AbstractVector)
 """
-function mo_inverse_transform(X::MOInput, Y::AbstractVector)
-    N = length(Y) ÷ X.out_dim
-    y = [Y[[i + j*N for j in 0:(X.out_dim - 1)]] for i in 1:N]
-    return X.x, y
+function mo_inverse_transform(X::MOInput, Y::MOutput)
+    return X.x, Y.x
 end
+
+"""
+    mo_inverse_transform(X::MOInput)
+"""
+mo_inverse_transform(X::MOInput) = X.x
+
+"""
+    mo_inverse_transform(Y::MOutput)
+"""
+mo_inverse_transform(Y::MOutput) = Y.x
 
 """
     mo_inverse_transform(X::AbstractVector, Y::AbstractVector, out_dim::Int)
@@ -79,13 +114,4 @@ function mo_inverse_transform(X::AbstractVector, Y::AbstractVector, out_dim::Int
     x = [first(xi) for xi in X[1:N]]
     y = [Y[[i + j*N for j in 0:(out_dim - 1)]] for i in 1:N]
     return x, y
-end
-
-"""
-    mo_inverse_transform(Y::AbstractVector, out_dim::Int)
-"""
-function mo_inverse_transform(Y::AbstractVector, out_dim::Int)
-    N = length(Y) ÷ out_dim
-    y = [Y[[i + j*N for j in 0:(out_dim - 1)]] for i in 1:N]
-    return y
 end
