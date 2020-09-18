@@ -10,9 +10,8 @@ end
 
 Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
 
-function Base.getindex(out::MOutput, ind::Integer)
+@inline function Base.getindex(out::MOutput, ind::Integer)
     @boundscheck checkbounds(out, ind)
-
     len = length(out.x)
     ind1 = ind % len
     ind2 = (ind - 1) ÷ len + 1
