@@ -11,9 +11,7 @@ end
 Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
 
 function Base.getindex(out::MOutput, ind::Integer)
-    @boundscheck if ind <= 0 || ind > length(out)
-        throw(BoundsError(string("Out of bounds. Trying to access at ", ind)))
-    end
+    @boundscheck checkbounds(out, ind)
 
     len = length(out.x)
     ind1 = ind % len
