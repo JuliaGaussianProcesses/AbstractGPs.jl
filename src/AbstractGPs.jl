@@ -12,7 +12,7 @@ module AbstractGPs
     using KernelFunctions: ColVecs, RowVecs
 
     export GP, mean, cov, std, cov_diag, mean_and_cov, marginals, rand,
-        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, AbstractGP, sampleplot,
+        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, sampleplot,
         update_approx_posterior, LatentGP, ColVecs, RowVecs
 
     # Various bits of utility functionality.
