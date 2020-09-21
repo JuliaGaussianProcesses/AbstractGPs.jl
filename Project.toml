@@ -1,7 +1,7 @@
 name = "AbstractGPs"
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
 authors = ["willtebbutt <wt0881@my.bristol.ac.uk>"]
-version = "0.2.9"
+version = "0.2.10"
 
 
 [deps]
