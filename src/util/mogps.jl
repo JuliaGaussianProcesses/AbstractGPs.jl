@@ -3,19 +3,26 @@
 
 A data type to handle multi-dimensional outputs.
 """
-struct MOutput{T<:AbstractVector} <: AbstractVector{Real}
+struct MOutput{T<:AbstractVector} <: AbstractVector{eltype(eltype(T))} where T <: Real
     x::T
-    out_dim::Integer
+    out_dim::Int
 end
+
+"""
+    MOutput(x::AbstractMatrix)
+"""
+MOutput(x::AbstractMatrix) = MOutput(ColVecs(x), size(x, 1))
+
+"""
+    MOutput(x::AbstractVector)
+"""
+MOutput(x::AbstractVector) = MOutput(x, length(first(x)))
 
 Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
 
 @inline function Base.getindex(out::MOutput, ind::Integer)
     @boundscheck checkbounds(out, ind)
-    len = length(out.x)
-    ind1 = ind % len
-    ind2 = (ind - 1) ÷ len + 1
-    if ind1 == 0 ind1 = len end
+    (ind2, ind1) = fldmod1(ind, length(out.x))
     return out.x[ind1][ind2]
 end
 
@@ -44,7 +51,7 @@ is a input/target for one observation.
 ...
 """
 function mo_transform(x::AbstractVector, y::AbstractVector, out_dim::Int)
-    return MOInput(x, out_dim), MOutput(y, out_dim)
+    return MOInput(x, out_dim), MOutput(y)
 end
 
 """
@@ -59,7 +66,7 @@ end
 function mo_transform(x::AbstractMatrix, y::AbstractMatrix)
     size(x, 2) == size(y, 2) || error("`x` and `y` are do not have compatible sizes.")
     out_dim = size(y, 1) 
-    return MOInput(ColVecs(x), out_dim), MOutput(ColVecs(y), out_dim)
+    return MOInput(ColVecs(x), out_dim), MOutput(y)
 end
 
 """

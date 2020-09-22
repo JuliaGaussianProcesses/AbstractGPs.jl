@@ -6,7 +6,7 @@
     y = [rand(out_dim) for _ in 1:N]
 
     @testset "MOutput" begin
-        mout = MOutput(y, out_dim)
+        mout = MOutput(y)
         @test length(mout) == out_dim * N
         
         @test size(mout) == (out_dim * N,)
@@ -21,21 +21,21 @@
         @test mout[out_dim * N] == y[N][out_dim]
 
         @test mout isa MOutput
-        @test mout isa AbstractVector{Real}
+        @test mout isa AbstractVector
         @test mout ≈ vcat(([yi[i] for yi in y] for i in 1:out_dim)...)
     end
 
-    X, Y =  mo_transform(x, y, out_dim)
-    @test length(X) == length(Y)
-    @test (x, y) == mo_inverse_transform(X, Y)
-    @test (x, y) == mo_inverse_transform(collect(X), collect(Y), out_dim)
+    # X, Y =  mo_transform(x, y, out_dim)
+    # @test length(X) == length(Y)
+    # @test (x, y) == mo_inverse_transform(X, Y)
+    # @test (x, y) == mo_inverse_transform(collect(X), collect(Y), out_dim)
 
-    # Matrix inputs
-    xm = hcat(x...)
-    ym = hcat(y...)
+    # # Matrix inputs
+    # xm = hcat(x...)
+    # ym = hcat(y...)
     
-    Xm, Ym = mo_transform(xm, ym)
-    @test length(Xm) == length(Ym)
-    @test (X, Y) == (Xm, Ym)
-    @test size(ym) == (out_dim, N)
+    # Xm, Ym = mo_transform(xm, ym)
+    # @test length(Xm) == length(Ym)
+    # @test (X, Y) == (Xm, Ym)
+    # @test size(ym) == (out_dim, N)
 end
