@@ -1,22 +1,34 @@
 """
-    MOutput(x::AbstractVector, out_dim::Integer)
+    MOutput(x<:AbstractVector, out_dim::Int)
 
 A data type to handle multi-dimensional outputs.
 """
-struct MOutput{T<:AbstractVector} <: AbstractVector{eltype(eltype(T))} where T <: Real
-    x::T
+struct MOutput{T<:Real,X<:AbstractVector} <: AbstractVector{T}
+    x::X
     out_dim::Int
 end
 
 """
     MOutput(x::AbstractMatrix)
+
+If the input is a `Matrix`, it expects the size of the input `x` to be `(out_dim, N)`
+where `out_dim` is the output dimension and `N` is the number of data-points.
 """
-MOutput(x::AbstractMatrix) = MOutput(ColVecs(x), size(x, 1))
+function MOutput(x::X) where X <: AbstractMatrix
+    cv = ColVecs(x)
+    return MOutput{eltype(X), typeof(cv)}(cv, size(x, 1))
+end
 
 """
     MOutput(x::AbstractVector)
+
+If the input is a `Vector` of `Vector`s, it expects input `x` to be `Vector` of
+`N` `Vector`s each of length `out_dim` where `out_dim` is the output dimension and 
+`N` is the number of data-points.
 """
-MOutput(x::AbstractVector) = MOutput(x, length(first(x)))
+function MOutput(x::X) where X <: AbstractVector
+    return MOutput{eltype(first(x)), X}(x, length(first(x)))
+end
 
 Base.size(out::MOutput) = (out.out_dim * size(out.x, 1),)
 
