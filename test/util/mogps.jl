@@ -30,7 +30,6 @@
         
         # Matrix Input
         mout2 = MOutput(ym)
-        @test mout2 isa MOutput{<:Real, <:ColVecs}
         @test mout2 isa AbstractVector{<:Real}
         @test mout2 ≈ vcat(([yi[i] for yi in y] for i in 1:out_dim)...)
     end

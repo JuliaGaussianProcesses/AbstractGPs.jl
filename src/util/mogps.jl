@@ -14,10 +14,7 @@ end
 If the input is a `Matrix`, it expects the size of the input `x` to be `(out_dim, N)`
 where `out_dim` is the output dimension and `N` is the number of data-points.
 """
-function MOutput(x::X) where X <: AbstractMatrix
-    cv = ColVecs(x)
-    return MOutput{eltype(X), typeof(cv)}(cv, size(x, 1))
-end
+MOutput(x::AbstractMatrix) = vec(permutedims(x))
 
 """
     MOutput(x::AbstractVector)
