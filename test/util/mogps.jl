@@ -10,7 +10,7 @@
     ym = hcat(y...)
 
     @testset "MOutput" begin
-        mout = MOutput(y)
+        mout = moutput(y)
         @test length(mout) == out_dim * N
         
         @test size(mout) == (out_dim * N,)
@@ -24,12 +24,13 @@
         @test mout[12] == y[2][2]
         @test mout[out_dim * N] == y[N][out_dim]
 
-        @test mout isa MOutput{<:Real, <:AbstractVector}
+        @test mout isa AbstractGPs.MOutput{<:Real, <:AbstractVector}
         @test mout isa AbstractVector{<:Real}
         @test mout ≈ vcat(([yi[i] for yi in y] for i in 1:out_dim)...)
         
         # Matrix Input
-        mout2 = MOutput(ym)
+        mout2 = moutput(ym)
+        @test moutput(ym) ≈ moutput(permutedims(ym); obsdim=1)
         @test mout2 isa AbstractVector{<:Real}
         @test mout2 ≈ vcat(([yi[i] for yi in y] for i in 1:out_dim)...)
     end

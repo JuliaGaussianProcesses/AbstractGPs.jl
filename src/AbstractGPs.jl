@@ -15,7 +15,7 @@ module AbstractGPs
         logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, 
         update_approx_posterior, LatentGP, ColVecs, RowVecs
 
-    export mo_transform, mo_inverse_transform, MOutput
+    export mo_transform, mo_inverse_transform, moutput
 
     export sampleplot, multigpplot, multidataplot
 
