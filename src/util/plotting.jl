@@ -63,7 +63,7 @@ end
     f = gp.f
     in_dim = mgp.args[2]
     out_dim = mgp.args[3]
-    ms = mo_inverse_transform(marginals(gp), out_dim)
+    ms = mo_inverse_transform(;Y=marginals(gp), out_dim=out_dim)
     x = [[[x[i][j] for i in 1:length(x)] for j in 1:in_dim] for k in 1:out_dim]
     μ = [[[mean(ms[i][k]) for i in 1:length(ms)] for j in 1:in_dim] for k in 1:out_dim]
     σ = [[[std(ms[i][k]) for i in 1:length(ms)] for j in 1:in_dim] for k in 1:out_dim]

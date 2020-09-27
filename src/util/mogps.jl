@@ -127,3 +127,12 @@ function mo_inverse_transform(X::AbstractVector, Y::AbstractVector, out_dim::Int
     y = [Y[[i + j*N for j in 0:(out_dim - 1)]] for i in 1:N]
     return x, y
 end
+
+"""
+    mo_inverse_transform(;X::AbstractVector, out_dim::Int)
+"""
+function mo_inverse_transform(;Y::AbstractVector, out_dim::Int)
+    N = length(Y) ÷ out_dim
+    y = [Y[[i + j*N for j in 0:(out_dim - 1)]] for i in 1:N]
+    return y
+end
