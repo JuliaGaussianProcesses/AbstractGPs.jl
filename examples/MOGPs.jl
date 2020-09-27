@@ -50,7 +50,4 @@ logpdf(p_fx(X, 0.1), Y)
 
 X_Test = MOInput(reshape(collect.(collect(Iterators.product(-1:0.05:1, -1:0.05:1, -1:0.05:1))), :), out_dim)
 p_fx_x = p_fx(X_Test, 0.01)
-plt = multigpplot(p_fx_x, in_dim, out_dim, layout=(1,3))
-plot!(plt, size=(900, 300), label="", )
-
-
+plt = multigpplot(p_fx_x, in_dim, out_dim, layout=(1,3), size=(900, 300), label="")
