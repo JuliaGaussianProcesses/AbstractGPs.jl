@@ -116,19 +116,17 @@ mean(logp(param; x=x_test, y=y_test) for param in samples)
 
 
 plt = scatter(x_train, y_train; label="Train data")
-scatter!(plt, x_train, y_train; label="Test data")
+scatter!(plt, x_test, y_test; label="Test data")
 for params in @view(samples[(end-100):end,:])
     opt_kernel = ScaledKernel(
         transform(
-            Matern52Kernel(), 
+            Matern52Kernel(),
             ScaleTransform(exp(params[1]))
-        ), 
+        ),
         exp(params[2])
     )
     f = GP(opt_kernel)
-    p_fx = posterior(f(x, 0.1), y)
+    p_fx = posterior(f(x_train, 0.1), y_train)
     sampleplot!(plt, p_fx(collect(0:0.02:1)), 1)
 end
 plt
-
-
