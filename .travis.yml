@@ -17,7 +17,7 @@ jobs:
   fast_finish: true
   include:
     - stage: Documentation
-      julia: 1.4
+      julia: 1
       os: linux
       env:
         - GKSwstype=nul
