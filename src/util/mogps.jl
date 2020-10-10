@@ -9,13 +9,13 @@ struct MOutput{T<:Real,X<:AbstractVector} <: AbstractVector{T}
 end
 
 """
-    moutput(x::AbstractMatrix; obsdim::Int=2)
+    mo_output(x::AbstractMatrix; obsdim::Int=2)
 
 If the input is a `Matrix`, it expects the size of the input `x` to be `(out_dim, N)`
 in the default case and `(N, out_dim)` when `obsdim=1` 
 where `out_dim` is the output dimension and `N` is the number of data-points.
 """
-function moutput(x::AbstractMatrix; obsdim::Int=2)
+function mo_output(x::AbstractMatrix; obsdim::Int=2)
     @assert obsdim in [1,2] || error("obsdim should be 1 or 2")
     if obsdim ==2 
         return vec(permutedims(x))
@@ -25,13 +25,13 @@ function moutput(x::AbstractMatrix; obsdim::Int=2)
 end 
 
 """
-    moutput(x::AbstractVector)
+    mo_output(x::AbstractVector)
 
 If the input is a `Vector` of `Vector`s, it expects input `x` to be `Vector` of
 `N` `Vector`s each of length `out_dim` where `out_dim` is the output dimension and 
 `N` is the number of data-points.
 """
-function moutput(x::X) where X <: AbstractVector
+function mo_output(x::X) where X <: AbstractVector
     return MOutput{eltype(first(x)), X}(x, length(first(x)))
 end
 
@@ -68,7 +68,7 @@ is a input/target for one observation.
 ...
 """
 function mo_transform(x::AbstractVector, y::AbstractVector, out_dim::Int)
-    return MOInput(x, out_dim), moutput(y)
+    return MOInput(x, out_dim), mo_output(y)
 end
 
 """
@@ -83,7 +83,7 @@ end
 function mo_transform(x::AbstractMatrix, y::AbstractMatrix)
     size(x, 2) == size(y, 2) || error("`x` and `y` are do not have compatible sizes.")
     out_dim = size(y, 1) 
-    return MOInput(ColVecs(x), out_dim), moutput(y)
+    return MOInput(ColVecs(x), out_dim), mo_output(y)
 end
 
 """
