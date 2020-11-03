@@ -75,7 +75,7 @@ end
 Test _very_ basic consistency properties of the mean function `m`.
 """
 function mean_function_tests(m::MeanFunction, x::AbstractVector)
-    @test map(m, x) isa AbstractVector
+    @test AbstractGPs._map(m, x) isa AbstractVector
     @test length(ew(m, x)) == length(x)
 end
 
