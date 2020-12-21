@@ -1,5 +1,6 @@
 using Documenter
 
+# Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
 if haskey(ENV, "GITHUB_ACTIONS")
     ENV["JULIA_DEBUG"] = "Documenter"
 end
@@ -50,6 +51,4 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
-    target="build",
-    versions = ["dev" => "dev", "v#.#.#"],
 )
