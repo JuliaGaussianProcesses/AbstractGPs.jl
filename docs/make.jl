@@ -1,14 +1,9 @@
 using Documenter
 
+# Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
 if haskey(ENV, "GITHUB_ACTIONS")
     ENV["JULIA_DEBUG"] = "Documenter"
 end
-
-Documenter.post_status(; 
-    type="pending", 
-    repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git"
-)
-
 
 using Literate, AbstractGPs
 
@@ -56,6 +51,4 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
-    target="build",
-    versions = ["dev" => "dev", "v#.#.#"],
 )
