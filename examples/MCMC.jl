@@ -148,7 +148,7 @@ samples, _ = sample(
 )
 nothing #hide
 
-# We transform the samples back to the constrained space and compute the maen of both
+# We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
 samples_constrained = [map(softplus, p) for p in samples]
@@ -234,7 +234,7 @@ samples = mcmc_with_warmup(
 ).chain
 nothing #hide
 
-# We transform the samples back to the constrained space and compute the maen of both
+# We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
 samples_constrained = [map(softplus, p) for p in samples]
@@ -289,7 +289,7 @@ samples = sample(
 )
 nothing #hide
 
-# We transform the samples back to the constrained space and compute the maen of both
+# We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
 samples_constrained = [map(softplus, p) for p in samples]
