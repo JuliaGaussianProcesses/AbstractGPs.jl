@@ -20,9 +20,9 @@ version = "0.3.3"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "42c42f2221906892ceb765dbcb1a51deeffd86d7"
+git-tree-sha1 = "345a14764e43fe927d6f5c250fe4c8e4664e6ee8"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
-version = "2.3.0"
+version = "2.4.0"
 
 [[AdvancedHMC]]
 deps = ["ArgCheck", "DocStringExtensions", "InplaceOps", "LinearAlgebra", "Parameters", "ProgressMeter", "Random", "Requires", "Statistics", "StatsBase", "StatsFuns"]
@@ -37,9 +37,9 @@ version = "2.1.0"
 
 [[ArrayInterface]]
 deps = ["LinearAlgebra", "Requires", "SparseArrays"]
-git-tree-sha1 = "b6ea8a312b6747ffcf46e1200d91b19d2e1dc1d6"
+git-tree-sha1 = "a0c202d58f0f99156bd77972fe75ae8498fd9f4b"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "2.14.12"
+version = "2.14.13"
 
 [[Artifacts]]
 deps = ["Pkg"]
@@ -212,12 +212,6 @@ deps = ["AbstractMCMC", "ArrayInterface", "Distributions", "Random", "Statistics
 git-tree-sha1 = "66ba49b5f7959cdb407275026279ae70dff47dcf"
 uuid = "cad2338a-1db2-11e9-3401-43bc07c9ede2"
 version = "0.4.0"
-
-[[Expat_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "1402e52fcda25064f51c77a9655ce8680b76acf0"
-uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
-version = "2.2.7+6"
 
 [[Expat_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -848,9 +842,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Transducers]]
 deps = ["ArgCheck", "BangBang", "CompositionsBase", "DefineSingletons", "Distributed", "InitialValues", "Logging", "Markdown", "MicroCollections", "Requires", "Setfield", "SplittablesBase", "Tables"]
-git-tree-sha1 = "80f9fad2026c304f391198d391a0c698b666b201"
+git-tree-sha1 = "266420fe31e9c86abcf0d4905c75b67dac087c33"
 uuid = "28d57a85-8fef-5791-bfe6-a80928e7c999"
-version = "0.4.53"
+version = "0.4.54"
 
 [[UUIDs]]
 deps = ["Random", "SHA"]

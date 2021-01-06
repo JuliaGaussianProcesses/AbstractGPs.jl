@@ -229,7 +229,7 @@ function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
 end
 
 """
-   elbo(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
+    elbo(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
 
 The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `f`, and `u`
 are pseudo-points, where `u = f(z)` for some `z`.
