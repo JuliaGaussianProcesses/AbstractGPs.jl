@@ -4,7 +4,7 @@
 deps = ["ChainRulesCore", "Distributions", "FillArrays", "KernelFunctions", "LinearAlgebra", "Random", "RecipesBase", "Reexport", "Statistics"]
 path = ".."
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
-version = "0.2.15"
+version = "0.2.16"
 
 [[AbstractMCMC]]
 deps = ["BangBang", "ConsoleProgressMonitor", "Distributed", "Logging", "LoggingExtras", "ProgressLogging", "Random", "StatsBase", "TerminalLoggers", "Transducers"]
@@ -55,6 +55,12 @@ version = "0.3.29"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[BenchmarkTools]]
+deps = ["JSON", "Logging", "Printf", "Statistics", "UUIDs"]
+git-tree-sha1 = "9e62e66db34540a0c919d72172cc2f642ac71260"
+uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+version = "0.5.0"
 
 [[Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -200,6 +206,12 @@ deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils
 git-tree-sha1 = "b7715ae18be02110a8cf9cc8ed2ccdb1e3e3aba2"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "0.26.1"
+
+[[DynamicHMC]]
+deps = ["ArgCheck", "DocStringExtensions", "LinearAlgebra", "LogDensityProblems", "NLSolversBase", "Optim", "Parameters", "ProgressMeter", "Random", "Statistics"]
+git-tree-sha1 = "7aa21d9ff8d2dafb8a4bf9f1b18c69bcc8960f8d"
+uuid = "bbc10e6e-7c05-544b-b16e-64fede858acb"
+version = "2.2.0"
 
 [[EarCut_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -501,6 +513,12 @@ deps = ["Base64", "JSON", "REPL"]
 git-tree-sha1 = "7f289e9db7a93d30b9a44af4a8ae9cf92af74683"
 uuid = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 version = "2.7.0"
+
+[[LogDensityProblems]]
+deps = ["ArgCheck", "BenchmarkTools", "DiffResults", "DocStringExtensions", "Parameters", "Random", "Requires", "TransformVariables"]
+git-tree-sha1 = "77ac6c4bb1eae4072a5d0fcfba621020f7802cc2"
+uuid = "6fdf6af0-433a-55f7-b3ed-c6c6e0b8df7c"
+version = "0.10.3"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -845,6 +863,12 @@ deps = ["ArgCheck", "BangBang", "CompositionsBase", "DefineSingletons", "Distrib
 git-tree-sha1 = "266420fe31e9c86abcf0d4905c75b67dac087c33"
 uuid = "28d57a85-8fef-5791-bfe6-a80928e7c999"
 version = "0.4.54"
+
+[[TransformVariables]]
+deps = ["ArgCheck", "DocStringExtensions", "ForwardDiff", "LinearAlgebra", "MacroTools", "Parameters", "Pkg", "Random"]
+git-tree-sha1 = "cd253a2ff93ee97e8d2bc938a3dc71d822d89dd9"
+uuid = "84d833dd-6860-57f9-a1a7-6da5db126cff"
+version = "0.3.10"
 
 [[UUIDs]]
 deps = ["Random", "SHA"]
