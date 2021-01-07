@@ -10,7 +10,7 @@ using Plots
 using StatsFuns
 using Random
 Random.seed!(1234)
-nothing #hide
+#md nothing #hide
 
 # Load toy regression
 # [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv)
@@ -30,12 +30,13 @@ x_train = x[1:8]
 y_train = y[1:8]
 x_test = x[9:end]
 y_test = y[9:end]
-nothing #hide
+#md nothing #hide
 
 # We instantiate a Gaussian process with a Matern kernel. The kernel has
 # fixed variance and length scale parameters of default value 1.
 
 f = GP(Matern52Kernel())
+#md nothing #hide
 
 # We create a finite dimentional projection at the inputs of the training dataset
 # observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
@@ -89,12 +90,13 @@ function (ℓ::GPLoglikelihood)(params)
 end
 
 const loglik_train = GPLoglikelihood(x_train, y_train)
-nothing #hide
+#md nothing #hide
 
 # We define a Gaussian prior for the joint distribution of the two transformed kernel
 # parameters. We assume that both parameters are independent with mean 0 and variance 1.
 
 logprior(params) = logpdf(MvNormal(2, 1), params)
+#md nothing #hide
 
 # ### Hamiltonian Monte Carlo
 #
@@ -115,18 +117,21 @@ using ForwardDiff
 
 n_samples = 2_000
 n_adapts = 1_000
+#md nothing #hide
 
 # Define a Hamiltonian system of the log joint probability.
 
 logjoint_train(params) = loglik_train(params) + logprior(params)
 metric = DiagEuclideanMetric(2)
 hamiltonian = Hamiltonian(metric, logjoint_train, ForwardDiff)
+#md nothing #hide
 
 # Define a leapfrog solver, with initial step size chosen heuristically.
 
 initial_params = rand(2)
 initial_ϵ = find_good_stepsize(hamiltonian, initial_params)
 integrator = Leapfrog(initial_ϵ)
+#md nothing #hide
 
 # Define an HMC sampler, with the following components:
 # - multinomial sampling scheme,
@@ -135,6 +140,7 @@ integrator = Leapfrog(initial_ϵ)
 
 proposal = NUTS{MultinomialTS, GeneralisedNoUTurn}(integrator)
 adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
+#md nothing #hide
 
 # We draw samples from the posterior distribution of kernel parameters. These samples
 # are in the unconstrained space $\mathbb{R}^2$.
@@ -148,7 +154,7 @@ samples, _ = sample(
     n_adapts;
     progress=false,
 )
-nothing #hide
+#md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
@@ -234,7 +240,7 @@ samples = mcmc_with_warmup(
     n_samples;
     reporter = NoProgressReport(),
 ).chain
-nothing #hide
+#md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
@@ -289,7 +295,7 @@ samples = sample(
     n_samples;
     progress=false,
 )
-nothing #hide
+#md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
@@ -360,12 +366,16 @@ function (g::NegativeELBO)(params)
     fx = f(g.x, 0.1)
     return -elbo(fx, g.y, f(@view(params[3:end])))
 end
+#md nothing #hide
 
 # We randomly initialize the kernel parameters and 5 pseudo points, and minimize the
 # negative ELBO with the LBFGS algorithm and obtain the following optimal parameters:
 
 x0 = rand(7)
 opt = optimize(NegativeELBO(x_train, y_train), x0, LBFGS())
+
+#-
+
 opt.minimizer
 
 # The optimized value of the inverse lengthscale is
