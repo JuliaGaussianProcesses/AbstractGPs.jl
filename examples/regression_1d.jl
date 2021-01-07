@@ -6,8 +6,11 @@
 
 using AbstractGPs
 using Distributions
-using Plots
 using StatsFuns
+
+using Plots
+default(legend=:outertopright, size=(700,400))
+
 using Random
 Random.seed!(1234)
 #md nothing #hide
@@ -22,7 +25,7 @@ x = [0.8658165855998895, 0.6661700880180962, 0.8049218148148531, 0.7714303440386
 y = [1.5255314337144372, 3.6434202968230003, 3.010885733911661, 3.774442382979625, 
     3.3687639483798324, 1.5506452040608503, 3.790447985799683, 3.8689707574953, 
     3.4933565751758713, 1.4284538820635841, 3.8715350915692364, 3.7045949061144983]
-scatter(x, y; xlabel="x", ylabel="y")
+scatter(x, y; xlabel="x", ylabel="y", legend=false)
 
 # We split the observations into train and test data.
 
@@ -53,9 +56,13 @@ logpdf(p_fx(x_test), y_test)
 
 # We plot the posterior Gaussian process along with the observations.
 
-plt = scatter(x_train, y_train; title="posterior (default parameters)", label="Train Data")
-scatter!(plt, x_test, y_test; label="Test Data")
-plot!(plt, p_fx, 0:0.001:1; label="Posterior")
+scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (default parameters)", label="Train Data",
+)
+scatter!(x_test, y_test; label="Test Data")
+plot!(p_fx, 0:0.001:1; label=false)
 
 # ## Markov Chain Monte Carlo
 #
@@ -168,9 +175,9 @@ mean_samples = mean(samples_constrained)
 histogram(
     reduce(hcat, samples_constrained)';
     xlabel="sample", ylabel="counts", layout=2,
-    labels=["inverse length scale" "variance"],
+    title=["inverse length scale" "variance"], legend=false,
 )
-vline!(mean_samples'; layout=2, labels="mean")
+vline!(mean_samples'; linewidth=2)
 
 # We approximate the log-likelihood of the test data using the posterior Gaussian processes
 # for kernels with the sampled kernel parameters. We can observe that there is a significant
@@ -201,13 +208,16 @@ mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-scatter(x_train, y_train; title="posterior (AdvancedHMC)", label="Train Data")
-scatter!(x_test, y_test; label="Test Data")
-for p in @view(samples[(end-100):end,:])
-    p_fx = gp_posterior(p)
-    sampleplot!(p_fx(collect(0:0.02:1)), 1)
+plt = scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (AdvancedHMC)", label="Train Data",
+)
+scatter!(plt, x_test, y_test; label="Test Data")
+for p in samples[(end-100):end]
+    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
 end
-Plots.current() #hide
+plt
 
 # #### DynamicHMC
 #
@@ -254,9 +264,9 @@ mean_samples = mean(samples_constrained)
 histogram(
     reduce(hcat, samples_constrained)';
     xlabel="sample", ylabel="counts", layout=2,
-    labels=["inverse length scale" "variance"],
+    title=["inverse length scale" "variance"], legend=false,
 )
-vline!(mean_samples'; layout=2, labels="mean")
+vline!(mean_samples'; linewidth=2)
 
 # Again we can observe that there is a significant improvement over the log-likelihood
 # of the test data with respect to the posterior Gaussian process with default kernel
@@ -267,13 +277,16 @@ mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-scatter(x_train, y_train; title="posterior (DynamicHMC)", label="Train Data")
-scatter!(x_test, y_test; label="Test Data")
-for p in @view(samples[(end-100):end,:])
-    p_fx = gp_posterior(p)
-    sampleplot!(p_fx(collect(0:0.02:1)), 1)
+plt = scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (DynamicHMC)", label="Train Data",
+)
+scatter!(plt, x_test, y_test; label="Test Data")
+for p in samples[(end-100):end]
+    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
 end
-Plots.current() #hide
+plt
 
 # ### Elliptical slice sampling
 #
@@ -309,7 +322,7 @@ mean_samples = mean(samples_constrained)
 histogram(
     reduce(hcat, samples_constrained)';
     xlabel="sample", ylabel="counts", layout=2,
-    labels=["inverse length scale" "variance"],
+    title=["inverse length scale" "variance"],
 )
 vline!(mean_samples'; layout=2, labels="mean")
 
@@ -322,13 +335,16 @@ mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-scatter(x_train, y_train; title="posterior (EllipticalSliceSampling)", label="Train Data")
-scatter!(x_test, y_test; label="Test Data")
-for p in @view(samples[(end-100):end,:])
-    p_fx = gp_posterior(p)
-    sampleplot!(p_fx(collect(0:0.02:1)), 1)
+plt = scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (EllipticalSliceSampling)", label="Train Data",
+)
+scatter!(plt, x_test, y_test; label="Test Data")
+for p in samples[(end-100):end]
+    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
 end
-Plots.current() #hide
+plt
 
 # ## Variational Inference
 #
