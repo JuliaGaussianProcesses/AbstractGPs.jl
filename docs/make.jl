@@ -13,13 +13,10 @@ end
 
 for filename in readdir(joinpath(@__DIR__, "..", "examples"))
     endswith(filename, ".jl") || continue
-	name = splitext(filename)[1]
-    Literate.markdown(
-        joinpath(@__DIR__, "..", "examples", filename),
-        joinpath(@__DIR__, "src/examples");
-        name = name,
-        documenter=true,
-    )
+    file = joinpath(@__DIR__, "..", "examples", filename)
+    output = joinpath(@__DIR__, "src/examples")
+    Literate.markdown(file, output; documenter=true)
+    Literate.notebook(file, output)
 end
 
 generated_examples = joinpath.("examples", filter(
