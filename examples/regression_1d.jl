@@ -1,4 +1,6 @@
-# # Approximate Inference using MCMC
+# # One-dimensional regression
+#
+# ## Setup
 #
 # Loading the necessary packages and setting seed.
 
@@ -54,7 +56,7 @@ plt = scatter(x_train, y_train; title="posterior (default parameters)", label="T
 scatter!(plt, x_test, y_test; label="Test Data")
 plot!(plt, p_fx, 0:0.001:1; label="Posterior")
 
-# # Markov Chain Monte Carlo
+# ## Markov Chain Monte Carlo
 #
 # Previously we computed the log likelihood of the untuned kernel parameters of the GP.
 # We now also perform approximate inference over said kernel parameters using different
@@ -94,7 +96,7 @@ nothing #hide
 
 logprior(params) = logpdf(MvNormal(2, 1), params)
 
-# # Hamiltonian Monte Carlo
+# ### Hamiltonian Monte Carlo
 #
 # We start with a Hamiltonian Monte Carlo (HMC) sampler. More precisely, we use the
 # [No-U-Turn sampler (NUTS)](http://www.jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf),
@@ -102,7 +104,7 @@ logprior(params) = logpdf(MvNormal(2, 1), params)
 # [AdvancedHMC.jl](https://github.com/TuringLang/AdvancedHMC.jl/) and
 # [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl/).
 #
-# ## AdvancedHMC
+# #### AdvancedHMC
 #
 # We start with performing inference with AdvancedHMC.
 
@@ -201,7 +203,7 @@ for p in @view(samples[(end-100):end,:])
 end
 Plots.current() #hide
 
-# ## DynamicHMC
+# #### DynamicHMC
 #
 # We repeat the inference with DynamicHMC.
 
@@ -267,7 +269,7 @@ for p in @view(samples[(end-100):end,:])
 end
 Plots.current() #hide
 
-# # Elliptical slice sampling
+# ### Elliptical slice sampling
 #
 # Instead of HMC, we use
 # [elliptical slice sampling](http://proceedings.mlr.press/v9/murray10a/murray10a.pdf)
@@ -320,4 +322,84 @@ for p in @view(samples[(end-100):end,:])
     p_fx = gp_posterior(p)
     sampleplot!(p_fx(collect(0:0.02:1)), 1)
 end
+Plots.current() #hide
+
+# ## Variational Inference
+#
+# Sanity check for the Evidence Lower BOund (ELBO) implemented according to
+# M. K. Titsias's _Variational learning of inducing variables in sparse Gaussian processes_.
+
+elbo(fx, y_train, f(rand(7)))
+
+# We use the LBFGS algorithm to maximize the given ELBO. It is provided by the Julia
+# package [Optim.jl](https://github.com/JuliaNLSolvers/Optim.jl).
+
+using Optim
+
+# We define a function which returns the negative ELBO for different variance and inverse
+# lengthscale parameters of the Matern kernel and different pseudo-points. We ensure that
+# the kernel parameters are positive with the softplus function
+# ```math
+# f(x) = \log (1 + \exp x).
+# ```
+
+struct NegativeELBO{X,Y}
+    x::X
+    y::Y
+end
+
+function (g::NegativeELBO)(params)
+    kernel = ScaledKernel(
+        transform(
+            Matern52Kernel(), 
+            ScaleTransform(softplus(params[1]))
+        ), 
+        softplus(params[2]),
+    )
+    f = GP(kernel)
+    fx = f(g.x, 0.1)
+    return -elbo(fx, g.y, f(@view(params[3:end])))
+end
+
+# We randomly initialize the kernel parameters and 5 pseudo points, and minimize the
+# negative ELBO with the LBFGS algorithm and obtain the following optimal parameters:
+
+x0 = rand(7)
+opt = optimize(NegativeELBO(x_train, y_train), x0, LBFGS())
+opt.minimizer
+
+# The optimized value of the inverse lengthscale is
+
+softplus(opt.minimizer[1])
+
+# and of the variance is
+
+softplus(opt.minimizer[2])
+
+# We compute the log-likelihood of the test data for the resulting approximate
+# posterior. We can observe that there is a significant improvement over the
+# log-likelihood with the default kernel parameters of value 1.
+
+opt_kernel = ScaledKernel(
+    transform(
+        Matern52Kernel(),
+        ScaleTransform(softplus(opt.minimizer[1]))
+    ),
+    softplus(opt.minimizer[2]),
+)
+opt_f = GP(opt_kernel)
+opt_fx = opt_f(x_train, 0.1)
+ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(opt.minimizer[3:end]))
+logpdf(ap(x_test), y_test)
+
+# We visualize the approximate posterior with optimized parameters.
+
+plot(ap, 0:0.001:1; label="Approximate Posterior")
+scatter!(
+    opt.minimizer[3:end], 
+    mean(rand(ap(opt.minimizer[3:end], 0.1), 100), dims=2);
+    label="Pseudo-points",
+)
+scatter!(x_train, y_train; label="Train Data")
+scatter!(x_test, y_test; label="Test Data")
 Plots.current() #hide
