@@ -4,7 +4,7 @@
 deps = ["ChainRulesCore", "Distributions", "FillArrays", "KernelFunctions", "LinearAlgebra", "Random", "RecipesBase", "Reexport", "Statistics"]
 path = ".."
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
-version = "0.2.15"
+version = "0.2.16"
 
 [[AbstractMCMC]]
 deps = ["BangBang", "ConsoleProgressMonitor", "Distributed", "Logging", "LoggingExtras", "ProgressLogging", "Random", "StatsBase", "TerminalLoggers", "Transducers"]
@@ -646,15 +646,15 @@ version = "2.0.0"
 
 [[PlotUtils]]
 deps = ["ColorSchemes", "Colors", "Dates", "Printf", "Random", "Reexport", "Statistics"]
-git-tree-sha1 = "6a59c282058f46967069972d74526a68d27a9012"
+git-tree-sha1 = "90ed6dcd2d5c40f35dcdc4f74ccb4a8e088ceb44"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
-version = "1.0.8"
+version = "1.0.9"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "539f1c69593db907a304c1dc3ac49ccb98eb283c"
+git-tree-sha1 = "4797acb266b8d9ff316f4581924e71c6709f152d"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.10.0"
+version = "1.10.1"
 
 [[PositiveFactorizations]]
 deps = ["LinearAlgebra"]
