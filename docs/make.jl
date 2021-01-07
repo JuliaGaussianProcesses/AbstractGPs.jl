@@ -7,23 +7,16 @@ end
 
 using Literate, AbstractGPs
 
-if ispath(joinpath(@__DIR__, "src/examples"))
-    rm(joinpath(@__DIR__, "src/examples"), recursive=true)
-end
+EXAMPLES = joinpath(@__DIR__, "..", "examples")
+OUTPUT = joinpath(@__DIR__, "src", "examples")
 
-for filename in readdir(joinpath(@__DIR__, "..", "examples"))
-    endswith(filename, ".jl") || continue
-    file = joinpath(@__DIR__, "..", "examples", filename)
-    output = joinpath(@__DIR__, "src/examples")
-    Literate.markdown(file, output; documenter=true)
-    Literate.notebook(file, output)
-end
+ispath(OUTPUT) && rm(OUTPUT; recursive=true)
 
-generated_examples = joinpath.("examples", filter(
-    x -> endswith(x, ".md"), 
-    readdir(joinpath(@__DIR__, "src", "examples"))
-    )
-)
+for file in readdir(EXAMPLES; join=true)
+    endswith(file, ".jl") || continue
+    Literate.markdown(file, OUTPUT; documenter=true)
+    Literate.notebook(file, OUTPUT)
+end
 
 DocMeta.setdocmeta!(
     AbstractGPs,
@@ -40,9 +33,7 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "API" => "api.md",
-        "Examples" => [
-            generated_examples...
-        ]
+        "Examples" => joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
     ]
 )
 
