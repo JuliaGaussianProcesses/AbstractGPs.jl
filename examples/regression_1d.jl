@@ -335,7 +335,7 @@ Plots.current() #hide
 # Sanity check for the Evidence Lower BOund (ELBO) implemented according to
 # M. K. Titsias's _Variational learning of inducing variables in sparse Gaussian processes_.
 
-elbo(fx, y_train, f(rand(7)))
+elbo(fx, y_train, f(rand(5)))
 
 # We use the LBFGS algorithm to maximize the given ELBO. It is provided by the Julia
 # package [Optim.jl](https://github.com/JuliaNLSolvers/Optim.jl).
@@ -346,7 +346,11 @@ using Optim
 # lengthscale parameters of the Matern kernel and different pseudo-points. We ensure that
 # the kernel parameters are positive with the softplus function
 # ```math
-# f(x) = \log (1 + \exp x).
+# f(x) = \log (1 + \exp x),
+# ```
+# and that the pseudo-points are in the unit interval $[0,1]$ with the logistic function
+# ```math
+# f(x) = \frac{1}{1 + \exp{(-x)}}.
 # ```
 
 struct NegativeELBO{X,Y}
@@ -364,7 +368,7 @@ function (g::NegativeELBO)(params)
     )
     f = GP(kernel)
     fx = f(g.x, 0.1)
-    return -elbo(fx, g.y, f(@view(params[3:end])))
+    return -elbo(fx, g.y, f(logistic.(params[3:end])))
 end
 #md nothing #hide
 
@@ -399,17 +403,16 @@ opt_kernel = ScaledKernel(
 )
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
-ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(opt.minimizer[3:end]))
+ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
 logpdf(ap(x_test), y_test)
 
 # We visualize the approximate posterior with optimized parameters.
 
-plot(ap, 0:0.001:1; label="Approximate Posterior")
-scatter!(
-    opt.minimizer[3:end], 
-    mean(rand(ap(opt.minimizer[3:end], 0.1), 100), dims=2);
-    label="Pseudo-points",
+scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (VI with sparse grid)", label="Train Data",
 )
-scatter!(x_train, y_train; label="Train Data")
 scatter!(x_test, y_test; label="Test Data")
-Plots.current() #hide
+plot!(ap, 0:0.001:1; label=false)
+vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
