@@ -50,5 +50,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
+    repo = "github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
+    push_preview = true,
 )
