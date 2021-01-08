@@ -6,11 +6,14 @@
 
 using AbstractGPs
 using Distributions
-using Plots
 using StatsFuns
+
+using Plots
+default(legend=:outertopright, size=(700,400))
+
 using Random
 Random.seed!(1234)
-nothing #hide
+#md nothing #hide
 
 # Load toy regression
 # [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv)
@@ -22,7 +25,7 @@ x = [0.8658165855998895, 0.6661700880180962, 0.8049218148148531, 0.7714303440386
 y = [1.5255314337144372, 3.6434202968230003, 3.010885733911661, 3.774442382979625, 
     3.3687639483798324, 1.5506452040608503, 3.790447985799683, 3.8689707574953, 
     3.4933565751758713, 1.4284538820635841, 3.8715350915692364, 3.7045949061144983]
-scatter(x, y; xlabel="x", ylabel="y")
+scatter(x, y; xlabel="x", ylabel="y", legend=false)
 
 # We split the observations into train and test data.
 
@@ -30,12 +33,13 @@ x_train = x[1:8]
 y_train = y[1:8]
 x_test = x[9:end]
 y_test = y[9:end]
-nothing #hide
+#md nothing #hide
 
 # We instantiate a Gaussian process with a Matern kernel. The kernel has
 # fixed variance and length scale parameters of default value 1.
 
 f = GP(Matern52Kernel())
+#md nothing #hide
 
 # We create a finite dimentional projection at the inputs of the training dataset
 # observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
@@ -52,9 +56,13 @@ logpdf(p_fx(x_test), y_test)
 
 # We plot the posterior Gaussian process along with the observations.
 
-plt = scatter(x_train, y_train; title="posterior (default parameters)", label="Train Data")
-scatter!(plt, x_test, y_test; label="Test Data")
-plot!(plt, p_fx, 0:0.001:1; label="Posterior")
+scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (default parameters)", label="Train Data",
+)
+scatter!(x_test, y_test; label="Test Data")
+plot!(p_fx, 0:0.001:1; label=false)
 
 # ## Markov Chain Monte Carlo
 #
@@ -89,12 +97,13 @@ function (ℓ::GPLoglikelihood)(params)
 end
 
 const loglik_train = GPLoglikelihood(x_train, y_train)
-nothing #hide
+#md nothing #hide
 
 # We define a Gaussian prior for the joint distribution of the two transformed kernel
 # parameters. We assume that both parameters are independent with mean 0 and variance 1.
 
 logprior(params) = logpdf(MvNormal(2, 1), params)
+#md nothing #hide
 
 # ### Hamiltonian Monte Carlo
 #
@@ -115,18 +124,21 @@ using ForwardDiff
 
 n_samples = 2_000
 n_adapts = 1_000
+#md nothing #hide
 
 # Define a Hamiltonian system of the log joint probability.
 
 logjoint_train(params) = loglik_train(params) + logprior(params)
 metric = DiagEuclideanMetric(2)
 hamiltonian = Hamiltonian(metric, logjoint_train, ForwardDiff)
+#md nothing #hide
 
 # Define a leapfrog solver, with initial step size chosen heuristically.
 
 initial_params = rand(2)
 initial_ϵ = find_good_stepsize(hamiltonian, initial_params)
 integrator = Leapfrog(initial_ϵ)
+#md nothing #hide
 
 # Define an HMC sampler, with the following components:
 # - multinomial sampling scheme,
@@ -135,6 +147,7 @@ integrator = Leapfrog(initial_ϵ)
 
 proposal = NUTS{MultinomialTS, GeneralisedNoUTurn}(integrator)
 adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
+#md nothing #hide
 
 # We draw samples from the posterior distribution of kernel parameters. These samples
 # are in the unconstrained space $\mathbb{R}^2$.
@@ -148,7 +161,7 @@ samples, _ = sample(
     n_adapts;
     progress=false,
 )
-nothing #hide
+#md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
@@ -162,9 +175,9 @@ mean_samples = mean(samples_constrained)
 histogram(
     reduce(hcat, samples_constrained)';
     xlabel="sample", ylabel="counts", layout=2,
-    labels=["inverse length scale" "variance"],
+    title=["inverse length scale" "variance"], legend=false,
 )
-vline!(mean_samples'; layout=2, labels="mean")
+vline!(mean_samples'; linewidth=2)
 
 # We approximate the log-likelihood of the test data using the posterior Gaussian processes
 # for kernels with the sampled kernel parameters. We can observe that there is a significant
@@ -195,13 +208,16 @@ mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-scatter(x_train, y_train; title="posterior (AdvancedHMC)", label="Train Data")
-scatter!(x_test, y_test; label="Test Data")
-for p in @view(samples[(end-100):end,:])
-    p_fx = gp_posterior(p)
-    sampleplot!(p_fx(collect(0:0.02:1)), 1)
+plt = scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (AdvancedHMC)", label="Train Data",
+)
+scatter!(plt, x_test, y_test; label="Test Data")
+for p in samples[(end-100):end]
+    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
 end
-Plots.current() #hide
+plt
 
 # #### DynamicHMC
 #
@@ -234,7 +250,7 @@ samples = mcmc_with_warmup(
     n_samples;
     reporter = NoProgressReport(),
 ).chain
-nothing #hide
+#md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
@@ -248,9 +264,9 @@ mean_samples = mean(samples_constrained)
 histogram(
     reduce(hcat, samples_constrained)';
     xlabel="sample", ylabel="counts", layout=2,
-    labels=["inverse length scale" "variance"],
+    title=["inverse length scale" "variance"], legend=false,
 )
-vline!(mean_samples'; layout=2, labels="mean")
+vline!(mean_samples'; linewidth=2)
 
 # Again we can observe that there is a significant improvement over the log-likelihood
 # of the test data with respect to the posterior Gaussian process with default kernel
@@ -261,13 +277,16 @@ mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-scatter(x_train, y_train; title="posterior (DynamicHMC)", label="Train Data")
-scatter!(x_test, y_test; label="Test Data")
-for p in @view(samples[(end-100):end,:])
-    p_fx = gp_posterior(p)
-    sampleplot!(p_fx(collect(0:0.02:1)), 1)
+plt = scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (DynamicHMC)", label="Train Data",
+)
+scatter!(plt, x_test, y_test; label="Test Data")
+for p in samples[(end-100):end]
+    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
 end
-Plots.current() #hide
+plt
 
 # ### Elliptical slice sampling
 #
@@ -289,7 +308,7 @@ samples = sample(
     n_samples;
     progress=false,
 )
-nothing #hide
+#md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
@@ -303,7 +322,7 @@ mean_samples = mean(samples_constrained)
 histogram(
     reduce(hcat, samples_constrained)';
     xlabel="sample", ylabel="counts", layout=2,
-    labels=["inverse length scale" "variance"],
+    title=["inverse length scale" "variance"],
 )
 vline!(mean_samples'; layout=2, labels="mean")
 
@@ -316,20 +335,23 @@ mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-scatter(x_train, y_train; title="posterior (EllipticalSliceSampling)", label="Train Data")
-scatter!(x_test, y_test; label="Test Data")
-for p in @view(samples[(end-100):end,:])
-    p_fx = gp_posterior(p)
-    sampleplot!(p_fx(collect(0:0.02:1)), 1)
+plt = scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (EllipticalSliceSampling)", label="Train Data",
+)
+scatter!(plt, x_test, y_test; label="Test Data")
+for p in samples[(end-100):end]
+    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
 end
-Plots.current() #hide
+plt
 
 # ## Variational Inference
 #
 # Sanity check for the Evidence Lower BOund (ELBO) implemented according to
 # M. K. Titsias's _Variational learning of inducing variables in sparse Gaussian processes_.
 
-elbo(fx, y_train, f(rand(7)))
+elbo(fx, y_train, f(rand(5)))
 
 # We use the LBFGS algorithm to maximize the given ELBO. It is provided by the Julia
 # package [Optim.jl](https://github.com/JuliaNLSolvers/Optim.jl).
@@ -340,7 +362,11 @@ using Optim
 # lengthscale parameters of the Matern kernel and different pseudo-points. We ensure that
 # the kernel parameters are positive with the softplus function
 # ```math
-# f(x) = \log (1 + \exp x).
+# f(x) = \log (1 + \exp x),
+# ```
+# and that the pseudo-points are in the unit interval $[0,1]$ with the logistic function
+# ```math
+# f(x) = \frac{1}{1 + \exp{(-x)}}.
 # ```
 
 struct NegativeELBO{X,Y}
@@ -358,14 +384,18 @@ function (g::NegativeELBO)(params)
     )
     f = GP(kernel)
     fx = f(g.x, 0.1)
-    return -elbo(fx, g.y, f(@view(params[3:end])))
+    return -elbo(fx, g.y, f(logistic.(params[3:end])))
 end
+#md nothing #hide
 
 # We randomly initialize the kernel parameters and 5 pseudo points, and minimize the
 # negative ELBO with the LBFGS algorithm and obtain the following optimal parameters:
 
 x0 = rand(7)
 opt = optimize(NegativeELBO(x_train, y_train), x0, LBFGS())
+
+#-
+
 opt.minimizer
 
 # The optimized value of the inverse lengthscale is
@@ -389,17 +419,16 @@ opt_kernel = ScaledKernel(
 )
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
-ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(opt.minimizer[3:end]))
+ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
 logpdf(ap(x_test), y_test)
 
 # We visualize the approximate posterior with optimized parameters.
 
-plot(ap, 0:0.001:1; label="Approximate Posterior")
-scatter!(
-    opt.minimizer[3:end], 
-    mean(rand(ap(opt.minimizer[3:end], 0.1), 100), dims=2);
-    label="Pseudo-points",
+scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (VI with sparse grid)", label="Train Data",
 )
-scatter!(x_train, y_train; label="Train Data")
 scatter!(x_test, y_test; label="Test Data")
-Plots.current() #hide
+plot!(ap, 0:0.001:1; label=false)
+vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")

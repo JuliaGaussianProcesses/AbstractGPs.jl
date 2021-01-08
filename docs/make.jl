@@ -7,26 +7,27 @@ end
 
 using Literate, AbstractGPs
 
-if ispath(joinpath(@__DIR__, "src/examples"))
-    rm(joinpath(@__DIR__, "src/examples"), recursive=true)
+EXAMPLES = joinpath(@__DIR__, "..", "examples")
+OUTPUT = joinpath(@__DIR__, "src", "examples")
+
+ispath(OUTPUT) && rm(OUTPUT; recursive=true)
+
+# add links to binder and nbviewer below the first heading of level 1
+function preprocess(content)
+    sub = s"""
+        \0
+        #
+        # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/examples/@__NAME__.ipynb)
+        # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/examples/@__NAME__.ipynb)
+    """
+    return replace(content, r"^# # [^\n]*"m => sub; count=1)
 end
 
-for filename in readdir(joinpath(@__DIR__, "..", "examples"))
-    endswith(filename, ".jl") || continue
-	name = splitext(filename)[1]
-    Literate.markdown(
-        joinpath(@__DIR__, "..", "examples", filename),
-        joinpath(@__DIR__, "src/examples");
-        name = name,
-        documenter=true,
-    )
+for file in readdir(EXAMPLES; join=true)
+    endswith(file, ".jl") || continue
+    Literate.markdown(file, OUTPUT; documenter=true, preprocess=preprocess)
+    Literate.notebook(file, OUTPUT)
 end
-
-generated_examples = joinpath.("examples", filter(
-    x -> endswith(x, ".md"), 
-    readdir(joinpath(@__DIR__, "src", "examples"))
-    )
-)
 
 DocMeta.setdocmeta!(
     AbstractGPs,
@@ -43,9 +44,7 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "API" => "api.md",
-        "Examples" => [
-            generated_examples...
-        ]
+        "Examples" => joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
     ]
 )
 
