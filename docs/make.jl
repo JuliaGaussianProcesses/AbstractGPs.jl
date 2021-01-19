@@ -45,7 +45,9 @@ makedocs(;
         "Home" => "index.md",
         "API" => "api.md",
         "Examples" => joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
-    ]
+    ],
+    strict=true,
+    checkdocs=:exports, 
 )
 
 deploydocs(;
