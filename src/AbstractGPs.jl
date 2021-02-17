@@ -12,8 +12,12 @@ module AbstractGPs
     using KernelFunctions: ColVecs, RowVecs
 
     export GP, mean, cov, std, cov_diag, mean_and_cov, marginals, rand,
-        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, sampleplot,
+        logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, 
         update_approx_posterior, LatentGP, ColVecs, RowVecs
+
+    export mo_transform, mo_inverse_transform, mo_output
+
+    export sampleplot, multigpplot, multidataplot
 
     # Various bits of utility functionality.
     include(joinpath("util", "common_covmat_ops.jl"))
@@ -34,5 +38,7 @@ module AbstractGPs
     include(joinpath("latent_gp", "latent_gp.jl"))
 
     # Plotting utilities.
+    include(joinpath("util", "mogps.jl"))
     include(joinpath("util", "plotting.jl"))
+
 end # module

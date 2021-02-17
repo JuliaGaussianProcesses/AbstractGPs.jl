@@ -9,4 +9,4 @@
 /docs/build/
 /docs/src/generated/
 /docs/site/
-*/.ipynb_checkpoints
+.ipynb_checkpoints
