@@ -432,3 +432,86 @@ scatter(
 scatter!(x_test, y_test; label="Test Data")
 plot!(ap, 0:0.001:1; label=false)
 vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
+
+# ## Exact Gaussian Process Inference
+#
+# Here we use Type-II MLE to train the hyperparameters of the Gaussian process.
+# This mean that our loss function is the negative log marginal likelihood.
+
+# We re-calculate the log-likelihood of the test dataset with the
+# default kernel parameters of value 1 for the sake of comparison.
+
+logpdf(p_fx(x_test), y_test)
+
+# We define a function which returns the negative log marginal
+# likelihood for different variance and inverse lengthscale parameters
+# of the Matern kernel and different pseudo-points. We ensure that the
+# kernel parameters are positive with the softplus function ```math
+# f(x) = \log (1 + \exp x).```
+
+struct NegativeGPLoglikelihood{X,Y}
+    x::X
+    y::Y
+end
+
+function (ℓ::NegativeGPLoglikelihood)(params)
+    kernel = ScaledKernel(
+        transform(
+            Matern52Kernel(),
+            ScaleTransform(softplus(params[1]))
+        ),
+        softplus(params[2]),
+    )
+    f = GP(kernel)
+    fx = f(ℓ.x, 0.1)
+    return -logpdf(fx, ℓ.y)
+end
+
+const negloglik_train = NegativeGPLoglikelihood(x_train, y_train)
+#md nothing #hide
+
+# We randomly initialize the kernel parameters, and minimize the
+# negative negative log marginal likelihood with the LBFGS algorithm
+# and obtain the following optimal parameters:
+
+θ0 = randn(2)
+opt = Optim.optimize(negloglik_train, θ0, LBFGS())
+
+#-
+
+opt.minimizer
+
+# The optimized value of the inverse lengthscale is
+
+softplus(opt.minimizer[1])
+
+# and of the variance is
+
+softplus(opt.minimizer[2])
+
+# We compute the log-likelihood of the test data for the resulting optimized
+# posterior. We can observe that there is a significant improvement over the
+# log-likelihood with the default kernel parameters of value 1.
+
+opt_kernel = ScaledKernel(
+    transform(
+        Matern52Kernel(),
+        ScaleTransform(softplus(opt.minimizer[1]))
+    ),
+    softplus(opt.minimizer[2]),
+)
+
+opt_f = GP(opt_kernel)
+opt_fx = opt_f(x_train, 0.1)
+opt_p_fx = posterior(opt_fx, y_train)
+logpdf(opt_p_fx(x_test), y_test)
+
+# We visualize the posterior with optimized parameters.
+
+scatter(
+    x_train, y_train;
+    xlim=(0,1), xlabel="x", ylabel="y",
+    title="posterior (optimized parameters)", label="Train Data",
+)
+scatter!(x_test, y_test; label="Test Data")
+plot!(opt_p_fx, 0:0.001:1; label=false)
