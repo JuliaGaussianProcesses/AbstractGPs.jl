@@ -7,6 +7,7 @@ using AbstractGPs: AbstractGP, MeanFunction, FiniteGP, ConstMean, GP, ZeroMean,
 using Documenter
 using ChainRulesCore
 using Distributions: MvNormal, PDMat
+using FillArrays
 using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
 using LinearAlgebra
