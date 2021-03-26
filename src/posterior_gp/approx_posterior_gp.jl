@@ -7,6 +7,9 @@ struct ApproxPosteriorGP{Tapprox, Tprior, Tdata} <: AbstractGP
     data::Tdata
 end
 
+_symmetric(X) = Symmetric(X)
+_symmetric(X::Diagonal) = X
+
 """
     approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
 
@@ -18,7 +21,7 @@ processes". In: Proceedings of the Twelfth International Conference on Artificia
 Intelligence and Statistics. 2009.
 """
 function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-    U_y = cholesky(Symmetric(fx.Σy)).U
+    U_y = _cholesky(_symmetric(fx.Σy)).U
     U = cholesky(Symmetric(cov(u))).U
     
     B_εf = U' \ (U_y' \ cov(fx, u))'
@@ -62,7 +65,7 @@ function update_approx_posterior(
     U = f_post_approx.data.U
     z = f_post_approx.data.z
 
-    U_y₂ = cholesky(Symmetric(fx.Σy)).U
+    U_y₂ = _cholesky(_symmetric(fx.Σy)).U
 
     temp = zeros(size(f_post_approx.data.Σy, 1), size(fx.Σy, 2))
     Σy = [f_post_approx.data.Σy temp; temp' fx.Σy]
@@ -121,7 +124,7 @@ function update_approx_posterior(
     Cu1f = cov(f_post_approx.prior, f_post_approx.data.z, f_post_approx.data.x)
     Cu2f = cov(f_post_approx.prior, u.x, f_post_approx.data.x)
 
-    U_y = cholesky(Symmetric(f_post_approx.data.Σy)).U
+    U_y = _cholesky(_symmetric(f_post_approx.data.Σy)).U
 
     B_εf₂ = U22' \ (Cu2f * inv(U_y)   - U12' * B_εf₁)
     B_εf = vcat(B_εf₁, B_εf₂)
