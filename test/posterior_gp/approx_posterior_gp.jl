@@ -1,4 +1,18 @@
 @testset "approx_posterior_gp" begin
+
+    @testset "_symmetric" begin
+        @testset "Matrix" begin
+            X = randn(5, 5)
+            @test AbstractGPs._symmetric(X) isa Symmetric
+            @test collect(AbstractGPs._symmetric(X)) == collect(Symmetric(X))
+        end
+        @testset "Diagonal" begin
+            X = Diagonal(randn(5))
+            @test AbstractGPs._symmetric(X) isa Diagonal
+            @test collect(_symmteric(X)) == collect(Symmetric(X))
+        end
+    end
+
     rng = MersenneTwister(123456)
     N_cond = 3
     N_a = 5
