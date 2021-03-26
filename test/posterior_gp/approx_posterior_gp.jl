@@ -9,7 +9,7 @@
         @testset "Diagonal" begin
             X = Diagonal(randn(5))
             @test AbstractGPs._symmetric(X) isa Diagonal
-            @test collect(AbstractGPs._symmteric(X)) == collect(Symmetric(X))
+            @test collect(AbstractGPs._symmetric(X)) == collect(Symmetric(X))
         end
     end
 
