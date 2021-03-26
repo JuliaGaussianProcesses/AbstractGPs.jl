@@ -7,6 +7,9 @@ struct ApproxPosteriorGP{Tapprox, Tprior, Tdata} <: AbstractGP
     data::Tdata
 end
 
+# If a matrix is `Diagonal`, we generally don't need to wrap it in a `Symmetric`, because
+# it's already symmetric. This is used in a couple of places to avoid precisely this and
+# having to add specialised methods of e.g. `_cholesky` for complicated wrapped types.
 _symmetric(X) = Symmetric(X)
 _symmetric(X::Diagonal) = X
 
