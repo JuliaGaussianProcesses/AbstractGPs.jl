@@ -29,6 +29,10 @@ end
             @test m == mean(fx)
             @test C == cov(fx)
         end
+        let m, c = mean_and_cov_diag(fx)
+            @test m == mean(fx)
+            @test c == cov_diag(fx)
+        end
     end
     @testset "rand (deterministic)" begin
         rng = MersenneTwister(123456)

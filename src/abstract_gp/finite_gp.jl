@@ -112,6 +112,28 @@ function mean_and_cov(f::FiniteGP)
 end
 
 """
+    mean_and_cov_diag(f::FiniteGP)
+
+Compute both `mean(f)` and the diagonal elements of `cov(f)`.
+
+Sometimes more efficient than computing them separately, particularly for posteriors.
+
+# Examples
+
+```jldoctest
+julia> fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
+
+julia> mean_and_cov_diag(fx) == (mean(fx), cov_diag(fx))
+true
+```
+"""
+function mean_and_cov_diag(f::FiniteGP)
+    m, c = mean_and_cov_diag(f.f, f.x)
+    Σy = f.Σy
+    return m, c + view(Σy, diagind(Σy))
+end
+
+"""
     cov(fx::FiniteGP, gx::FiniteGP)
 
 Compute the cross-covariance matrix between `fx` and `gx`.
@@ -154,7 +176,10 @@ julia> std.(fs) == sqrt.(diag(cov(f(x))))
 true
 ```
 """
-marginals(f::FiniteGP) = Normal.(mean(f), sqrt.(cov_diag(f.f, f.x) .+ diag(f.Σy)))
+function marginals(f::FiniteGP)
+    m, c = mean_and_cov_diag(f)
+    return Normal.(m, sqrt.(c))
+end
 
 """
     rand(rng::AbstractRNG, f::FiniteGP, N::Int=1)
