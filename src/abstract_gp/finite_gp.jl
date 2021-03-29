@@ -93,6 +93,25 @@ true
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 
 """
+    cov_diag(f::FiniteGP)
+
+Compute only the diagonal elements of [`cov(f)`](@ref).
+
+# Examples
+
+```jldoctest
+julia> fx = GP(Matern52Kernel())(randn(10), 0.1);
+
+julia> cov_diag(fx) == diag(cov(fx))
+true
+```
+"""
+function cov_diag(f::FiniteGP)
+    Σy = f.Σy
+    return cov_diag(f.f, f.x) + view(Σy, diagind(Σy))
+end
+
+"""
     mean_and_cov(f::FiniteGP)
 
 Equivalent to `(mean(f), cov(f))`, but sometimes more efficient to compute them jointly than
