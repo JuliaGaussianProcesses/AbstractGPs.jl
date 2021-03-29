@@ -183,7 +183,7 @@ true
 """
 function Random.rand(rng::AbstractRNG, f::FiniteGP, N::Int)
     m, C_mat = mean_and_cov(f)
-    C = cholesky(Symmetric(C_mat))
+    C = cholesky(_symmetric(C_mat))
     return m .+ C.U' * randn(rng, promote_type(eltype(m), eltype(C)), length(m), N)
 end
 Random.rand(f::FiniteGP, N::Int) = rand(Random.GLOBAL_RNG, f, N)
@@ -223,7 +223,7 @@ Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf
 
 function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     m, C_mat = mean_and_cov(f)
-    C = cholesky(Symmetric(C_mat))
+    C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
     return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
 end
@@ -285,19 +285,12 @@ function dtc(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     return first(_compute_intermediates(f, y, u))
 end
 
-# Small bit of indirection to work around a cholesky-related bug whereby the interaction
-# between `FillArrays` and `Diagonal` and `Cholesky` causes problems.
-_cholesky(X) = cholesky(X)
-function _cholesky(X::Diagonal{<:Real, <:FillArrays.AbstractFill})
-    return cholesky(Diagonal(collect(diag(X))))
-end
-
 # Factor out computations common to the `elbo` and `dtc`.
 function _compute_intermediates(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     consistency_check(f, y, u)
     chol_Σy = _cholesky(f.Σy)
 
-    A = cholesky(Symmetric(cov(u))).U' \ (chol_Σy.U' \ cov(f, u))'
+    A = cholesky(_symmetric(cov(u))).U' \ (chol_Σy.U' \ cov(f, u))'
     Λ_ε = cholesky(Symmetric(A * A' + I))
     δ = chol_Σy.U' \ (y - mean(f))
 

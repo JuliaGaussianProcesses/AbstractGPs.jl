@@ -20,7 +20,7 @@ where `m` and `k` are the mean function and kernel of `fx.f` respectively.
 """
 function posterior(fx::FiniteGP, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(fx)
-    C = cholesky(Symmetric(C_mat))
+    C = cholesky(_symmetric(C_mat))
     δ = y - m
     α = C \ δ
     return PosteriorGP(fx.f, (α=α, C=C, x=fx.x, δ=δ))
