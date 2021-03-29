@@ -7,12 +7,6 @@ struct ApproxPosteriorGP{Tapprox, Tprior, Tdata} <: AbstractGP
     data::Tdata
 end
 
-# If a matrix is `Diagonal`, we generally don't need to wrap it in a `Symmetric`, because
-# it's already symmetric. This is used in a couple of places to avoid precisely this and
-# having to add specialised methods of e.g. `_cholesky` for complicated wrapped types.
-_symmetric(X) = Symmetric(X)
-_symmetric(X::Diagonal) = X
-
 """
     approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
 
@@ -25,14 +19,14 @@ Intelligence and Statistics. 2009.
 """
 function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     U_y = _cholesky(_symmetric(fx.Σy)).U
-    U = cholesky(Symmetric(cov(u))).U
+    U = cholesky(_symmetric(cov(u))).U
     
     B_εf = U' \ (U_y' \ cov(fx, u))'
 
     b_y = U_y' \ (y - mean(fx))
 
     D = B_εf * B_εf' + I
-    Λ_ε = cholesky(Symmetric(D))
+    Λ_ε = cholesky(_symmetric(D))
 
     m_ε = Λ_ε \ (B_εf * b_y)
 
@@ -117,7 +111,7 @@ function update_approx_posterior(
 )
     U11 = f_post_approx.data.U
     C12 = cov(u.f, f_post_approx.data.z, u.x)
-    C22 = Symmetric(cov(u))
+    C22 = _symmetric(cov(u))
     U = update_chol(Cholesky(U11,'U', 0), C12, C22).U
     U22 = U[end-length(u)+1:end, end-length(u)+1:end]
     U12 = U[1:length(f_post_approx.data.z), end-length(u)+1:end]
@@ -153,8 +147,6 @@ function update_approx_posterior(
     )
     return ApproxPosteriorGP(VFE(), f_post_approx.prior, cache)
 end
-
-LinearAlgebra.Symmetric(X::Diagonal) = X
 
 # AbstractGP interface implementation.
 
