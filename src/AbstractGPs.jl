@@ -8,6 +8,7 @@ module AbstractGPs
     @reexport using KernelFunctions
     using Random
     using Statistics
+    using RecipesBase
 
     using KernelFunctions: ColVecs, RowVecs
 

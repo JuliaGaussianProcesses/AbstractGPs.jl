@@ -1,21 +1,24 @@
-using RecipesBase
-
 @recipe f(gp::AbstractGP, x::AbstractArray) = gp(x)
-@recipe f(gp::AbstractGP, x::AbstractRange) = gp(x)
-@recipe f(gp::AbstractGP, xmin::Real, xmax::Real) = gp(collect(range(xmin, xmax, length=1000)))
-@recipe function f(gp::FiniteGP)
-    x = gp.x
-    f = gp.f
-    ms = marginals(gp)
+@recipe f(gp::AbstractGP, xmin::Real, xmax::Real) = gp(range(xmin, xmax; length=1_000))
 
-    @series begin
-        μ = mean.(ms)
-        σ = std.(ms)
-        ribbon := σ
-        fillalpha --> 0.3
-        linewidth --> 2
-        x, μ
-    end
+@recipe f(z::AbstractVector, gp::AbstractGP, x::AbstractArray) = (z, gp(x))
+@recipe function f(z::AbstractVector, gp::AbstractGP, xmin::Real, xmax::Real)
+    return (z, gp(range(xmin, xmax; length=1_000)))
+end
+
+@recipe f(gp::FiniteGP) = (gp.x, gp)
+@recipe function f(z::AbstractVector, gp::FiniteGP)
+    length(z) == length(gp.x) ||
+        throw(DimensionMismatch("length of `z` and `gp.x` has to be equal"))
+
+    # compute marginals
+    μ, σ2 = mean_and_cov_diag(gp)
+    σ = map(sqrt, σ2)
+
+    ribbon := σ
+    fillalpha --> 0.3
+    linewidth --> 2
+    return z, μ
 end
 
 """
