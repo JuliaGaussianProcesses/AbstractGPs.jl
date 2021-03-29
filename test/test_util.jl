@@ -167,7 +167,7 @@ function abstractgp_interface_tests(
     @test size(C_xx) == (length(x), length(x))
 
     # Check that C_xx is positive definite.
-    @test minimum(eigvals(Symmetric(C_xx))) > -eig_tol
+    @test eigmin(Symmetric(C_xx)) > -eig_tol
 
     # Check that C_xx is consistent with cov(f, x, x).
     @test C_xx ≈ cov(f, x, x)
