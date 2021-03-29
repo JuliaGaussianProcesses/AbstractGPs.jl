@@ -93,6 +93,25 @@ true
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 
 """
+    cov_diag(f::FiniteGP)
+
+Compute only the diagonal elements of [`cov(f)`](@ref).
+
+# Examples
+
+```jldoctest
+julia> fx = GP(Matern52Kernel())(randn(10), 0.1);
+
+julia> cov_diag(fx) == diag(cov(fx))
+true
+```
+"""
+function cov_diag(f::FiniteGP)
+    Σy = f.Σy
+    return cov_diag(f.f, f.x) + view(Σy, diagind(Σy))
+end
+
+"""
     mean_and_cov(f::FiniteGP)
 
 Equivalent to `(mean(f), cov(f))`, but sometimes more efficient to compute them jointly than
@@ -109,6 +128,28 @@ true
 function mean_and_cov(f::FiniteGP)
     m, C = mean_and_cov(f.f, f.x)
     return m, C + f.Σy
+end
+
+"""
+    mean_and_cov_diag(f::FiniteGP)
+
+Compute both `mean(f)` and the diagonal elements of `cov(f)`.
+
+Sometimes more efficient than computing them separately, particularly for posteriors.
+
+# Examples
+
+```jldoctest
+julia> fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
+
+julia> mean_and_cov_diag(fx) == (mean(fx), cov_diag(fx))
+true
+```
+"""
+function mean_and_cov_diag(f::FiniteGP)
+    m, c = mean_and_cov_diag(f.f, f.x)
+    Σy = f.Σy
+    return m, c + view(Σy, diagind(Σy))
 end
 
 """
@@ -154,7 +195,10 @@ julia> std.(fs) == sqrt.(diag(cov(f(x))))
 true
 ```
 """
-marginals(f::FiniteGP) = Normal.(mean(f), sqrt.(cov_diag(f.f, f.x) .+ diag(f.Σy)))
+function marginals(f::FiniteGP)
+    m, c = mean_and_cov_diag(f)
+    return Normal.(m, sqrt.(c))
+end
 
 """
     rand(rng::AbstractRNG, f::FiniteGP, N::Int=1)
