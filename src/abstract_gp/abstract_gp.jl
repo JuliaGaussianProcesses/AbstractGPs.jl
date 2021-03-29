@@ -30,7 +30,7 @@ Statistics.cov(::AbstractGP, x::AbstractVector)
 
 Compute only the diagonal elements of `cov(f(x))`.
 """
-cov_diag(f::AbstractGP, x::AbstractVector) = diag(cov(f, x))
+cov_diag(::AbstractGP, ::AbstractVector)
 
 """
     cov(f::AbstractGP, x::AbstractVector, y::AbstractVector)
