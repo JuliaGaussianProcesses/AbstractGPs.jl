@@ -174,12 +174,6 @@ end
         #     atol=1e-8, rtol=1e-8,
         # )
 
-        # Supporting utility function.
-        @testset "_cholesky" begin
-            D = Diagonal(Fill(5.0, 10))
-            @test AbstractGPs._cholesky(D).U ≈ AbstractGPs._cholesky(collect(D)).U
-        end
-
         # Ensure that the elbo is close to the logpdf when appropriate.
         @test elbo(y, ŷ, fx) isa Real
         @test elbo(y, ŷ, fx) ≈ logpdf(y, ŷ)
