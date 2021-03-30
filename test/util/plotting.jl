@@ -14,16 +14,19 @@
     @test isempty(rec[1].plotattributes) # no default attributes
 
     z = 1 .+ x
-    rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), z, gp)
-    @test length(rec) == 1 && length(rec[1].args) == 2 # one series with two arguments
-    @test rec[1].args[1] == z
-    @test rec[1].args[2] == zero(x)
-    # 3 default attributes
-    attributes = rec[1].plotattributes
-    @test sort!(collect(keys(attributes))) == [:fillalpha, :linewidth, :ribbon]
-    @test attributes[:fillalpha] == 0.3
-    @test attributes[:linewidth] == 2
-    @test attributes[:ribbon] == sqrt.(cov_diag(gp))
+    for kwargs in (Dict{Symbol, Any}(), Dict{Symbol, Any}(:ribbon_scale => rand()))
+        scale = get(kwargs, :ribbon_scale, 1.0)::Float64
+        rec = RecipesBase.apply_recipe(kwargs, z, gp)
+        @test length(rec) == 1 && length(rec[1].args) == 2 # one series with two arguments
+        @test rec[1].args[1] == z
+        @test rec[1].args[2] == zero(x)
+        # 3 default attributes
+        attributes = rec[1].plotattributes
+        @test sort!(collect(keys(attributes))) == [:fillalpha, :linewidth, :ribbon]
+        @test attributes[:fillalpha] == 0.3
+        @test attributes[:linewidth] == 2
+        @test attributes[:ribbon] == scale .* sqrt.(cov_diag(gp))
+    end
 
     # Check recipe dispatches for `AbstractGP`s
     # with `AbstractVector` and `AbstractRange`:
@@ -36,6 +39,7 @@
         @test isempty(rec[1].plotattributes) # no default attributes
     end
 
-    # Check dimensions
+    # Checks
     @test_throws DimensionMismatch plot(rand(5), gp)
+    @test_throws ErrorException plot(rand(10), gp; ribbon_scale=-0.5)
 end
