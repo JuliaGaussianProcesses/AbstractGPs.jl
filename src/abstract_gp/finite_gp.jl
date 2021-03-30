@@ -4,7 +4,7 @@
 The finite-dimensional projection of the AbstractGP `f` at `x`. Assumed to be observed under
 Gaussian noise with zero mean and covariance matrix `Σ`
 """
-struct FiniteGP{Tf<:AbstractGP, Tx<:AbstractVector, TΣ} <: ContinuousMultivariateDistribution
+struct FiniteGP{Tf<:AbstractGP, Tx<:AbstractVector, TΣ} <: AbstractMvNormal
     f::Tf
     x::Tx
     Σy::TΣ
