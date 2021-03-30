@@ -28,41 +28,13 @@
     # Check recipe dispatches for `AbstractGP`s
     # with `AbstractVector` and `AbstractRange`:
     for x in (rand(10), 0:0.01:1)
-        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), f, x)
+        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), x, f)
         @test length(rec) == 1 && length(rec[1].args) == 1 # one series with one argument
         @test rec[1].args[1] isa AbstractGPs.FiniteGP
         @test rec[1].args[1].x == x
         @test rec[1].args[1].f == f
         @test isempty(rec[1].plotattributes) # no default attributes
-
-        z = 1 .+ x
-        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), z, f, x)
-        @test length(rec) == 1 && length(rec[1].args) == 2 # one series with two arguments
-        @test rec[1].args[1] == z
-        @test rec[1].args[2] isa AbstractGPs.FiniteGP
-        @test rec[1].args[2].x == x
-        @test rec[1].args[2].f == f
-        @test isempty(rec[1].plotattributes) # no default attributes
     end
-
-    # with minimum and maximum:
-    xmin = rand()
-    xmax = 4 + rand()
-    rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), f, xmin, xmax)
-    @test length(rec) == 1 && length(rec[1].args) == 1 # one series with one argument
-    @test rec[1].args[1] isa AbstractGPs.FiniteGP
-    @test rec[1].args[1].x == range(xmin, xmax; length=1_000)
-    @test rec[1].args[1].f == f
-    @test isempty(rec[1].plotattributes) # no default attributes
-
-    z = range(0, 1; length=1_000)
-    rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), z, f, xmin, xmax)
-    @test length(rec) == 1 && length(rec[1].args) == 2 # one series with two arguments
-    @test rec[1].args[1] == z
-    @test rec[1].args[2] isa AbstractGPs.FiniteGP
-    @test rec[1].args[2].x == range(xmin, xmax; length=1_000)
-    @test rec[1].args[2].f == f
-    @test isempty(rec[1].plotattributes) # no default attributes
 
     # Check dimensions
     @test_throws DimensionMismatch plot(rand(5), gp)
