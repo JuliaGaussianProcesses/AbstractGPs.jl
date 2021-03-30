@@ -3,7 +3,7 @@
 @recipe function f(x::AbstractVector, gp::FiniteGP)
     length(x) == length(gp.x) ||
         throw(DimensionMismatch("length of `x` and `gp.x` has to be equal"))
-    scale = pop!(plotattributes, :ribbon_scale, 1.0)::Float64
+    scale::Float64 = pop!(plotattributes, :ribbon_scale, 1.0)
     scale > 0.0 || error("`bandwidth` keyword argument must be non-negative")
 
     # compute marginals

@@ -14,8 +14,12 @@
     @test isempty(rec[1].plotattributes) # no default attributes
 
     z = 1 .+ x
-    for kwargs in (Dict{Symbol, Any}(), Dict{Symbol, Any}(:ribbon_scale => rand()))
-        scale = get(kwargs, :ribbon_scale, 1.0)::Float64
+    for kwargs in (
+        Dict{Symbol, Any}(),
+        Dict{Symbol, Any}(:ribbon_scale => 3),
+        Dict{Symbol, Any}(:ribbon_scale => rand()),
+    )
+        scale = get(kwargs, :ribbon_scale, 1.0)
         rec = RecipesBase.apply_recipe(kwargs, z, gp)
         @test length(rec) == 1 && length(rec[1].args) == 2 # one series with two arguments
         @test rec[1].args[1] == z
