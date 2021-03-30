@@ -31,3 +31,8 @@ end
     )
     return z, gp(range(xmin, xmax; length=1_000))
 end
+
+@deprecate cov_diag(f::AbstractGP, x::AbstractVector) var(f, x)
+@deprecate cov_diag(gp::FiniteGP) var(gp)
+@deprecate mean_and_cov_diag(f::AbstractGP, x::AbstractVector) mean_and_var(f, x)
+@deprecate mean_and_cov_diag(gp::FiniteGP) mean_and_var(gp)

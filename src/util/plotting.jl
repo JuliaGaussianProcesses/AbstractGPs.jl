@@ -7,7 +7,7 @@
     scale > 0.0 || error("`bandwidth` keyword argument must be non-negative")
 
     # compute marginals
-    μ, σ2 = mean_and_cov_diag(gp)
+    μ, σ2 = mean_and_var(gp)
 
     ribbon := scale .* sqrt.(σ2)
     fillalpha --> 0.3
