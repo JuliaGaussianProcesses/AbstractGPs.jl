@@ -36,4 +36,7 @@ module AbstractGPs
 
     # Plotting utilities.
     include(joinpath("util", "plotting.jl"))
+
+    # Deprecations.
+    include("deprecations.jl")
 end # module

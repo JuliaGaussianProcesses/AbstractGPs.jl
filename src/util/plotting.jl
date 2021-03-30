@@ -1,24 +1,18 @@
-@recipe f(gp::AbstractGP, x::AbstractArray) = gp(x)
-@recipe f(gp::AbstractGP, xmin::Real, xmax::Real) = gp(range(xmin, xmax; length=1_000))
-
-@recipe f(z::AbstractVector, gp::AbstractGP, x::AbstractArray) = (z, gp(x))
-@recipe function f(z::AbstractVector, gp::AbstractGP, xmin::Real, xmax::Real)
-    return (z, gp(range(xmin, xmax; length=1_000)))
-end
-
+@recipe f(x::AbstractVector, gp::AbstractGP) = gp(x)
 @recipe f(gp::FiniteGP) = (gp.x, gp)
-@recipe function f(z::AbstractVector, gp::FiniteGP)
-    length(z) == length(gp.x) ||
-        throw(DimensionMismatch("length of `z` and `gp.x` has to be equal"))
+@recipe function f(x::AbstractVector, gp::FiniteGP)
+    length(x) == length(gp.x) ||
+        throw(DimensionMismatch("length of `x` and `gp.x` has to be equal"))
+    scale::Float64 = pop!(plotattributes, :ribbon_scale, 1.0)
+    scale > 0.0 || error("`bandwidth` keyword argument must be non-negative")
 
     # compute marginals
     μ, σ2 = mean_and_cov_diag(gp)
-    σ = map(sqrt, σ2)
 
-    ribbon := σ
+    ribbon := scale .* sqrt.(σ2)
     fillalpha --> 0.3
     linewidth --> 2
-    return z, μ
+    return x, μ
 end
 
 """
