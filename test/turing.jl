@@ -25,20 +25,20 @@
         @test length(sample(m, HMC(0.5, 1), 5)) == 5
     end
     @testset "latent GP regression" begin
-		X = randn(3, 1)
-		x = [rand(1) for _ in 1:3]
-		y = rand.(Poisson.(exp.(randn(3))))
+        X = randn(3, 1)
+        x = [rand(1) for _ in 1:3]
+        y = rand.(Poisson.(exp.(randn(3))))
 
-		@model function latent_gp_regression(y, X)
-			f  = GP(Matern32Kernel())
-			u ~ f(X)
-			λ = exp.(u)
-			y .~ Poisson.(λ)
-		end
-		m = latent_gp_regression(y, RowVecs(X))
-		@test length(sample(m, NUTS(), 5)) == 5
-		# Test for vectors of vector
-		m = latent_gp_regression(y, x)
-		@test length(sample(m, NUTS(), 5)) == 5
-	end
+        @model function latent_gp_regression(y, X)
+            f  = GP(Matern32Kernel())
+            u ~ f(X)
+            λ = exp.(u)
+            y .~ Poisson.(λ)
+        end
+        m = latent_gp_regression(y, RowVecs(X))
+        @test length(sample(m, NUTS(), 5)) == 5
+        # Test for vectors of vector
+        m = latent_gp_regression(y, x)
+        @test length(sample(m, NUTS(), 5)) == 5
+    end
 end
