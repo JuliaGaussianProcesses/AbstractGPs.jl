@@ -68,6 +68,6 @@ Statistics.mean(f::GP, x::AbstractVector) = _map(f.mean, x)
 
 Statistics.cov(f::GP, x::AbstractVector) = kernelmatrix(f.kernel, x)
 
-cov_diag(f::GP, x::AbstractVector) = kernelmatrix_diag(f.kernel, x)
+Statistics.var(f::GP, x::AbstractVector) = kernelmatrix_diag(f.kernel, x)
 
 Statistics.cov(f::GP, x::AbstractVector, x′::AbstractVector) = kernelmatrix(f.kernel, x, x′)

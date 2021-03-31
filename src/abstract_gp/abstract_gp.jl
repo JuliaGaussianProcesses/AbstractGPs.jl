@@ -26,11 +26,11 @@ Compute the `length(x)` by `length(x)` covariance matrix of the multivariate Nor
 Statistics.cov(::AbstractGP, x::AbstractVector)
 
 """
-    cov_diag(f::AbstractGP, x::AbstractVector)
+    var(f::AbstractGP, x::AbstractVector)
 
 Compute only the diagonal elements of `cov(f(x))`.
 """
-cov_diag(::AbstractGP, ::AbstractVector)
+Statistics.var(::AbstractGP, ::AbstractVector)
 
 """
     cov(f::AbstractGP, x::AbstractVector, y::AbstractVector)
@@ -48,9 +48,9 @@ computation, particularly for posteriors.
 mean_and_cov(f::AbstractGP, x::AbstractVector) = (mean(f, x), cov(f, x))
 
 """
-    mean_and_cov_diag(f::AbstractGP, x::AbstractVector)
+    mean_and_var(f::AbstractGP, x::AbstractVector)
 
 Compute both `mean(f(x))` and the diagonal elements of `cov(f(x))`. Sometimes more efficient
 than separately computation, particularly for posteriors.
 """
-mean_and_cov_diag(f::AbstractGP, x::AbstractVector) = (mean(f, x), cov_diag(f, x))
+mean_and_var(f::AbstractGP, x::AbstractVector) = (mean(f, x), var(f, x))

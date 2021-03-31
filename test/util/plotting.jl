@@ -29,7 +29,7 @@
         @test sort!(collect(keys(attributes))) == [:fillalpha, :linewidth, :ribbon]
         @test attributes[:fillalpha] == 0.3
         @test attributes[:linewidth] == 2
-        @test attributes[:ribbon] == scale .* sqrt.(cov_diag(gp))
+        @test attributes[:ribbon] == scale .* sqrt.(var(gp))
     end
 
     # Check recipe dispatches for `AbstractGP`s

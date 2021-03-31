@@ -172,8 +172,8 @@ function abstractgp_interface_tests(
     # Check that C_xx is consistent with cov(f, x, x).
     @test C_xx ≈ cov(f, x, x)
 
-    # Check that cov_diag works, is the correct size and type.
-    C_xx_diag = cov_diag(f, x)
+    # Check that var(f, x) works, is the correct size and type.
+    C_xx_diag = var(f, x)
     @test C_xx_diag isa AbstractVector{<:Real}
     @test length(C_xx_diag) == length(x)
 
@@ -187,11 +187,11 @@ function abstractgp_interface_tests(
         @test C ≈ cov(f, x)
     end
 
-    # Check that mean_and_cov_diag is consistent.
+    # Check that mean_and_var is consistent.
     let
-        m, c = mean_and_cov_diag(f, x)
+        m, c = mean_and_var(f, x)
         @test m ≈ mean(f, x)
-        @test c ≈ cov_diag(f, x)
+        @test c ≈ var(f, x)
     end
 
     # Construct a FiniteGP, and check that all standard methods defined on it at least run.
@@ -203,7 +203,7 @@ function abstractgp_interface_tests(
     @test first(mean_and_cov(fx)) ≈ mean(f, x)
     @test last(mean_and_cov(fx)) ≈ cov(f, x)
     @test mean.(marginals(fx)) ≈ mean(f, x)
-    @test var.(marginals(fx)) ≈ cov_diag(f, x) .+ diag(fx.Σy)
+    @test var.(marginals(fx)) ≈ var(f, x) .+ diag(fx.Σy)
 
     # Generate, compute logpdf, compare against VFE and DTC.
     y = rand(fx)
