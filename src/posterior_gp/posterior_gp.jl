@@ -67,14 +67,14 @@ function Statistics.cov(f::PosteriorGP, x::AbstractVector, z::AbstractVector)
     return cov(f.prior, x, z) - Xt_invA_Y(C_xcond_x, f.data.C, C_xcond_y)
 end
 
-function mean_and_cov(f::PosteriorGP, x::AbstractVector)
+function StatsBase.mean_and_cov(f::PosteriorGP, x::AbstractVector)
     C_xcond_x = cov(f.prior, f.data.x, x)
     m_post = mean(f.prior, x) + C_xcond_x' * f.data.α
     C_post = cov(f.prior, x) - Xt_invA_X(f.data.C, C_xcond_x)
     return (m_post, C_post)
 end
 
-function mean_and_var(f::PosteriorGP, x::AbstractVector)
+function StatsBase.mean_and_var(f::PosteriorGP, x::AbstractVector)
     C_xcond_x = cov(f.prior, f.data.x, x)
     m_post = mean(f.prior, x) + C_xcond_x' * f.data.α
     C_post_diag = var(f.prior, x) - diag_Xt_invA_X(f.data.C, C_xcond_x)
