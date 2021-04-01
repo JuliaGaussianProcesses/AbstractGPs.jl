@@ -125,7 +125,7 @@ julia> mean_and_cov(fx) == (mean(fx), cov(fx))
 true
 ```
 """
-function mean_and_cov(f::FiniteGP)
+function StatsBase.mean_and_cov(f::FiniteGP)
     m, C = mean_and_cov(f.f, f.x)
     return m, C + f.Σy
 end
@@ -146,7 +146,7 @@ julia> mean_and_var(fx) == (mean(fx), var(fx))
 true
 ```
 """
-function mean_and_var(f::FiniteGP)
+function StatsBase.mean_and_var(f::FiniteGP)
     m, c = mean_and_var(f.f, f.x)
     Σy = f.Σy
     return m, c + view(Σy, diagind(Σy))
