@@ -19,7 +19,7 @@
 
     # Verify that posterior collapses around observations.
     @test mean(f_post, x) ≈ y
-    @test cov_diag(f_post, x) ≈ zeros(N_cond) rtol=1e-14 atol=1e-14
+    @test var(f_post, x) ≈ zeros(N_cond) rtol=1e-14 atol=1e-14
 
     # Check interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))

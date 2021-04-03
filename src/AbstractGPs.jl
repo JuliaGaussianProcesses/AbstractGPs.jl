@@ -8,11 +8,12 @@ module AbstractGPs
     @reexport using KernelFunctions
     using Random
     using Statistics
+    using StatsBase
     using RecipesBase
 
     using KernelFunctions: ColVecs, RowVecs
 
-    export GP, mean, cov, std, cov_diag, mean_and_cov, mean_and_cov_diag, marginals,
+    export GP, mean, cov, var, std, mean_and_cov, mean_and_var, marginals,
         logpdf, elbo, dtc, posterior, approx_posterior, VFE, DTC, sampleplot,
         update_approx_posterior, LatentGP, ColVecs, RowVecs
 
@@ -36,4 +37,7 @@ module AbstractGPs
 
     # Plotting utilities.
     include(joinpath("util", "plotting.jl"))
+
+    # Deprecations.
+    include("deprecations.jl")
 end # module

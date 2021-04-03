@@ -20,20 +20,20 @@ end
         @test FiniteGP(f, Xmat, σ², obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²) 
         @test mean(fx) == mean(f, x)
         @test cov(fx) == cov(f, x)
-        @test cov_diag(fx) == diag(cov(fx))
+        @test var(fx) == diag(cov(fx))
         @test cov(fx, fx′) == cov(f, x, x′)
         @test mean.(marginals(fx)) == mean(f(x))
-        @test var.(marginals(fx)) == cov_diag(f, x)
-        @test std.(marginals(fx)) == sqrt.(cov_diag(f, x))
+        @test var.(marginals(fx)) == var(f, x)
+        @test std.(marginals(fx)) == sqrt.(var(f, x))
         let
             m, C = mean_and_cov(fx)
             @test m == mean(fx)
             @test C == cov(fx)
         end
         let
-            m, c = mean_and_cov_diag(fx)
+            m, c = mean_and_var(fx)
             @test m == mean(fx)
-            @test c == cov_diag(fx)
+            @test c == var(fx)
         end
     end
     @testset "rand (deterministic)" begin

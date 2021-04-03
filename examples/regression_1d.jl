@@ -62,7 +62,7 @@ scatter(
     title="posterior (default parameters)", label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(p_fx, 0:0.001:1; label=false)
+plot!(0:0.001:1, p_fx; label=false)
 
 # ## Markov Chain Monte Carlo
 #
@@ -430,5 +430,5 @@ scatter(
     title="posterior (VI with sparse grid)", label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(ap, 0:0.001:1; label=false)
+plot!(0:0.001:1, ap; label=false)
 vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")

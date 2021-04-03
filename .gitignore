@@ -10,3 +10,4 @@
 /docs/src/generated/
 /docs/site/
 */.ipynb_checkpoints
+.vscode/settings.json

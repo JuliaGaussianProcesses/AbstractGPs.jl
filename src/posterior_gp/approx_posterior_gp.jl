@@ -159,9 +159,9 @@ function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     return cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function cov_diag(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function Statistics.var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, f.data.z, x)
-    return cov_diag(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
+    return var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
 end
 
 function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector, y::AbstractVector)
@@ -170,16 +170,16 @@ function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector, y::Abstrac
     return cov(f.prior, x, y) - A_zx'A_zy + Xt_invA_Y(A_zx, f.data.Λ_ε, A_zy)
 end
 
-function mean_and_cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function StatsBase.mean_and_cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, f.data.z, x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     C_post = cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
     return m_post, C_post
 end
 
-function mean_and_cov_diag(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function StatsBase.mean_and_var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, f.data.z, x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
-    c_post = cov_diag(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
+    c_post = var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
     return m_post, c_post
 end

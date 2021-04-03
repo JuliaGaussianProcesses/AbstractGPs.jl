@@ -93,7 +93,7 @@ true
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 
 """
-    cov_diag(f::FiniteGP)
+    var(f::FiniteGP)
 
 Compute only the diagonal elements of [`cov(f)`](@ref).
 
@@ -102,13 +102,13 @@ Compute only the diagonal elements of [`cov(f)`](@ref).
 ```jldoctest
 julia> fx = GP(Matern52Kernel())(randn(10), 0.1);
 
-julia> cov_diag(fx) == diag(cov(fx))
+julia> var(fx) == diag(cov(fx))
 true
 ```
 """
-function cov_diag(f::FiniteGP)
+function Statistics.var(f::FiniteGP)
     Σy = f.Σy
-    return cov_diag(f.f, f.x) + view(Σy, diagind(Σy))
+    return var(f.f, f.x) + view(Σy, diagind(Σy))
 end
 
 """
@@ -125,13 +125,13 @@ julia> mean_and_cov(fx) == (mean(fx), cov(fx))
 true
 ```
 """
-function mean_and_cov(f::FiniteGP)
+function StatsBase.mean_and_cov(f::FiniteGP)
     m, C = mean_and_cov(f.f, f.x)
     return m, C + f.Σy
 end
 
 """
-    mean_and_cov_diag(f::FiniteGP)
+    mean_and_var(f::FiniteGP)
 
 Compute both `mean(f)` and the diagonal elements of `cov(f)`.
 
@@ -142,12 +142,12 @@ Sometimes more efficient than computing them separately, particularly for poster
 ```jldoctest
 julia> fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
 
-julia> mean_and_cov_diag(fx) == (mean(fx), cov_diag(fx))
+julia> mean_and_var(fx) == (mean(fx), var(fx))
 true
 ```
 """
-function mean_and_cov_diag(f::FiniteGP)
-    m, c = mean_and_cov_diag(f.f, f.x)
+function StatsBase.mean_and_var(f::FiniteGP)
+    m, c = mean_and_var(f.f, f.x)
     Σy = f.Σy
     return m, c + view(Σy, diagind(Σy))
 end
@@ -196,7 +196,7 @@ true
 ```
 """
 function marginals(f::FiniteGP)
-    m, c = mean_and_cov_diag(f)
+    m, c = mean_and_var(f)
     return Normal.(m, sqrt.(c))
 end
 
@@ -348,5 +348,5 @@ function consistency_check(f, y, u)
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal, chol_Σy::Cholesky)
-    return sum(cov_diag(f.f, f.x) ./ diag(Σy))
+    return sum(var(f.f, f.x) ./ diag(Σy))
 end
