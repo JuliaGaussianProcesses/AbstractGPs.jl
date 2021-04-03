@@ -54,10 +54,6 @@ include("test_util.jl")
     println(" ")
     @info "Ran latent_gp tests"
 
-    include("deprecations.jl")
-    println(" ")
-    @info "Ran deprecation tests"
-
     include("turing.jl")
     println(" ")
     @info "Ran Turing tests"
