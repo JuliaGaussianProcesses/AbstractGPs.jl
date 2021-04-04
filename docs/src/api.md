@@ -93,7 +93,7 @@ mean_and_cov(::AbstractGPs.AbstractGP, ::AbstractVector)
 mean_and_var(::AbstractGPs.AbstractGP, ::AbstractVector)
 ```
 
-Note that, while we _could_ provide a default implementation for `var` as `diag(cov(f, x))`, this is generally such an inefficient fallback, that we view find it preferable to error if it's not implemented than to ever hit a fallback.
+Note that, while we _could_ provide a default implementation for `var(f, x)` as `diag(cov(f, x))`, this is generally such an inefficient fallback, that we find it preferable to error if it's not implemented than to ever hit a fallback.
 
 
 
