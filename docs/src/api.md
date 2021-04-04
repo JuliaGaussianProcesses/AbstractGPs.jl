@@ -52,7 +52,7 @@ This is similar to the well-known observation that you rarely need the inverse o
 This is important, for example, as `TemporalGPs.jl` is able to implement all of the Primary Public API in linear time in the dimension of the `FiniteGP`, as it never needs to evaluate the covariance matrix.
 
 However, for many (probably the majority of) GPs, this acceleration isn't possible, and there is really nothing lost by explicitly evaluating the covariance matrix.
-We call this the Secondary Public API, because it's available a large proportion of the time, but should be avoided if at all possible.
+We call this the [Secondary Public API](@ref), because it's available a large proportion of the time, but should be avoided if at all possible.
 
 #### Required Methods
 
@@ -69,7 +69,7 @@ mean_and_cov(::AbstractGPs.FiniteGP)
 
 ## Internal AbstractGPs API
 
-This functionality is not intended to be used directly be users, or those building functionality on top of `AbstractGP` -- they should interact with Primary Public API above, and the Seconary Public API if truly necessary.
+This functionality is not intended to be used directly be users, or those building functionality on top of `AbstractGP` -- they should interact with [Primary Public API](@ref) above, and the [Secondary Public API](@ref) if truly necessary.
 
 The reason for this is that some `AbstractGP`s will not actually implement any of these methods, but they will ensure that the Primary Public API is implemented for `FiniteGP`s containing them.
 See the next section for more info on this.
@@ -99,15 +99,15 @@ Note that, while we _could_ provide a default implementation for `var(f, x)` as 
 
 ## When to implement FiniteGP methods
 
-If you have a new subtype of `AbstractGP` and it implements the API above (i.e. you don't mind computing covariance matrices), then you'll not usually need to add new methods involving your own `FiniteGP` -- the fallback implementations will often be completely fine.
+If you have a new subtype of `AbstractGP` and it implements the [Internal AbstractGPs API](@ref) above (i.e. you don't mind computing covariance matrices), then you'll not usually need to add new methods involving your own `FiniteGP` -- the fallback implementations will often be completely fine.
 
-If, on the other hand, you don't want to implement the Internal AbstractGPs API for e.g. performance reasons, then you'll need to implement the Primary Public API directly.
-This is the case in `TemporalGPs.jl` -- the covariance matrix is never actually needed, so we neglect to provide any implementations involving it, instead implementing specialised methods for the Primary Public API.
+If, on the other hand, you don't want to implement the [Internal AbstractGPs API](@ref) for e.g. performance reasons, then you'll need to implement the [Primary Public API](@ref) directly.
+This is the case in `TemporalGPs.jl` -- the covariance matrix is never actually needed, so we neglect to provide any implementations involving it, instead implementing specialised methods for the [Primary Public API](@ref).
 
 There are possibly other reasons why you might wish to modify the way in which e.g. `logpdf` works for GPs implementing the Primary and Secondary public APIs.
 For example, you might wish to avoid ever computing Cholesky factorisations directly, instead implementing everything in terms of matrix-vector multiplies, conjugate gradients, etc.
 
-In these cases, we advise that you use the type parameters in `FiniteGP` to dispatch appropriately to specialised Primary Public API methods for your type. E.g.
+In these cases, we advise that you use the type parameters in `FiniteGP` to dispatch appropriately to specialised [Primary Public API](@ref) methods for your type. E.g.
 ```julia
 const MyFiniteGP = FiniteGP{<:MyGPType}
 AbstractGPs.logpdf(::MyFiniteGP, ::AbstractVector{<:Real})
