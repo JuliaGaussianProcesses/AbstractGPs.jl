@@ -107,7 +107,7 @@ This is the case in `TemporalGPs.jl` -- the covariance matrix is never actually 
 There are possibly other reasons why you might wish to modify the way in which e.g. `logpdf` works for GPs implementing the Primary and Secondary public APIs.
 For example, you might wish to avoid ever computing Cholesky factorisations directly, instead implementing everything in terms of matrix-vector multiplies, conjugate gradients, etc.
 
-In these cases, we advise that you use the type parameters in `FiniteGP` to dispatch appropriately to specialised Primary Public API methods for your type:
+In these cases, we advise that you use the type parameters in `FiniteGP` to dispatch appropriately to specialised Primary Public API methods for your type. E.g.
 ```julia
 const MyFiniteGP = FiniteGP{<:MyGPType}
 AbstractGPs.logpdf(::MyFiniteGP, ::AbstractVector{<:Real})
