@@ -101,13 +101,11 @@ Note that, while we _could_ provide a default implementation for `var` as `diag(
 
 If you have a new subtype of `AbstractGP` and it implements the API above (i.e. you don't mind computing covariance matrices), then you'll not usually need to add new methods involving your own `FiniteGP` -- the fallback implementations will often be completely fine.
 
-There are, however, some situations in which this is not the case.
-
-One is that it might not be a good idea for your subtype of `AbstractGP` to implement e.g. `cov` for performance reasons.
+If, on the other hand, you don't want to implement the Internal AbstractGPs API for e.g. performance reasons, then you'll need to implement the Primary Public API directly.
 This is the case in `TemporalGPs.jl` -- the covariance matrix is never actually needed, so we neglect to provide any implementations involving it, instead implementing specialised methods for the Primary Public API.
 
-Another is that you may just want to try out different implementation of the Primary and Secondary Public APIs.
-This might be something you do if implementing all functionality only in terms of matrix-vector multiplies, conjugate gradients, etc.
+There are possibly other reasons why you might wish to modify the way in which e.g. `logpdf` works for GPs implementing the Primary and Secondary public APIs.
+For example, you might wish to avoid ever computing Cholesky factorisations directly, instead implementing everything in terms of matrix-vector multiplies, conjugate gradients, etc.
 
 In these cases, we advise that you use the type parameters in `FiniteGP` to dispatch appropriately to specialised Primary Public API methods for your type:
 ```julia
