@@ -1,6 +1,6 @@
 # FiniteGPs and AbstractGPs
 
-In the realms of exact inference, there are two key types that AbstractGPs provides: `FiniteGP`, and `AbstractGP`.
+There are two core types that AbstractGPs provides: `FiniteGP`, and `AbstractGP`.
 
 
 ## FiniteGP
