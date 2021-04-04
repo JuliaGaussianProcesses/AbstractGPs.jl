@@ -42,11 +42,12 @@ makedocs(;
     sitename="AbstractGPs.jl",
     pages = [
         "Home" => "index.md",
-        "API" => "api.md",
+        "The Main APIs" => "api.md",
+        "Concrete Features" => "concrete_features.md",
         "Examples" => joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
     ],
-    strict=true,
-    checkdocs=:exports, 
+    # strict=true,
+    # checkdocs=:exports, 
 )
 
 deploydocs(;
