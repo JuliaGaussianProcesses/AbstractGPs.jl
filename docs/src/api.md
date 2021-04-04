@@ -49,7 +49,7 @@ mean_and_var(::AbstractGPs.FiniteGP)
 While the covariance matrix of any multivariate Gaussian is defined, it is not always a good idea to actually compute it.
 Fortunately, it's often the case that you're not actually interested in the covariance matrix per-se, rather the other quantities that you might use it to compute (`logpdf`, `rand`, `posterior`).
 This is similar to the well-known observation that you rarely need the inverse of a matrix, you just need to compute the inverse multiplied by something, so it's considered good practice to avoid ever explicitly computing the inverse of a matrix so as to avoid the numerical issues associated with it.
-This is important, for example, as `TemporalGPs.jl` is able to implement all of the Primary Public API in linear time in the dimension of the `FiniteGP`, as it never needs to evaluate the covariance matrix.
+This is important, for example, as [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) is able to [implement](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl/blob/master/src/gp/lti_sde.jl) all of the [Primary Public API](@ref) in linear time in the dimension of the `FiniteGP`, as it never needs to evaluate the covariance matrix.
 
 However, for many (probably the majority of) GPs, this acceleration isn't possible, and there is really nothing lost by explicitly evaluating the covariance matrix.
 We call this the [Secondary Public API](@ref), because it's available a large proportion of the time, but should be avoided if at all possible.
@@ -102,7 +102,7 @@ Note that, while we _could_ provide a default implementation for `var(f, x)` as 
 If you have a new subtype of `AbstractGP` and it implements the [Internal AbstractGPs API](@ref) above (i.e. you don't mind computing covariance matrices), then you'll not usually need to add new methods involving your own `FiniteGP` -- the fallback implementations will often be completely fine.
 
 If, on the other hand, you don't want to implement the [Internal AbstractGPs API](@ref) for e.g. performance reasons, then you'll need to implement the [Primary Public API](@ref) directly.
-This is the case in `TemporalGPs.jl` -- the covariance matrix is never actually needed, so we neglect to provide any implementations involving it, instead implementing specialised methods for the [Primary Public API](@ref).
+This is the case in [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) -- the covariance matrix is never actually needed, so we neglect to provide any implementations involving it, instead implementing specialised methods for the [Primary Public API](@ref).
 
 There are possibly other reasons why you might wish to modify the way in which e.g. `logpdf` works for GPs implementing the Primary and Secondary public APIs.
 For example, you might wish to avoid ever computing Cholesky factorisations directly, instead implementing everything in terms of matrix-vector multiplies, conjugate gradients, etc.
