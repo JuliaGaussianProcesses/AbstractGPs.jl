@@ -15,7 +15,7 @@
             f = GP(kernel)
 
             # Sampling Distribution.
-            y ~ f(X, σ²)
+            return y ~ f(X, σ²)
         end
         # Test for matrices
         m = GPRegression(y, RowVecs(X))
@@ -30,10 +30,10 @@
         y = rand.(Poisson.(exp.(randn(3))))
 
         @model function latent_gp_regression(y, X)
-            f  = GP(Matern32Kernel())
+            f = GP(Matern32Kernel())
             u ~ f(X)
             λ = exp.(u)
-            y .~ Poisson.(λ)
+            return y .~ Poisson.(λ)
         end
         m = latent_gp_regression(y, RowVecs(X))
         @test length(sample(m, NUTS(), 5)) == 5

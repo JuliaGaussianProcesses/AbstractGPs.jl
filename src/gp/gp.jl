@@ -53,9 +53,9 @@ true
 [1] - C. E. Rasmussen and C. Williams. "Gaussian processes for machine learning". 
 MIT Press. 2006.
 """
-struct GP{Tm<:MeanFunction, Tk<:Kernel} <: AbstractGP
+struct GP{Tm<:MeanFunction,Tk<:Kernel} <: AbstractGP
     mean::Tm
-    kernel::Tk 
+    kernel::Tk
 end
 
 GP(mean, kernel::Kernel) = GP(CustomMean(mean), kernel)

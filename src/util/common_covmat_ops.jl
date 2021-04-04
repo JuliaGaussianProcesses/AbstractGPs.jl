@@ -7,7 +7,7 @@ _symmetric(X::Diagonal) = X
 # Small bit of indirection to work around a cholesky-related bug whereby the interaction
 # between `FillArrays` and `Diagonal` and `Cholesky` causes problems.
 _cholesky(X) = cholesky(X)
-function _cholesky(X::Diagonal{<:Real, <:FillArrays.AbstractFill})
+function _cholesky(X::Diagonal{<:Real,<:FillArrays.AbstractFill})
     return cholesky(Diagonal(collect(diag(X))))
 end
 

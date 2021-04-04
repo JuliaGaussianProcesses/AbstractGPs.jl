@@ -7,7 +7,7 @@
     @test plt1.n == 10
 
     # Check recipe dispatches for `FiniteGP`s
-    rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), gp)
+    rec = RecipesBase.apply_recipe(Dict{Symbol,Any}(), gp)
     @test length(rec) == 1 && length(rec[1].args) == 2 # one series with two arguments
     @test rec[1].args[1] == x
     @test rec[1].args[2] == gp
@@ -15,9 +15,9 @@
 
     z = 1 .+ x
     for kwargs in (
-        Dict{Symbol, Any}(),
-        Dict{Symbol, Any}(:ribbon_scale => 3),
-        Dict{Symbol, Any}(:ribbon_scale => rand()),
+        Dict{Symbol,Any}(),
+        Dict{Symbol,Any}(:ribbon_scale => 3),
+        Dict{Symbol,Any}(:ribbon_scale => rand()),
     )
         scale = get(kwargs, :ribbon_scale, 1.0)
         rec = RecipesBase.apply_recipe(kwargs, z, gp)
@@ -35,7 +35,7 @@
     # Check recipe dispatches for `AbstractGP`s
     # with `AbstractVector` and `AbstractRange`:
     for x in (rand(10), 0:0.01:1)
-        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), x, f)
+        rec = RecipesBase.apply_recipe(Dict{Symbol,Any}(), x, f)
         @test length(rec) == 1 && length(rec[1].args) == 1 # one series with one argument
         @test rec[1].args[1] isa AbstractGPs.FiniteGP
         @test rec[1].args[1].x == x

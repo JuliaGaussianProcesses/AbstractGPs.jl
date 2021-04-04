@@ -38,7 +38,7 @@
     @testset "CustomMean" begin
         rng, N, D = MersenneTwister(123456), 11, 2
         x = randn(rng, N)
-        foo_mean = x->sum(abs2, x)
+        foo_mean = x -> sum(abs2, x)
         f = CustomMean(foo_mean)
 
         @test AbstractGPs._map(f, x) == map(foo_mean, x)

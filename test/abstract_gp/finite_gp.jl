@@ -14,10 +14,10 @@ end
         f = GP(sin, SqExponentialKernel())
         fx, fx′ = FiniteGP(f, x, Σy), FiniteGP(f, x′, Σy′)
 
-        @test FiniteGP(f, Xmat, obsdim=1) == FiniteGP(f, RowVecs(Xmat))
-        @test FiniteGP(f, Xmat, obsdim=2) == FiniteGP(f, ColVecs(Xmat))
-        @test FiniteGP(f, Xmat, σ², obsdim=1) == FiniteGP(f, RowVecs(Xmat), σ²)
-        @test FiniteGP(f, Xmat, σ², obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²) 
+        @test FiniteGP(f, Xmat; obsdim=1) == FiniteGP(f, RowVecs(Xmat))
+        @test FiniteGP(f, Xmat; obsdim=2) == FiniteGP(f, ColVecs(Xmat))
+        @test FiniteGP(f, Xmat, σ²; obsdim=1) == FiniteGP(f, RowVecs(Xmat), σ²)
+        @test FiniteGP(f, Xmat, σ²; obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²)
         @test mean(fx) == mean(f, x)
         @test cov(fx) == cov(f, x)
         @test var(fx) == diag(cov(fx))
@@ -120,7 +120,7 @@ end
         N = 10
         S = 11
         σ = 1e-1
-        x = collect(range(-3.0, stop=3.0, length=N))
+        x = collect(range(-3.0; stop=3.0, length=N))
         f = GP(1, SqExponentialKernel())
         fx = FiniteGP(f, x, 0)
         y = FiniteGP(f, x, σ^2)
@@ -214,10 +214,10 @@ end
     end
 end
 
-    @testset "Docs" begin
-        docstring = string(Docs.doc(logpdf, Tuple{FiniteGP, Vector{Float64}}))
-        @test occursin("logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
-    end
+@testset "Docs" begin
+    docstring = string(Docs.doc(logpdf, Tuple{FiniteGP,Vector{Float64}}))
+    @test occursin("logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
+end
 
 # """
 #     simple_gp_tests(rng::AbstractRNG, f::GP, xs::AV{<:AV}, σs::AV{<:Real})
