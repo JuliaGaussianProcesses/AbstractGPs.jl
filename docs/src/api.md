@@ -99,7 +99,7 @@ Note that, while we _could_ provide a default implementation for `var` as `diag(
 
 ## When to implement FiniteGP methods
 
-If you have a new subtype of `AbstractGP` and it implements the API above (i.e. you don't mind computing covariance matrices), then you'll not need to add new methods involving your own `FiniteGP` -- the fallback implementations will be completely fine.
+If you have a new subtype of `AbstractGP` and it implements the API above (i.e. you don't mind computing covariance matrices), then you'll not usually need to add new methods involving your own `FiniteGP` -- the fallback implementations will often be completely fine.
 
 There are, however, some situations in which this is not the case.
 
