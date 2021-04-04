@@ -14,7 +14,7 @@ fx = AbstractGPs.FiniteGP(f, x, Σ)
 ```
 
 The `FiniteGP` has two API levels.
-The first should be supported by all `FiniteGPs`, while the second will only be supported by a subset.
+The first should be supported by all `FiniteGP`s, while the second will only be supported by a subset.
 
 
 
@@ -112,4 +112,3 @@ In these cases, we advise that you use the type parameters in `FiniteGP` to disp
 const MyFiniteGP = FiniteGP{<:MyGPType}
 AbstractGPs.logpdf(::MyFiniteGP, ::AbstractVector{<:Real})
 ```
-
