@@ -1,7 +1,8 @@
 # FiniteGPs and AbstractGPs
 
-There are two core types that AbstractGPs provides: `FiniteGP`, and `AbstractGP`.
-
+There are two core abstract types that AbstractGPs provides: `FiniteGP`, and `AbstractGP`.
+Note that neither of these abstract types are exported as this package also provides user-facing concrete types which are generally what users should interact with.
+Package developers, and anyone writing code that is intended to work with any GP in the ecosystem, should work with these types.
 
 ## FiniteGP
 
