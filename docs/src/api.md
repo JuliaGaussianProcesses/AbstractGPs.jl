@@ -9,7 +9,8 @@ AbstractGPs provides the `FiniteGP` type. It represents the multivariate Gaussia
 ```julia
 fx = f(x, Σ)
 
-# The above is equivalent to:
+# The code below is equivalent to the above, and is just for reference.
+# When writing code, prefer the above syntax.
 fx = AbstractGPs.FiniteGP(f, x, Σ)
 ```
 
