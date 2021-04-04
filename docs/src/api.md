@@ -5,7 +5,7 @@ There are two core types that AbstractGPs provides: `FiniteGP`, and `AbstractGP`
 
 ## FiniteGP
 
-AbstractGPs.jl provides the `FiniteGP` type. It represents the multivariate Gaussian induced by "indexing" into a GP `f` at a collection of points `x`, and adding independent zero-mean noise with variance `Σ`:
+AbstractGPs provides the `FiniteGP` type. It represents the multivariate Gaussian induced by "indexing" into a GP `f` at a collection of points `x`, and adding independent zero-mean noise with variance `Σ`:
 ```julia
 fx = f(x, Σ)
 
@@ -22,7 +22,7 @@ The first should be supported by all `FiniteGPs`, while the second will only be 
 
 These are user-facing methods.
 You can expect them to be implemented whenever you encounter a `FiniteGP`.
-If you are building something on top of AbstractGPs.jl, try to implement it in terms of these functions.
+If you are building something on top of AbstractGPs, try to implement it in terms of these functions.
 
 #### Required Methods
 
