@@ -1,7 +1,7 @@
 struct VFE end
 const DTC = VFE
 
-struct ApproxPosteriorGP{Tapprox, Tprior, Tdata} <: AbstractGP
+struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
     approx::Tapprox
     prior::Tprior
     data::Tdata
@@ -20,7 +20,7 @@ Intelligence and Statistics. 2009.
 function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     U_y = _cholesky(_symmetric(fx.Σy)).U
     U = cholesky(_symmetric(cov(u))).U
-    
+
     B_εf = U' \ (U_y' \ cov(fx, u))'
 
     b_y = U_y' \ (y - mean(fx))
@@ -30,17 +30,7 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
 
     m_ε = Λ_ε \ (B_εf * b_y)
 
-    cache = (
-        m_ε=m_ε,
-        Λ_ε=Λ_ε,
-        U=U,
-        α=U \ m_ε,
-        z=u.x,
-        b_y=b_y,
-        B_εf=B_εf,
-        x=fx.x,
-        Σy=fx.Σy,
-    )
+    cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, z=u.x, b_y=b_y, B_εf=B_εf, x=fx.x, Σy=fx.Σy)
     return ApproxPosteriorGP(VFE(), fx.f, cache)
 end
 
@@ -55,9 +45,7 @@ Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain 
 of pseudo-points.
 """
 function update_approx_posterior(
-    f_post_approx::ApproxPosteriorGP,
-    fx::FiniteGP,
-    y::AbstractVector{<:Real}
+    f_post_approx::ApproxPosteriorGP, fx::FiniteGP, y::AbstractVector{<:Real}
 )
     U = f_post_approx.data.U
     z = f_post_approx.data.z
@@ -68,7 +56,7 @@ function update_approx_posterior(
     Σy = [f_post_approx.data.Σy temp; temp' fx.Σy]
 
     b_y = vcat(f_post_approx.data.b_y, U_y₂ \ (y - mean(fx)))
-    
+
     B_εf₂ = U' \ (U_y₂' \ cov(fx.f, fx.x, z))'
     B_εf = hcat(f_post_approx.data.B_εf, B_εf₂)
 
@@ -82,17 +70,7 @@ function update_approx_posterior(
     α = U \ m_ε
     x = vcat(f_post_approx.data.x, fx.x)
 
-    cache = (
-        m_ε=m_ε,
-        Λ_ε=Λ_ε,
-        U=U,
-        α=α,
-        z=z,
-        b_y=b_y,
-        B_εf=B_εf,
-        x=x,
-        Σy=Σy,
-    )
+    cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=α, z=z, b_y=b_y, B_εf=B_εf, x=x, Σy=Σy)
     return ApproxPosteriorGP(VFE(), fx.f, cache)
 end
 
@@ -105,16 +83,13 @@ end
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
 set of pseudo points. 
 """
-function update_approx_posterior(
-    f_post_approx::ApproxPosteriorGP,
-    u::FiniteGP,
-)
+function update_approx_posterior(f_post_approx::ApproxPosteriorGP, u::FiniteGP)
     U11 = f_post_approx.data.U
     C12 = cov(u.f, f_post_approx.data.z, u.x)
     C22 = _symmetric(cov(u))
-    U = update_chol(Cholesky(U11,'U', 0), C12, C22).U
-    U22 = U[end-length(u)+1:end, end-length(u)+1:end]
-    U12 = U[1:length(f_post_approx.data.z), end-length(u)+1:end]
+    U = update_chol(Cholesky(U11, 'U', 0), C12, C22).U
+    U22 = U[(end - length(u) + 1):end, (end - length(u) + 1):end]
+    U12 = U[1:length(f_post_approx.data.z), (end - length(u) + 1):end]
 
     B_εf₁ = f_post_approx.data.B_εf
 
@@ -123,7 +98,7 @@ function update_approx_posterior(
 
     U_y = _cholesky(_symmetric(f_post_approx.data.Σy)).U
 
-    B_εf₂ = U22' \ (Cu2f * inv(U_y)   - U12' * B_εf₁)
+    B_εf₂ = U22' \ (Cu2f * inv(U_y) - U12' * B_εf₁)
     B_εf = vcat(B_εf₁, B_εf₂)
 
     Λ_ε = update_chol(f_post_approx.data.Λ_ε, B_εf₁ * B_εf₂', B_εf₂ * B_εf₂' + I)
@@ -143,7 +118,7 @@ function update_approx_posterior(
         b_y=f_post_approx.data.b_y,
         B_εf=B_εf,
         x=f_post_approx.data.x,
-        Σy=f_post_approx.data.Σy,   
+        Σy=f_post_approx.data.Σy,
     )
     return ApproxPosteriorGP(VFE(), f_post_approx.prior, cache)
 end

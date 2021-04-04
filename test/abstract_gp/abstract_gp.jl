@@ -1,2 +1,1 @@
-@testset "abstract_gp.jl" begin
-end
+@testset "abstract_gp.jl" begin end

@@ -48,4 +48,3 @@ from default of 0.5 to 5.
         x, samples
     end
 end
-
