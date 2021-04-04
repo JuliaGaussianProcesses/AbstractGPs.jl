@@ -74,7 +74,7 @@ This functionality is not intended to be used directly be users, or those buildi
 The reason for this is that some `AbstractGP`s will not actually implement any of these methods, but they will ensure that the Primary Public API is implemented for `FiniteGP`s containing them.
 See the next section for more info on this.
 
-The `AbstractGP` abstract type lets you implement `mean` and `cov` + variants for your own GP type, and implements the Primary and Secondary public APIs above in terms of them.
+Implementing the following API for your own GP type automatically implements both the Primary and Secondary public APIs above in terms of them.
 
 
 #### Required Methods
