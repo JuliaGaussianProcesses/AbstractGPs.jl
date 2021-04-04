@@ -14,7 +14,7 @@ fx = AbstractGPs.FiniteGP(f, x, Σ)
 ```
 
 The `FiniteGP` has two API levels.
-The first should be supported by all `FiniteGPs`, while the second will only be supported by a subset.
+The first should be supported by all `FiniteGP`s, while the second will only be supported by a subset.
 
 
 
@@ -93,7 +93,7 @@ mean_and_cov(::AbstractGPs.AbstractGP, ::AbstractVector)
 mean_and_var(::AbstractGPs.AbstractGP, ::AbstractVector)
 ```
 
-Note that, while we _could_ provide a default implementation for `var` as `diag(cov(f, x))`, this is generally such an inefficient fallback, that we view find it preferable to error if it's not implemented than to ever hit a fallback.
+Note that, while we _could_ provide a default implementation for `var(f, x)` as `diag(cov(f, x))`, this is generally such an inefficient fallback, that we find it preferable to error if it's not implemented than to ever hit a fallback.
 
 
 
@@ -112,4 +112,3 @@ In these cases, we advise that you use the type parameters in `FiniteGP` to disp
 const MyFiniteGP = FiniteGP{<:MyGPType}
 AbstractGPs.logpdf(::MyFiniteGP, ::AbstractVector{<:Real})
 ```
-
