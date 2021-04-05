@@ -29,10 +29,7 @@ for file in readdir(EXAMPLES; join=true)
 end
 
 DocMeta.setdocmeta!(
-    AbstractGPs,
-    :DocTestSetup,
-    :(using AbstractGPs, LinearAlgebra, Random);
-    recursive=true,
+    AbstractGPs, :DocTestSetup, :(using AbstractGPs, LinearAlgebra, Random); recursive=true
 )
 
 makedocs(;
@@ -40,17 +37,15 @@ makedocs(;
     format=Documenter.HTML(),
     repo="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/{commit}{path}#L{line}",
     sitename="AbstractGPs.jl",
-    pages = [
+    pages=[
         "Home" => "index.md",
         "The Main APIs" => "api.md",
         "Concrete Features" => "concrete_features.md",
-        "Examples" => joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
+        "Examples" =>
+            joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
     ],
     # strict=true,
-    # checkdocs=:exports, 
+    # checkdocs=:exports,
 )
 
-deploydocs(;
-    repo = "github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
-    push_preview = true,
-)
+deploydocs(; repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git", push_preview=true)

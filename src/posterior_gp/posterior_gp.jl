@@ -1,4 +1,4 @@
-struct PosteriorGP{Tprior, Tdata} <: AbstractGP
+struct PosteriorGP{Tprior,Tdata} <: AbstractGP
     prior::Tprior
     data::Tdata
 end
@@ -44,7 +44,7 @@ function posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
     δ = vcat(fx.f.data.δ, δ2)
     α = chol \ δ
     x = vcat(fx.f.data.x, fx.x)
-    return PosteriorGP(fx.f.prior , (α=α, C=chol, x=x, δ=δ))
+    return PosteriorGP(fx.f.prior, (α=α, C=chol, x=x, δ=δ))
 end
 
 # AbstractGP interface implementation.

@@ -32,10 +32,9 @@
         C12 = kernelmatrix(k, X[1:3], X[4:5])
         chol = AbstractGPs.update_chol(chol1, C12, C22)
 
-        @test U ≈ chol.U atol=1e-5
-        @test chol1.U ≈ chol.U[1:3, 1:3] atol=1e-5
+        @test U ≈ chol.U atol = 1e-5
+        @test chol1.U ≈ chol.U[1:3, 1:3] atol = 1e-5
     end
-
 
     # Set up some matrices and factorisations.
     rng, N, N′, P, Q = MersenneTwister(123456), 5, 3, 6, 2
