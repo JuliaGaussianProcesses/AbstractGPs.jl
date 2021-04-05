@@ -1,12 +1,15 @@
 # FiniteGPs and AbstractGPs
 
-There are two core abstract types that AbstractGPs provides: `FiniteGP`, and `AbstractGP`.
-Note that neither of these abstract types are exported as this package also provides user-facing concrete types which are generally what users should interact with.
-Package developers, and anyone writing code that is intended to work with any GP in the ecosystem, should work with these types.
+AbstractGPs provides one main abstract type, the `AbstractGP`.
+Instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
+AbstractGPs also provides concrete type, `FiniteGP`, which represents a particular finite-dimensional projection of an `AbstractGP`, and is just a multivariate Gaussian.
+
+Note that neither `AbstractGP` nor `FiniteGP` are exported, as this package also provides user-facing concrete types which are generally what users should interact with.
+Package developers, and anyone writing code that is intended to work with any GP in the ecosystem, should import `AbstractGP` and / or `FiniteGP`.
 
 ## FiniteGP
 
-AbstractGPs provides the `FiniteGP` type. It represents the multivariate Gaussian induced by "indexing" into a GP `f` at a collection of points `x`, and adding independent zero-mean noise with variance `Σ`:
+A `FiniteGP` represents the multivariate Gaussian induced by "indexing" into an AbstractGP `f` at an `AbstractVector` of points `x`, and adding independent zero-mean noise with covariance matrix `Σ`:
 ```julia
 fx = f(x, Σ)
 
