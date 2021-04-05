@@ -71,7 +71,7 @@ mean_and_cov(::AbstractGPs.FiniteGP)
 
 ## Internal AbstractGPs API
 
-This functionality is not intended to be used directly be users, or those building functionality on top of `AbstractGP` -- they should interact with [Primary Public API](@ref) above, and the [Secondary Public API](@ref) if truly necessary.
+This functionality is not intended to be used directly by the users, or those building functionality on top of `AbstractGP` -- they should interact with [Primary Public API](@ref) above, and the [Secondary Public API](@ref) if truly necessary.
 
 The reason for this is that some `AbstractGP`s will not actually implement any of these methods, but they will ensure that the Primary Public API is implemented for `FiniteGP`s containing them.
 See the next section for more info on this.
