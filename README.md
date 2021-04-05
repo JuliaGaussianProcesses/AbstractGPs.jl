@@ -31,7 +31,7 @@ Y = sin.(rand(10))
 f = GP(Matern32Kernel())
 
 # Finite projection at the inputs `X`
-fx = f(X,  0.001)
+fx = f(X, 0.001)
 
 # Data's log-likelihood w.r.t prior GP `f`. 
 logpdf(fx, Y)
@@ -43,9 +43,8 @@ p_fx = posterior(fx, Y)
 logpdf(p_fx(X), Y)
 
 # Plot posterior.
-plt = scatter(X, Y; label = "Data")
-plot!(plt, p_fx, -0.5:0.001:1.5; label="Posterior")
-
+scatter(X, Y; label="Data")
+plot!(-0.5:0.001:1.5, p_fx; label="Posterior")
 ```
 
 
