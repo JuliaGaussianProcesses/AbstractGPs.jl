@@ -16,35 +16,55 @@
 end
 
 """
-    sampleplot(GP::FiniteGP, samples)
+    sampleplot([x::AbstractVector, ]f::FiniteGP; samples=1)
 
-Plot samples from the given `FiniteGP`. Make sure to run `using Plots` before using this 
-function. 
+Plot samples from `f` versus `x` (default value: `f.x`).
+
+Make sure to run `using Plots` before using this function.
 
 # Example
 ```julia
 using Plots
-f = GP(SqExponentialKernel())
-sampleplot(f(rand(10)), 10; markersize=5)
+gp = GP(SqExponentialKernel())
+sampleplot(gp(rand(5)); samples=10, markersize=5)
 ```
-The given example plots 10 samples from the given `FiniteGP`. The `markersize` is modified
+The given example plots 10 samples from the projection of the GP `gp`. The `markersize` is modified
 from default of 0.5 to 5.
+
+---
+    sampleplot(x::AbstractVector, gp::AbstractGP; samples=1)
+
+Plot samples from the finite projection `gp(x, 1e-9)` versus `x`.
 """
-@userplot SamplePlot
+@userplot struct SamplePlot{X<:AbstractVector,F<:FiniteGP}
+    x::X
+    f::F
+end
+
+# default constructor (recipe forwards arguments as tuple)
+SamplePlot((x, f)::Tuple{<:AbstractVector,<:FiniteGP}) = SamplePlot(x, f)
+
+# `FiniteGP`s without explicit `x`
+SamplePlot((f,)::Tuple{<:FiniteGP}) = SamplePlot((f.x, f))
+
+# `AbstractGP`s with explicit `x`
+# zero mean observation noise with variance 1e-9 to avoid numerical issues in
+# Cholesky decomposition
+SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e-9),))
+
 @recipe function f(sp::SamplePlot)
-    x = sp.args[1].x
-    f = sp.args[1].f
-    num_samples = sp.args[2]
-    @series begin
-        samples = rand(f(x, 1e-9), num_samples)
-        seriestype --> :line
-        linealpha --> 0.2
-        markershape --> :circle
-        markerstrokewidth --> 0.0
-        markersize --> 0.5
-        markeralpha --> 0.3
-        seriescolor --> "red"
-        label --> ""
-        x, samples
-    end
+    nsamples::Int = get(plotattributes, :samples, 1)
+    samples = rand(sp.f, nsamples)
+
+    # Set default attributes
+    seriestype --> :line
+    linealpha --> 0.2
+    markershape --> :circle
+    markerstrokewidth --> 0.0
+    markersize --> 0.5
+    markeralpha --> 0.3
+    seriescolor --> "red"
+    label --> ""
+
+    return sp.x, samples
 end

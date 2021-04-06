@@ -28,7 +28,6 @@ export GP,
     approx_posterior,
     VFE,
     DTC,
-    sampleplot,
     update_approx_posterior,
     LatentGP,
     ColVecs,
@@ -54,4 +53,7 @@ include(joinpath("latent_gp", "latent_gp.jl"))
 
 # Plotting utilities.
 include(joinpath("util", "plotting.jl"))
+
+# Deprecations.
+include("deprecations.jl")
 end # module
