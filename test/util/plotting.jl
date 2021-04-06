@@ -3,14 +3,21 @@
     f = GP(SqExponentialKernel())
     gp = f(x, 0.1)
 
-    plt1 = sampleplot(gp; samples=10)
-    @test plt1.n == 10
+    z = rand(10)
+    plt1 = sampleplot(z, gp)
+    @test plt1.n == 1
+    @test plt1.series_list[1].plotattributes[:x] == sort(z)
 
-    plt2 = sampleplot(rand(10), gp; samples=5)
-    @test plt2.n == 5
+    plt2 = sampleplot(gp; samples=10)
+    @test plt2.n == 10
+    sort_x = sort(x)
+    @test all(series.plotattributes[:x] == sort_x for series in plt2.series_list)
 
-    plt3 = sampleplot(rand(7), f; samples=8)
+    z = rand(7)
+    plt3 = sampleplot(z, f; samples=8)
     @test plt3.n == 8
+    sort_z = sort(z)
+    @test all(series.plotattributes[:x] == sort_z for series in plt3.series_list)
 
     # Check recipe dispatches for `FiniteGP`s
     rec = RecipesBase.apply_recipe(Dict{Symbol,Any}(), gp)
