@@ -3,8 +3,14 @@
     f = GP(SqExponentialKernel())
     gp = f(x, 0.1)
 
-    plt1 = sampleplot(gp, 10)
+    plt1 = sampleplot(gp; samples=10)
     @test plt1.n == 10
+
+    plt2 = sampleplot(rand(10), gp; samples=5)
+    @test plt2.n == 5
+
+    plt3 = sampleplot(rand(7), f; samples=8)
+    @test plt3.n == 8
 
     # Check recipe dispatches for `FiniteGP`s
     rec = RecipesBase.apply_recipe(Dict{Symbol,Any}(), gp)
