@@ -68,4 +68,3 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
 
     return sp.x, samples
 end
-
