@@ -235,7 +235,7 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
+    sampleplot!(plt, 0:0.02:1, gp_posterior(p))
 end
 plt
 
@@ -312,7 +312,7 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
+    sampleplot!(plt, 0:0.02:1, gp_posterior(p))
 end
 plt
 
@@ -371,7 +371,7 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
+    sampleplot!(plt, 0:0.02:1, gp_posterior(p))
 end
 plt
 
