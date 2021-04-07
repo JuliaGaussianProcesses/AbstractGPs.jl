@@ -49,9 +49,10 @@ plot!(-0.5:0.001:1.5, p_fx; label="Posterior")
 
 
 ## Related Projects
-- [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) -  Julia Package for kernel functions for machine learning 
+- [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) -  Julia package for kernel functions for machine learning 
 - [LikelihoodFunctions.jl](https://github.com/JuliaGaussianProcesses/LikelihoodFunctions.jl/) - Julia package for non-gaussian likelihood functions to use with Gaussian Processes.
-- [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) - Julia package for accelerated inference in GPs involving time. Implements the `AbstractGP` API.
+- [Stheno.jl](https://github.com/JuliaGaussianProcesses/Stheno.jl) - Julia package for building probabilistic programmes involving GPs. Built on types which implement this package's APIs.
+- [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) - Julia package for accelerated inference in GPs involving time. Built on types which implement this package's APIs.
 
 
 ## Issues/Contributing
