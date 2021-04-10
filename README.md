@@ -48,11 +48,13 @@ plot!(-0.5:0.001:1.5, p_fx; label="Posterior")
 ```
 
 
-## Related Projects
-- [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) -  Julia package for kernel functions for machine learning 
-- [GPLikelihoods.jl](https://github.com/JuliaGaussianProcesses/GPLikelihoods.jl/) - Julia package for non-gaussian likelihood functions to use with Gaussian Processes.
-- [Stheno.jl](https://github.com/JuliaGaussianProcesses/Stheno.jl) - Julia package for building probabilistic programmes involving GPs. Built on types which implement this package's APIs.
-- [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) - Julia package for accelerated inference in GPs involving time. Built on types which implement this package's APIs.
+## Related Julia packages
+
+- [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl/) - Plotting GPs with [Makie.jl](https://github.com/JuliaPlots/Makie.jl/).
+- [GPLikelihoods.jl](https://github.com/JuliaGaussianProcesses/GPLikelihoods.jl/) - Non-Gaussian likelihood functions to use with GPs.
+- [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) - Kernel functions for machine learning.
+- [Stheno.jl](https://github.com/JuliaGaussianProcesses/Stheno.jl) - Building probabilistic programmes involving GPs. Built on types which implement this package's APIs.
+- [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) - Accelerated inference in GPs involving time. Built on types which implement this package's APIs.
 
 
 ## Issues/Contributing
