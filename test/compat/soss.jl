@@ -20,11 +20,11 @@
         end
 
         # Test for matrices
-        m = gp_regression(X=RowVecs(X))
+        m = gp_regression(; X=RowVecs(X))
         @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
 
         # Test for vectors of vector
-        m = gp_regression(X=x)
+        m = gp_regression(; X=x)
         @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
     end
     @testset "latent GP regression" begin
@@ -41,11 +41,11 @@
             end
         end
 
-        m = latent_gp_regression(X=RowVecs(X))
+        m = latent_gp_regression(; X=RowVecs(X))
         @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
 
         # Test for vectors of vector
-        m = latent_gp_regression(X=x)
+        m = latent_gp_regression(; X=x)
         @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
     end
 end
