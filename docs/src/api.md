@@ -4,7 +4,7 @@ AbstractGPs provides one main abstract type, the `AbstractGP`.
 Instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
 AbstractGPs only become useful computationally when you specify a finite-dimensional marginal distribution to work with.
 It is for this reason that we provide the `FiniteGP` type.
-Roughly speaking, this type comprises an `AbstractGP` `f` and an `AbstractVector` `x`, and represents the multivariate Gaussian distribution over `f` at `x`.
+This type comprises an `AbstractGP`, `f`, and an `AbstractVector`, `x`, and represents the multivariate Gaussian distribution over `f` at every element of `x`.
 This distribution, being finite-dimensional, is something that can be used to compute useful things.
 For example, `rand(f(x))` generates a sample from the multivariate Gaussian that is `f` at `x`, and `logpdf(f(x), y)` computes the log (marginal) probability of observing the vector `y` under this distribution.
 
@@ -19,8 +19,7 @@ The second is to implement some methods directly involving `MyNewGP`, and utilis
 The second interface is generally easier to implement, but isn't applicable for all subtypes of `AbstractGP`.
 See [Which API should I implement?](@ref) for further discussion.
 
-Note that neither `AbstractGP` nor `FiniteGP` are exported as this package also provides user-facing concrete types which are generally what users should interact with.
-Package developers, and anyone writing code that is intended to work with any GP in the ecosystem, should import what they need.
+
 
 ## Intended Audience
 
@@ -100,7 +99,7 @@ mean_and_cov(::AbstractGPs.FiniteGP)
 
 ## Internal AbstractGPs API
 
-This functionality is not intended to be used directly by the users, or those building functionality on top of `AbstractGP` -- they should interact with [Primary Public API](@ref).
+This functionality is not intended to be used directly by the users, or those building functionality on top of this package -- they should interact with [Primary Public API](@ref).
 
 Implementing the following API for your own GP type automatically implements both the Primary and Secondary public APIs above in terms of them.
 
@@ -158,10 +157,8 @@ Do _not_ implement the [Secondary Public API](@ref).
 ### You don't want to use the default implementations
 
 Perhaps you just don't like the default implementations because you don't want to make use of Cholesky factorisations.
-For example, [GPyTorch](https://gpytorch.ai/) avoids the Cholesky factorisation in favour of iterative solvers.
+We don't have an example of this yet in Julia, however [GPyTorch](https://gpytorch.ai/) avoids the Cholesky factorisation in favour of iterative solvers.
 
-In this situation, considering implementing _both_ the [Internal AbstractGPs API](@ref) _and_ the [FiniteGP APIs](@ref).
+In this situation, implement _both_ the [Internal AbstractGPs API](@ref) _and_ the [FiniteGP APIs](@ref).
 
 In this situation you will benefit less from code reuse inside AbstractGPs, but will continue to benefit from the ability of others use your code, and to take advantage of any existing functionality which requires types which adhere to the AbstractGPs API.
-
-We don't have an example of this yet.
