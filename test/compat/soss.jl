@@ -1,10 +1,11 @@
-@testset "turing compat" begin
+@testset "soss compat" begin
     @testset "GP regression" begin
         k = SqExponentialKernel()
         y = randn(3)
         X = randn(3, 1)
         x = [rand(1) for _ in 1:3]
-        @model function GPRegression(y, X)
+
+        gp_regression = Soss.@model X begin
             # Priors.
             α ~ LogNormal(0.0, 0.1)
             ρ ~ LogNormal(0.0, 1.0)
@@ -15,30 +16,36 @@
             f = GP(kernel)
 
             # Sampling Distribution.
-            return y ~ f(X, σ²)
+            y ~ f(X, σ²)
         end
+
         # Test for matrices
-        m = GPRegression(y, RowVecs(X))
-        @test length(sample(m, HMC(0.5, 1), 5)) == 5
+        m = gp_regression(X=RowVecs(X))
+        @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
+
         # Test for vectors of vector
-        m = GPRegression(y, x)
-        @test length(sample(m, HMC(0.5, 1), 5)) == 5
+        m = gp_regression(X=x)
+        @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
     end
     @testset "latent GP regression" begin
         X = randn(3, 1)
         x = [rand(1) for _ in 1:3]
         y = rand.(Poisson.(exp.(randn(3))))
 
-        @model function latent_gp_regression(y, X)
+        latent_gp_regression = Soss.@model X begin
             f = GP(Matern32Kernel())
             u ~ f(X)
             λ = exp.(u)
-            return y .~ Poisson.(λ)
+            y ~ For(eachindex(λ)) do i
+                Poisson(λ[i])
+            end
         end
-        m = latent_gp_regression(y, RowVecs(X))
-        @test length(sample(m, NUTS(), 5)) == 5
+
+        m = latent_gp_regression(X=RowVecs(X))
+        @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
+
         # Test for vectors of vector
-        m = latent_gp_regression(y, x)
-        @test length(sample(m, NUTS(), 5)) == 5
+        m = latent_gp_regression(X=x)
+        @test length(Soss.sample(DynamicHMCChain, (m | (y=y,)), 5)) == 5
     end
 end

@@ -23,7 +23,7 @@ using AbstractGPs:
 
 using Documenter
 using ChainRulesCore
-using Distributions: MvNormal, PDMat
+using Distributions: MvNormal, PDMat, Poisson, LogNormal, sample
 using FillArrays
 using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
@@ -31,9 +31,11 @@ using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
 using Plots
 using Random
+using SampleChainsDynamicHMC
+using Soss: Soss
 using Statistics
 using Test
-using Turing
+using Turing: Turing
 using Zygote
 
 include("test_util.jl")
@@ -75,9 +77,15 @@ include("test_util.jl")
     println(" ")
     @info "Ran deprecation tests"
 
-    include("turing.jl")
-    println(" ")
-    @info "Ran Turing tests"
+    @testset "compat" begin
+        include(joinpath("compat", "turing.jl"))
+        println(" ")
+        @info "Ran Turing tests"
+
+        include(joinpath("compat", "soss.jl"))
+        println(" ")
+        @info "Ran Soss tests"
+    end
 
     @testset "doctests" begin
         DocMeta.setdocmeta!(
