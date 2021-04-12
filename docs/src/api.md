@@ -2,7 +2,7 @@
 
 AbstractGPs provides one main abstract type, the `AbstractGP`.
 Instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
-AbstractGPs only become useful computationally when you specify a finite-dimensional marginal distribution to work with.
+Gaussian processes only become useful computationally when you specify a finite-dimensional marginal distribution to work with.
 It is for this reason that we provide the `FiniteGP` type.
 Roughly speaking, this type comprises an `AbstractGP` `f` and an `AbstractVector` `x`, and represents the multivariate Gaussian distribution over `f` at `x`.
 This distribution, being finite-dimensional, is something that can be used to compute useful things.
