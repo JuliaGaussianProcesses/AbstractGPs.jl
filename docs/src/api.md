@@ -1,4 +1,4 @@
-# FiniteGPs and AbstractGPs
+# FiniteGP and AbstractGP
 
 AbstractGPs provides one main abstract type, the `AbstractGP`.
 Instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
