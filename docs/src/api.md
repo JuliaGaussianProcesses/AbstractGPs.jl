@@ -23,10 +23,8 @@ See [Which API should I implement?](@ref) for further discussion.
 
 ## Intended Audience
 
-If you do not plan to implement your own `AbstractGP` subtype because e.g. you just wish to build a model involving a GP, then the useful part of the API for you is the [FiniteGP APIs](@ref).
-Please avoid working directly with the [Internal AbstractGPs API](@ref).
-In fact, you can safely ignore its existence.
-
+This page is intended for developers.
+If you are a user, please refer to our other examples.
 
 
 
