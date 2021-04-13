@@ -1,5 +1,15 @@
 # FiniteGP and AbstractGP
 
+## Intended Audience
+
+This page is intended for developers.
+If you are a user, please refer to our other examples.
+
+
+
+
+## Introduction
+
 AbstractGPs provides one main abstract type, the `AbstractGP`.
 Instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
 Gaussian processes only become useful computationally when you specify a finite-dimensional marginal distribution to work with.
@@ -22,10 +32,6 @@ See [Which API should I implement?](@ref) for further discussion.
 
 
 
-## Intended Audience
-
-This page is intended for developers.
-If you are a user, please refer to our other examples.
 
 
 
