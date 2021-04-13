@@ -16,7 +16,7 @@ Gaussian processes only become useful computationally when you specify a finite-
 It is for this reason that we provide the `FiniteGP` type.
 This type comprises an `AbstractGP`, `f`, and an `AbstractVector`, `x`, and represents the multivariate Gaussian distribution over `f` at every element of `x`.
 This distribution, being finite-dimensional, is something that can be used to compute useful things.
-For example, `rand(f(x))` generates a sample from the multivariate Gaussian that is `f` at `x`, and `logpdf(f(x), y)` computes the log (marginal) probability of observing the vector `y` under this distribution.
+For example given `fx = f(x)` a `FiniteGP`, `rand(fx)` generates a sample from the multivariate Gaussian that is `f` at `x`, and `logpdf(fx, y)` computes the log (marginal) probability of observing the vector `y` under this distribution.
 
 Consequently, if you create a new subtype `MyNewGP` of `AbstractGP`, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
 ```julia
