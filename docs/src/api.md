@@ -38,7 +38,8 @@ See [Which API should I implement?](@ref) for further discussion.
 
 ## FiniteGP APIs
 
-A `FiniteGP` represents the multivariate Gaussian induced by "indexing" into an AbstractGP `f` at an `AbstractVector` of points `x`, and adding independent zero-mean noise with covariance matrix `Σ`:
+Let `f` be an `AbstractGP`, `x` an `AbstractVector` representing a collection of inputs, and `Σ` a positive-definite matrix of size `(length(x), length(x))`.
+A `FiniteGP` represents the multivariate Gaussian induced by "indexing" into `f` at each point in `x`, and adding independent zero-mean noise with covariance matrix `Σ`:
 ```julia
 fx = f(x, Σ)
 
