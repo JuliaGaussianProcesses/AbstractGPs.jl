@@ -15,8 +15,9 @@ FiniteGP{<:MyNewGP}
 We provide two ways in which to do this.
 The first is to implement methods directly on `Finite{<:MyNewGP}` -- this is detailed in the [FiniteGP APIs](@ref).
 The second is to implement some methods directly involving `MyNewGP`, and utilise default `FiniteGP` methods implemented in terms of these -- this is detailed in the [Internal AbstractGPs API](@ref).
+For example, the first method involves implementing methods like `AbstractGPs.mean(fx::FiniteGP{<:MyNewGP})`, while the second involves `AbstractGPs.mean(f::MyNewGP, x::AbstractVector)`.
 
-The second interface is generally easier to implement, but isn't applicable for all subtypes of `AbstractGP`.
+The second interface is generally easier to implement, but sometimes it isn't always appropriate.
 See [Which API should I implement?](@ref) for further discussion.
 
 
