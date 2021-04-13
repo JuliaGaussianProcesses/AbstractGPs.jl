@@ -142,7 +142,7 @@ Note that, while we _could_ provide a default implementation for `var(f, x)` as 
 ## Which API should I implement?
 
 To answer this question, you need to need to know whether or not the default implementations of the [FiniteGP APIs](@ref) work for your use case.
-There are a couple of reasons of which we are aware for why this might not be the case -- possibly there are others.
+There are a couple of reasons of which we are aware for why this might not be the case (see below) -- possibly there are others.
 
 If you are unsure, please open an issue to discuss.
 
