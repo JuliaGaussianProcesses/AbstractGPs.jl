@@ -100,7 +100,9 @@ mean_and_cov(::AbstractGPs.FiniteGP)
 
 This functionality is not intended to be used directly by the users, or those building functionality on top of this package -- they should interact with [Primary Public API](@ref).
 
-Implementing the following API for your own GP type automatically implements both the Primary and Secondary public APIs above in terms of them.
+As discussed at the top of this page, instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
+
+Implementing the following API for your own `AbstractGP` subtype automatically implements both the Primary and Secondary public APIs above in terms of them.
 
 Existing implementations of this interface include
 1. [`GP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/gp/gp.jl#L56)
