@@ -8,7 +8,7 @@ This type comprises an `AbstractGP`, `f`, and an `AbstractVector`, `x`, and repr
 This distribution, being finite-dimensional, is something that can be used to compute useful things.
 For example, `rand(f(x))` generates a sample from the multivariate Gaussian that is `f` at `x`, and `logpdf(f(x), y)` computes the log (marginal) probability of observing the vector `y` under this distribution.
 
-Consequently, if you create a new subtype `MyNewGP` of `AbstractGP`, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
+Consequently, if you create a new subtype `MyNewGP` of `AbstractGP`, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
 ```julia
 FiniteGP{<:MyNewGP}
 ```
