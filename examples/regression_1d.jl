@@ -110,10 +110,7 @@ struct GPLoglikelihood{X,Y}
 end
 
 function (ℓ::GPLoglikelihood)(params)
-    kernel = ScaledKernel(
-        transform(Matern52Kernel(), ScaleTransform(softplus(params[1]))),
-        softplus(params[2]),
-    )
+    kernel = softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
     f = GP(kernel)
     fx = f(ℓ.x, 0.1)
     return logpdf(fx, ℓ.y)
@@ -194,7 +191,7 @@ histogram(
     xlabel="sample",
     ylabel="counts",
     layout=2,
-    title=["inverse length scale" "variance"],
+    title=["variance" "inverse length scale"],
     legend=false,
 )
 vline!(mean_samples'; linewidth=2)
@@ -210,9 +207,7 @@ struct GPPosterior{X,Y}
 end
 
 function (g::GPPosterior)(p)
-    kernel = ScaledKernel(
-        transform(Matern52Kernel(), ScaleTransform(softplus(p[1]))), softplus(p[2])
-    )
+    kernel = softplus(p[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(p[2])))
     f = GP(kernel)
     return posterior(f(g.x, 0.1), g.y)
 end
@@ -287,7 +282,7 @@ histogram(
     xlabel="sample",
     ylabel="counts",
     layout=2,
-    title=["inverse length scale" "variance"],
+    title=["variance" "inverse length scale"],
     legend=false,
 )
 vline!(mean_samples'; linewidth=2)
@@ -347,7 +342,7 @@ histogram(
     xlabel="sample",
     ylabel="counts",
     layout=2,
-    title=["inverse length scale" "variance"],
+    title=["variance" "inverse length scale"],
 )
 vline!(mean_samples'; layout=2, labels="mean")
 
@@ -404,10 +399,7 @@ struct NegativeELBO{X,Y}
 end
 
 function (g::NegativeELBO)(params)
-    kernel = ScaledKernel(
-        transform(Matern52Kernel(), ScaleTransform(softplus(params[1]))),
-        softplus(params[2]),
-    )
+    kernel = softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
     f = GP(kernel)
     fx = f(g.x, 0.1)
     return -elbo(fx, g.y, f(logistic.(params[3:end])))
@@ -424,11 +416,11 @@ opt = optimize(NegativeELBO(x_train, y_train), x0, LBFGS())
 
 opt.minimizer
 
-# The optimized value of the inverse lengthscale is
+# The optimized value of the variance is
 
 softplus(opt.minimizer[1])
 
-# and of the variance is
+# and of the inverse lengthscale is
 
 softplus(opt.minimizer[2])
 
@@ -436,10 +428,9 @@ softplus(opt.minimizer[2])
 # posterior. We can observe that there is a significant improvement over the
 # log-likelihood with the default kernel parameters of value 1.
 
-opt_kernel = ScaledKernel(
-    transform(Matern52Kernel(), ScaleTransform(softplus(opt.minimizer[1]))),
-    softplus(opt.minimizer[2]),
-)
+opt_kernel =
+    softplus(opt.minimizer[1]) *
+    (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
 ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
