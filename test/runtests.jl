@@ -37,6 +37,7 @@ using Test
 using Zygote
 
 const GROUP = get(ENV, "GROUP", "All")
+const PKGDIR = dirname(dirname(pathof(AbstractGPs)))
 
 include("test_util.jl")
 
@@ -91,7 +92,7 @@ include("test_util.jl")
 
     if (GROUP == "All" || GROUP == "Compat") && VERSION >= v"1.5"
         Pkg.activate("compat")
-        Pkg.develop(PackageSpec(; path=".."))
+        Pkg.develop(PackageSpec(; path=PKGDIR))
         Pkg.instantiate()
         include(joinpath("compat", "runtests.jl"))
     end
