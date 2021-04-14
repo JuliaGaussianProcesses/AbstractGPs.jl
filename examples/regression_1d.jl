@@ -191,7 +191,7 @@ histogram(
     xlabel="sample",
     ylabel="counts",
     layout=2,
-    title=["inverse length scale" "variance"],
+    title=["variance" "inverse length scale"],
     legend=false,
 )
 vline!(mean_samples'; linewidth=2)
@@ -282,7 +282,7 @@ histogram(
     xlabel="sample",
     ylabel="counts",
     layout=2,
-    title=["inverse length scale" "variance"],
+    title=["variance" "inverse length scale"],
     legend=false,
 )
 vline!(mean_samples'; linewidth=2)
@@ -342,7 +342,7 @@ histogram(
     xlabel="sample",
     ylabel="counts",
     layout=2,
-    title=["inverse length scale" "variance"],
+    title=["variance" "inverse length scale"],
 )
 vline!(mean_samples'; layout=2, labels="mean")
 
