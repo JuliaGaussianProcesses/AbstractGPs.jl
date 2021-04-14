@@ -16,7 +16,7 @@
             f = GP(kernel)
 
             # Sampling Distribution.
-            y ~ f(X, σ²)
+            y ~ f(X, σ² + 1e-9)
         end
 
         # Test for matrices
