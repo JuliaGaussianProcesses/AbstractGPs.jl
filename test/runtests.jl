@@ -23,7 +23,7 @@ using AbstractGPs:
 
 using Documenter
 using ChainRulesCore
-using Distributions: MvNormal, PDMat
+using Distributions: MvNormal, PDMat, loglikelihood
 using FillArrays
 using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
