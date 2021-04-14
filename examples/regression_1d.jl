@@ -428,9 +428,9 @@ softplus(opt.minimizer[2])
 # posterior. We can observe that there is a significant improvement over the
 # log-likelihood with the default kernel parameters of value 1.
 
-opt_kernel = softplus(opt.minimizer[1]) * (
-    Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2]))
-)
+opt_kernel =
+    softplus(opt.minimizer[1]) *
+    (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
 ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
