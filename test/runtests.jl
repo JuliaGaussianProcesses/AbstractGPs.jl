@@ -90,7 +90,7 @@ include("test_util.jl")
         end
     end
 
-    if (GROUP == "All" || GROUP == "Compat") && VERSION >= v"1.5"
+    if GROUP == "All" && VERSION >= v"1.5"
         Pkg.activate("compat")
         Pkg.develop(PackageSpec(; path=PKGDIR))
         Pkg.instantiate()
