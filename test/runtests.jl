@@ -36,7 +36,7 @@ using Statistics
 using Test
 using Zygote
 
-const GROUP = get(env, "GROUP", "All")
+const GROUP = get(ENV, "GROUP", "All")
 
 include("test_util.jl")
 
