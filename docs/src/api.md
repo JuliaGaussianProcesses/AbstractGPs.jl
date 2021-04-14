@@ -10,15 +10,15 @@ If you are a user, please refer to our other examples.
 
 ## Introduction
 
-AbstractGPs provides one main abstract type, the `AbstractGP`.
-Instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
-Gaussian processes only become useful computationally when you specify a finite-dimensional marginal distribution to work with.
-It is for this reason that we provide the `FiniteGP` type.
-This type comprises an `AbstractGP`, `f`, and an `AbstractVector`, `x`, and represents the multivariate Gaussian distribution over `f` at every element of `x`.
-This distribution, being finite-dimensional, is something that can be used to compute useful things.
-For example, `rand(f(x))` generates a sample from the multivariate Gaussian that is `f` at `x`, and `logpdf(f(x), y)` computes the log (marginal) probability of observing the vector `y` under this distribution.
+AbstractGPs provides the abstract type `AbstractGP`, and the concrete type `FiniteGP`.
+An `AbstractGP`, `f`, should be thought of as a distribution over functions.
+This means that the output of `rand(f)` would be a real-valued function.
+It's not usually possible to implement this though, so we don't.
 
-Consequently, if you create a new subtype `MyNewGP` of `AbstractGP`, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
+A `FiniteGP` `fx = f(x)` represents the distribution over functions at the finite collection of points specified in `x`.
+`fx` is a multivariate Normal distribution, so `rand(fx)` produces a `Vector` of `Real`s.
+
+A `FiniteGP` is the interesting object computationally, so if you create a new subtype `MyNewGP` of `AbstractGP`, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
 ```julia
 FiniteGP{<:MyNewGP}
 ```
