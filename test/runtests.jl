@@ -42,7 +42,7 @@ const PKGDIR = dirname(dirname(pathof(AbstractGPs)))
 include("test_util.jl")
 
 @testset "AbstractGPs" begin
-    if GROUP == "All" || GROUP == "AbstractGP"
+    if GROUP == "All" || GROUP == "AbstractGPs"
         @testset "util" begin
             include(joinpath("util", "common_covmat_ops.jl"))
             include(joinpath("util", "plotting.jl"))
