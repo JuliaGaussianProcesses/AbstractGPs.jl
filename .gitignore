@@ -4,6 +4,7 @@
 *.ipynb
 .DS_Store
 /test/Manifest.toml
+/test/compat/Manifest.toml
 /Manifest.toml
 /dev/
 /docs/build/

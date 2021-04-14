@@ -12,7 +12,7 @@
             σ² ~ LogNormal(0.0, 1.0)
 
             # Realized covariance function
-            kernel = α * transform(SqExponentialKernel(), 1 / ρ)
+            kernel = α * (SqExponentialKernel() ∘ ScaleTransform(1 / ρ))
             f = GP(kernel)
 
             # Sampling Distribution.

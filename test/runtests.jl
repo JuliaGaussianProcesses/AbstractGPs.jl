@@ -23,77 +23,72 @@ using AbstractGPs:
 
 using Documenter
 using ChainRulesCore
-using Distributions: MvNormal, PDMat, Poisson, LogNormal
+using Distributions: MvNormal, PDMat
 using FillArrays
 using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
+using Pkg
 using Plots
 using Random
-using SampleChainsDynamicHMC
-using Soss: Soss
 using Statistics
 using Test
-using Turing: Turing
 using Zygote
 
 include("test_util.jl")
 
 @testset "AbstractGPs" begin
-    @testset "util" begin
-        include(joinpath("util", "common_covmat_ops.jl"))
-        include(joinpath("util", "plotting.jl"))
-    end
-    println(" ")
-    @info "Ran util tests"
+    # @testset "util" begin
+    #     include(joinpath("util", "common_covmat_ops.jl"))
+    #     include(joinpath("util", "plotting.jl"))
+    # end
+    # println(" ")
+    # @info "Ran util tests"
 
-    @testset "abstract_gp" begin
-        include(joinpath("abstract_gp", "abstract_gp.jl"))
-        include(joinpath("abstract_gp", "finite_gp.jl"))
-    end
-    println(" ")
-    @info "Ran abstract_gp tests"
+    # @testset "abstract_gp" begin
+    #     include(joinpath("abstract_gp", "abstract_gp.jl"))
+    #     include(joinpath("abstract_gp", "finite_gp.jl"))
+    # end
+    # println(" ")
+    # @info "Ran abstract_gp tests"
 
-    @testset "gp" begin
-        include(joinpath("gp", "mean_functions.jl"))
-        include(joinpath("gp", "gp.jl"))
-    end
-    println(" ")
-    @info "Ran gp tests"
+    # @testset "gp" begin
+    #     include(joinpath("gp", "mean_functions.jl"))
+    #     include(joinpath("gp", "gp.jl"))
+    # end
+    # println(" ")
+    # @info "Ran gp tests"
 
-    @testset "posterior_gp" begin
-        include(joinpath("posterior_gp", "posterior_gp.jl"))
-        include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
-    end
-    println(" ")
-    @info "Ran posterior_gp tests"
+    # @testset "posterior_gp" begin
+    #     include(joinpath("posterior_gp", "posterior_gp.jl"))
+    #     include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
+    # end
+    # println(" ")
+    # @info "Ran posterior_gp tests"
 
-    include(joinpath("latent_gp", "latent_gp.jl"))
-    println(" ")
-    @info "Ran latent_gp tests"
+    # include(joinpath("latent_gp", "latent_gp.jl"))
+    # println(" ")
+    # @info "Ran latent_gp tests"
 
-    include("deprecations.jl")
-    println(" ")
-    @info "Ran deprecation tests"
+    # include("deprecations.jl")
+    # println(" ")
+    # @info "Ran deprecation tests"
 
-    @testset "compat" begin
-        include(joinpath("compat", "turing.jl"))
-        println(" ")
-        @info "Ran Turing tests"
+    # @testset "doctests" begin
+    #     DocMeta.setdocmeta!(
+    #         AbstractGPs,
+    #         :DocTestSetup,
+    #         :(using AbstractGPs, Random, Documenter, LinearAlgebra);
+    #         recursive=true,
+    #     )
+    #     doctest(AbstractGPs)
+    # end
 
-        include(joinpath("compat", "soss.jl"))
-        println(" ")
-        @info "Ran Soss tests"
-    end
-
-    @testset "doctests" begin
-        DocMeta.setdocmeta!(
-            AbstractGPs,
-            :DocTestSetup,
-            :(using AbstractGPs, Random, Documenter, LinearAlgebra);
-            recursive=true,
-        )
-        doctest(AbstractGPs)
+    @static if VERSION >= v"1.5"
+        Pkg.activate("compat")
+        Pkg.develop(PackageSpec(; path=".."))
+        Pkg.instantiate()
+        include(joinpath("compat", "runtests.jl"))
     end
 end
