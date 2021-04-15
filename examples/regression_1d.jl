@@ -487,7 +487,7 @@ opt.minimizer
 
 softplus(opt.minimizer[1])
 
-# and of the variance is
+# and of the inverse lengthscale is
 
 softplus(opt.minimizer[2])
 
