@@ -64,14 +64,16 @@ for (m, f) in [
 ]
     @eval function $m.$f(::AbstractGP)
         return error(
-            "`" *
-            string($f) *
-            "(f::AbstractGP)` is not defined (and it should not be!).\n" *
-            "Please provide an `AbstractVector` of locations `x` at which you wish to compute your " *
-            string($f) *
-            " vector(s), and call `" *
-            string($f) *
-            "(f(x))`\n" *
+            "`",
+            $f,
+            "(f::AbstractGP)` is not defined (on purpose!).\n",
+            "Please provide an `AbstractVector` of locations `x` at which you wish to compute your ",
+            $f,
+            " vector",
+            ($m == StatsBase ? "s" : ""),
+            ", and call `",
+            $f,
+            "(f(x))`\n",
             "For more details please have a look at the AbstractGPs docs.",
         )
     end
