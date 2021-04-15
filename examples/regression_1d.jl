@@ -106,7 +106,8 @@ plot!(0:0.001:1, p_fx; label=false)
 
 function gp_loglikelihood(x, y)
     function loglikelihood(params)
-        kernel = softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
         fx = f(x, 0.1)
         return logpdf(fx, y)
@@ -235,7 +236,9 @@ using LogDensityProblems
 # We have to implement the LogDensityProblems interface for `loglik_train`.
 
 ## Log joint density
-LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params) = ℓ(params) + logprior(params)
+function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
+    return ℓ(params) + logprior(params)
+end
 
 ## The parameter space is two-dimensional
 LogDensityProblems.dimension(::typeof(loglik_train)) = 2
@@ -386,7 +389,8 @@ using Optim
 
 function objective_function(x, y)
     function negative_elbo(params)
-        kernel = softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
         fx = f(x, 0.1)
         return -elbo(fx, y, f(logistic.(params[3:end])))
