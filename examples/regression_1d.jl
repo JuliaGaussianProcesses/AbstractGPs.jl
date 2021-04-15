@@ -509,7 +509,7 @@ logpdf(opt_p_fx(x_test), y_test)
 scatter(
     x_train,
     y_train;
-    xlim=(0,1),
+    xlim=(0, 1),
     xlabel="x",
     ylabel="y",
     title="posterior (optimized parameters)",
