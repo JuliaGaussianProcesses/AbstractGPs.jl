@@ -179,7 +179,7 @@ samples, _ = sample(
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
-samples_constrained = [map(softplus, p) for p in samples]
+samples_constrained = map(softplus, samples)
 mean_samples = mean(samples_constrained)
 
 # We plot a histogram of the samples for the two parameters.
@@ -264,7 +264,7 @@ samples =
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
-samples_constrained = [map(softplus, p) for p in samples]
+samples_constrained = map(softplus, samples)
 mean_samples = mean(samples_constrained)
 
 # We plot a histogram of the samples for the two parameters.
@@ -324,7 +324,7 @@ samples = sample(ESSModel(
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
-samples_constrained = [map(softplus, p) for p in samples]
+samples_constrained = map(softplus, samples)
 mean_samples = mean(samples_constrained)
 
 # We plot a histogram of the samples for the two parameters.
