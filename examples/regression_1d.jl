@@ -9,7 +9,7 @@ using Distributions
 using StatsFuns
 
 using Plots
-default(legend=:outertopright, size=(700,400))
+default(; legend=:outertopright, size=(700, 400))
 
 using Random
 Random.seed!(1234)
@@ -19,12 +19,34 @@ Random.seed!(1234)
 # [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv)
 # taken from GPFlow examples.
 
-x = [0.8658165855998895, 0.6661700880180962, 0.8049218148148531, 0.7714303440386239, 
-    0.14790478354654835, 0.8666105548197428, 0.007044577166530286, 0.026331737288148638, 
-    0.17188596617099916, 0.8897812990554013, 0.24323574561119998, 0.028590102134105955]
-y = [1.5255314337144372, 3.6434202968230003, 3.010885733911661, 3.774442382979625, 
-    3.3687639483798324, 1.5506452040608503, 3.790447985799683, 3.8689707574953, 
-    3.4933565751758713, 1.4284538820635841, 3.8715350915692364, 3.7045949061144983]
+x = [
+    0.8658165855998895,
+    0.6661700880180962,
+    0.8049218148148531,
+    0.7714303440386239,
+    0.14790478354654835,
+    0.8666105548197428,
+    0.007044577166530286,
+    0.026331737288148638,
+    0.17188596617099916,
+    0.8897812990554013,
+    0.24323574561119998,
+    0.028590102134105955,
+]
+y = [
+    1.5255314337144372,
+    3.6434202968230003,
+    3.010885733911661,
+    3.774442382979625,
+    3.3687639483798324,
+    1.5506452040608503,
+    3.790447985799683,
+    3.8689707574953,
+    3.4933565751758713,
+    1.4284538820635841,
+    3.8715350915692364,
+    3.7045949061144983,
+]
 scatter(x, y; xlabel="x", ylabel="y", legend=false)
 
 # We split the observations into train and test data.
@@ -57,12 +79,16 @@ logpdf(p_fx(x_test), y_test)
 # We plot the posterior Gaussian process along with the observations.
 
 scatter(
-    x_train, y_train;
-    xlim=(0,1), xlabel="x", ylabel="y",
-    title="posterior (default parameters)", label="Train Data",
+    x_train,
+    y_train;
+    xlim=(0, 1),
+    xlabel="x",
+    ylabel="y",
+    title="posterior (default parameters)",
+    label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(p_fx, 0:0.001:1; label=false)
+plot!(0:0.001:1, p_fx; label=false)
 
 # ## Markov Chain Monte Carlo
 #
@@ -78,25 +104,18 @@ plot!(p_fx, 0:0.001:1; label=false)
 # f(x) = \log (1 + \exp x).
 # ```
 
-struct GPLoglikelihood{X,Y}
-    x::X
-    y::Y
+function gp_loglikelihood(x, y)
+    function loglikelihood(params)
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        f = GP(kernel)
+        fx = f(x, 0.1)
+        return logpdf(fx, y)
+    end
+    return loglikelihood
 end
 
-function (ℓ::GPLoglikelihood)(params)
-    kernel = ScaledKernel(
-        transform(
-            Matern52Kernel(), 
-            ScaleTransform(softplus(params[1]))
-        ), 
-        softplus(params[2]),
-    )
-    f = GP(kernel)
-    fx = f(ℓ.x, 0.1)
-    return logpdf(fx, ℓ.y)
-end
-
-const loglik_train = GPLoglikelihood(x_train, y_train)
+const loglik_train = gp_loglikelihood(x_train, y_train)
 #md nothing #hide
 
 # We define a Gaussian prior for the joint distribution of the two transformed kernel
@@ -145,7 +164,7 @@ integrator = Leapfrog(initial_ϵ)
 # - generalised No-U-Turn criteria, and
 # - windowed adaption for step-size and diagonal mass matrix
 
-proposal = NUTS{MultinomialTS, GeneralisedNoUTurn}(integrator)
+proposal = NUTS{MultinomialTS,GeneralisedNoUTurn}(integrator)
 adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
 #md nothing #hide
 
@@ -153,13 +172,7 @@ adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integra
 # are in the unconstrained space $\mathbb{R}^2$.
 
 samples, _ = sample(
-    hamiltonian,
-    proposal,
-    initial_params,
-    n_samples,
-    adaptor,
-    n_adapts;
-    progress=false,
+    hamiltonian, proposal, initial_params, n_samples, adaptor, n_adapts; progress=false
 )
 #md nothing #hide
 
@@ -174,8 +187,11 @@ mean_samples = mean(samples_constrained)
 
 histogram(
     reduce(hcat, samples_constrained)';
-    xlabel="sample", ylabel="counts", layout=2,
-    title=["inverse length scale" "variance"], legend=false,
+    xlabel="sample",
+    ylabel="counts",
+    layout=2,
+    title=["variance" "inverse length scale"],
+    legend=false,
 )
 vline!(mean_samples'; linewidth=2)
 
@@ -184,72 +200,65 @@ vline!(mean_samples'; linewidth=2)
 # improvement over the log-likelihood of the test data with respect to the posterior
 # Gaussian process with default kernel parameters of value 1.
 
-struct GPPosterior{X,Y}
-    x::X
-    y::Y
-end
-
-function (g::GPPosterior)(p)
-    kernel = ScaledKernel(
-        transform(
-            Matern52Kernel(), 
-            ScaleTransform(softplus(p[1]))
-        ), 
-        softplus(p[2]),
-    )
+function gp_posterior(x, y, p)
+    kernel = softplus(p[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(p[2])))
     f = GP(kernel)
-    return posterior(f(g.x, 0.1), g.y)
+    return posterior(f(x, 0.1), y)
 end
 
-const gp_posterior = GPPosterior(x_train, y_train)
-
-mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
 plt = scatter(
-    x_train, y_train;
-    xlim=(0,1), xlabel="x", ylabel="y",
-    title="posterior (AdvancedHMC)", label="Train Data",
+    x_train,
+    y_train;
+    xlim=(0, 1),
+    xlabel="x",
+    ylabel="y",
+    title="posterior (AdvancedHMC)",
+    label="Train Data",
 )
 scatter!(plt, x_test, y_test; label="Test Data")
-for p in samples[(end-100):end]
-    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
+for p in samples[(end - 100):end]
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
 end
 plt
 
 # #### DynamicHMC
 #
-# We repeat the inference with DynamicHMC.
+# We repeat the inference with DynamicHMC. DynamicHMC requires us to
+# implement the LogDensityProblems interface for `loglik_train`.
 
 using DynamicHMC
 using LogDensityProblems
 
-# We have to implement the LogDensityProblems interface for `GPLogLikelihood`.
-
 ## Log joint density
-LogDensityProblems.logdensity(ℓ::GPLoglikelihood, params) = ℓ(params) + logprior(params)
+function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
+    return ℓ(params) + logprior(params)
+end
 
 ## The parameter space is two-dimensional
-LogDensityProblems.dimension(::GPLoglikelihood) = 2
+LogDensityProblems.dimension(::typeof(loglik_train)) = 2
 
-## `GPLoglikelihood` does not allow to evaluate derivatives of
+## `loglik_train` does not allow to evaluate derivatives of
 ## the log-likelihood function
-function LogDensityProblems.capabilities(::Type{<:GPLoglikelihood})
-    LogDensityProblems.LogDensityOrder{0}()
+function LogDensityProblems.capabilities(::Type{<:typeof(loglik_train)})
+    return LogDensityProblems.LogDensityOrder{0}()
 end
 
 # Now we can draw samples from the posterior distribution of kernel parameters with
 # DynamicHMC. Again we use [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl)
 # to compute the derivatives of the log joint density with automatic differentiation.
 
-samples = mcmc_with_warmup(
-    Random.GLOBAL_RNG,
-    ADgradient(:ForwardDiff, loglik_train),
-    n_samples;
-    reporter = NoProgressReport(),
-).chain
+samples =
+    mcmc_with_warmup(
+        Random.GLOBAL_RNG,
+        ADgradient(:ForwardDiff, loglik_train),
+        n_samples;
+        reporter=NoProgressReport(),
+    ).chain
 #md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
@@ -263,8 +272,11 @@ mean_samples = mean(samples_constrained)
 
 histogram(
     reduce(hcat, samples_constrained)';
-    xlabel="sample", ylabel="counts", layout=2,
-    title=["inverse length scale" "variance"], legend=false,
+    xlabel="sample",
+    ylabel="counts",
+    layout=2,
+    title=["variance" "inverse length scale"],
+    legend=false,
 )
 vline!(mean_samples'; linewidth=2)
 
@@ -272,19 +284,23 @@ vline!(mean_samples'; linewidth=2)
 # of the test data with respect to the posterior Gaussian process with default kernel
 # parameters.
 
-mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
 plt = scatter(
-    x_train, y_train;
-    xlim=(0,1), xlabel="x", ylabel="y",
-    title="posterior (DynamicHMC)", label="Train Data",
+    x_train,
+    y_train;
+    xlim=(0, 1),
+    xlabel="x",
+    ylabel="y",
+    title="posterior (DynamicHMC)",
+    label="Train Data",
 )
 scatter!(plt, x_test, y_test; label="Test Data")
-for p in samples[(end-100):end]
-    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
+for p in samples[(end - 100):end]
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
 end
 plt
 
@@ -299,15 +315,10 @@ using EllipticalSliceSampling
 
 # We draw 2000 samples from the posterior distribution of kernel parameters.
 
-samples = sample(
-    ESSModel(
-        MvNormal(2, 1), # Gaussian prior
-        loglik_train,
-    ),
-    ESS(),
-    n_samples;
-    progress=false,
-)
+samples = sample(ESSModel(
+    MvNormal(2, 1), # Gaussian prior
+    loglik_train,
+), ESS(), n_samples; progress=false)
 #md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
@@ -321,8 +332,10 @@ mean_samples = mean(samples_constrained)
 
 histogram(
     reduce(hcat, samples_constrained)';
-    xlabel="sample", ylabel="counts", layout=2,
-    title=["inverse length scale" "variance"],
+    xlabel="sample",
+    ylabel="counts",
+    layout=2,
+    title=["variance" "inverse length scale"],
 )
 vline!(mean_samples'; layout=2, labels="mean")
 
@@ -330,19 +343,23 @@ vline!(mean_samples'; layout=2, labels="mean")
 # of the test data with respect to the posterior Gaussian process with default kernel
 # parameters.
 
-mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
 plt = scatter(
-    x_train, y_train;
-    xlim=(0,1), xlabel="x", ylabel="y",
-    title="posterior (EllipticalSliceSampling)", label="Train Data",
+    x_train,
+    y_train;
+    xlim=(0, 1),
+    xlabel="x",
+    ylabel="y",
+    title="posterior (EllipticalSliceSampling)",
+    label="Train Data",
 )
 scatter!(plt, x_test, y_test; label="Test Data")
-for p in samples[(end-100):end]
-    sampleplot!(plt, gp_posterior(p)(0:0.02:1), 1)
+for p in samples[(end - 100):end]
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
 end
 plt
 
@@ -369,22 +386,15 @@ using Optim
 # f(x) = \frac{1}{1 + \exp{(-x)}}.
 # ```
 
-struct NegativeELBO{X,Y}
-    x::X
-    y::Y
-end
-
-function (g::NegativeELBO)(params)
-    kernel = ScaledKernel(
-        transform(
-            Matern52Kernel(), 
-            ScaleTransform(softplus(params[1]))
-        ), 
-        softplus(params[2]),
-    )
-    f = GP(kernel)
-    fx = f(g.x, 0.1)
-    return -elbo(fx, g.y, f(logistic.(params[3:end])))
+function objective_function(x, y)
+    function negative_elbo(params)
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        f = GP(kernel)
+        fx = f(x, 0.1)
+        return -elbo(fx, y, f(logistic.(params[3:end])))
+    end
+    return negative_elbo
 end
 #md nothing #hide
 
@@ -392,17 +402,17 @@ end
 # negative ELBO with the LBFGS algorithm and obtain the following optimal parameters:
 
 x0 = rand(7)
-opt = optimize(NegativeELBO(x_train, y_train), x0, LBFGS())
+opt = optimize(objective_function(x_train, y_train), x0, LBFGS())
 
 #-
 
 opt.minimizer
 
-# The optimized value of the inverse lengthscale is
+# The optimized value of the variance is
 
 softplus(opt.minimizer[1])
 
-# and of the variance is
+# and of the inverse lengthscale is
 
 softplus(opt.minimizer[2])
 
@@ -410,13 +420,9 @@ softplus(opt.minimizer[2])
 # posterior. We can observe that there is a significant improvement over the
 # log-likelihood with the default kernel parameters of value 1.
 
-opt_kernel = ScaledKernel(
-    transform(
-        Matern52Kernel(),
-        ScaleTransform(softplus(opt.minimizer[1]))
-    ),
-    softplus(opt.minimizer[2]),
-)
+opt_kernel =
+    softplus(opt.minimizer[1]) *
+    (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
 ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
@@ -425,12 +431,16 @@ logpdf(ap(x_test), y_test)
 # We visualize the approximate posterior with optimized parameters.
 
 scatter(
-    x_train, y_train;
-    xlim=(0,1), xlabel="x", ylabel="y",
-    title="posterior (VI with sparse grid)", label="Train Data",
+    x_train,
+    y_train;
+    xlim=(0, 1),
+    xlabel="x",
+    ylabel="y",
+    title="posterior (VI with sparse grid)",
+    label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(ap, 0:0.001:1; label=false)
+plot!(0:0.001:1, ap; label=false)
 vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
 
 # ## Exact Gaussian Process Inference

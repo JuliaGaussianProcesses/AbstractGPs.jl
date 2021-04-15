@@ -4,8 +4,6 @@
     N_a = 5
     N_b = 6
 
-    @test Symmetric(Diagonal(randn(rng, 5))) isa Diagonal
-
     # Specify prior.
     f = GP(sin, Matern32Kernel())
 
@@ -29,7 +27,7 @@
     a = collect(range(-1.0, 1.0; length=N_a))
     b = randn(rng, N_b)
     abstractgp_interface_tests(f_approx_post, a, b)
-    
+
     @testset "update_approx_posterior (new observation)" begin
         rng = MersenneTwister(1)
         X = rand(rng, 10)
@@ -45,17 +43,15 @@
         # batch learning
         p_fx2 = approx_posterior(VFE(), f(X, 0.1), y, f(Z))
 
-
-        @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol=1e-5
-        @test u_p_fx1.data.Λ_ε.U ≈ p_fx2.data.Λ_ε.U atol=1e-5
-        @test u_p_fx1.data.U ≈ p_fx2.data.U atol=1e-5
-        @test u_p_fx1.data.α ≈ p_fx2.data.α atol=1e-5
-        @test u_p_fx1.data.z ≈ p_fx2.data.z atol=1e-5
-        @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol=1e-5
-        @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol=1e-5
-        @test u_p_fx1.data.x ≈ p_fx2.data.x atol=1e-5
-        @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol=1e-5
-
+        @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol = 1e-5
+        @test u_p_fx1.data.Λ_ε.U ≈ p_fx2.data.Λ_ε.U atol = 1e-5
+        @test u_p_fx1.data.U ≈ p_fx2.data.U atol = 1e-5
+        @test u_p_fx1.data.α ≈ p_fx2.data.α atol = 1e-5
+        @test u_p_fx1.data.z ≈ p_fx2.data.z atol = 1e-5
+        @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol = 1e-5
+        @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol = 1e-5
+        @test u_p_fx1.data.x ≈ p_fx2.data.x atol = 1e-5
+        @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol = 1e-5
     end
 
     @testset "update_approx_posterior (new pseudo-points)" begin
@@ -75,14 +71,14 @@
         # Adding all pseudo-points at once
         p_fx2 = approx_posterior(VFE(), f(X, 0.1), y, f(Z))
 
-        @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol=1e-5
-        @test u_p_fx1.data.Λ_ε.U ≈ p_fx2.data.Λ_ε.U atol=1e-5
-        @test u_p_fx1.data.U ≈ p_fx2.data.U atol=1e-5
-        @test u_p_fx1.data.α ≈ p_fx2.data.α atol=1e-2 rtol=1e-2
-        @test u_p_fx1.data.z ≈ p_fx2.data.z atol=1e-5
-        @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol=1e-5
-        @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol=1e-5
-        @test u_p_fx1.data.x ≈ p_fx2.data.x atol=1e-5
-        @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol=1e-5        
+        @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol = 1e-5
+        @test u_p_fx1.data.Λ_ε.U ≈ p_fx2.data.Λ_ε.U atol = 1e-5
+        @test u_p_fx1.data.U ≈ p_fx2.data.U atol = 1e-5
+        @test u_p_fx1.data.α ≈ p_fx2.data.α atol = 1e-2 rtol = 1e-2
+        @test u_p_fx1.data.z ≈ p_fx2.data.z atol = 1e-5
+        @test u_p_fx1.data.b_y ≈ p_fx2.data.b_y atol = 1e-5
+        @test u_p_fx1.data.B_εf ≈ p_fx2.data.B_εf atol = 1e-5
+        @test u_p_fx1.data.x ≈ p_fx2.data.x atol = 1e-5
+        @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol = 1e-5
     end
 end

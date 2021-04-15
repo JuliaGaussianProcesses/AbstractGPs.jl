@@ -31,7 +31,7 @@ Y = sin.(rand(10))
 f = GP(Matern32Kernel())
 
 # Finite projection at the inputs `X`
-fx = f(X,  0.001)
+fx = f(X, 0.001)
 
 # Data's log-likelihood w.r.t prior GP `f`. 
 logpdf(fx, Y)
@@ -43,15 +43,18 @@ p_fx = posterior(fx, Y)
 logpdf(p_fx(X), Y)
 
 # Plot posterior.
-plt = scatter(X, Y; label = "Data")
-plot!(plt, p_fx, -0.5:0.001:1.5; label="Posterior")
-
+scatter(X, Y; label="Data")
+plot!(-0.5:0.001:1.5, p_fx; label="Posterior")
 ```
 
 
-## Related Projects
-- [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) -  Julia Package for kernel functions for machine learning 
-- [LikelihoodFunctions.jl](https://github.com/JuliaGaussianProcesses/LikelihoodFunctions.jl/) - Julia package for non-gaussian likelihood functions to use with Gaussian Processes.
+## Related Julia packages
+
+- [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl/) - Plotting GPs with [Makie.jl](https://github.com/JuliaPlots/Makie.jl/).
+- [GPLikelihoods.jl](https://github.com/JuliaGaussianProcesses/GPLikelihoods.jl/) - Non-Gaussian likelihood functions to use with GPs.
+- [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) - Kernel functions for machine learning.
+- [Stheno.jl](https://github.com/JuliaGaussianProcesses/Stheno.jl) - Building probabilistic programmes involving GPs. Built on types which implement this package's APIs.
+- [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) - Accelerated inference in GPs involving time. Built on types which implement this package's APIs.
 
 
 ## Issues/Contributing

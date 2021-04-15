@@ -4,7 +4,7 @@
 The finite-dimensional projection of the AbstractGP `f` at `x`. Assumed to be observed under
 Gaussian noise with zero mean and covariance matrix `Σ`
 """
-struct FiniteGP{Tf<:AbstractGP, Tx<:AbstractVector, TΣ} <: ContinuousMultivariateDistribution
+struct FiniteGP{Tf<:AbstractGP,Tx<:AbstractVector,TΣ} <: AbstractMvNormal
     f::Tf
     x::Tx
     Σy::TΣ
@@ -21,8 +21,7 @@ function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
 end
 
 function FiniteGP(
-    f::AbstractGP, X::AbstractMatrix, σ²=default_σ²;
-    obsdim::Int = KernelFunctions.defaultobs,
+    f::AbstractGP, X::AbstractMatrix, σ²=default_σ²; obsdim::Int=KernelFunctions.defaultobs
 )
     return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
 end
@@ -93,6 +92,25 @@ true
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 
 """
+    var(f::FiniteGP)
+
+Compute only the diagonal elements of [`cov(f)`](@ref).
+
+# Examples
+
+```jldoctest
+julia> fx = GP(Matern52Kernel())(randn(10), 0.1);
+
+julia> var(fx) == diag(cov(fx))
+true
+```
+"""
+function Statistics.var(f::FiniteGP)
+    Σy = f.Σy
+    return var(f.f, f.x) + view(Σy, diagind(Σy))
+end
+
+"""
     mean_and_cov(f::FiniteGP)
 
 Equivalent to `(mean(f), cov(f))`, but sometimes more efficient to compute them jointly than
@@ -106,9 +124,31 @@ julia> mean_and_cov(fx) == (mean(fx), cov(fx))
 true
 ```
 """
-function mean_and_cov(f::FiniteGP)
+function StatsBase.mean_and_cov(f::FiniteGP)
     m, C = mean_and_cov(f.f, f.x)
     return m, C + f.Σy
+end
+
+"""
+    mean_and_var(f::FiniteGP)
+
+Compute both `mean(f)` and the diagonal elements of `cov(f)`.
+
+Sometimes more efficient than computing them separately, particularly for posteriors.
+
+# Examples
+
+```jldoctest
+julia> fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
+
+julia> mean_and_var(fx) == (mean(fx), var(fx))
+true
+```
+"""
+function StatsBase.mean_and_var(f::FiniteGP)
+    m, c = mean_and_var(f.f, f.x)
+    Σy = f.Σy
+    return m, c + view(Σy, diagind(Σy))
 end
 
 """
@@ -154,7 +194,10 @@ julia> std.(fs) == sqrt.(diag(cov(f(x))))
 true
 ```
 """
-marginals(f::FiniteGP) = Normal.(mean(f), sqrt.(cov_diag(f.f, f.x) .+ diag(f.Σy)))
+function marginals(f::FiniteGP)
+    m, c = mean_and_var(f)
+    return Normal.(m, sqrt.(c))
+end
 
 """
     rand(rng::AbstractRNG, f::FiniteGP, N::Int=1)
@@ -183,7 +226,7 @@ true
 """
 function Random.rand(rng::AbstractRNG, f::FiniteGP, N::Int)
     m, C_mat = mean_and_cov(f)
-    C = cholesky(Symmetric(C_mat))
+    C = cholesky(_symmetric(C_mat))
     return m .+ C.U' * randn(rng, promote_type(eltype(m), eltype(C)), length(m), N)
 end
 Random.rand(f::FiniteGP, N::Int) = rand(Random.GLOBAL_RNG, f, N)
@@ -223,7 +266,7 @@ Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf
 
 function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     m, C_mat = mean_and_cov(f)
-    C = cholesky(Symmetric(C_mat))
+    C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
     return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
 end
@@ -288,9 +331,9 @@ end
 # Factor out computations common to the `elbo` and `dtc`.
 function _compute_intermediates(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
     consistency_check(f, y, u)
-    chol_Σy = cholesky(f.Σy)
+    chol_Σy = _cholesky(f.Σy)
 
-    A = cholesky(Symmetric(cov(u))).U' \ (chol_Σy.U' \ cov(f, u))'
+    A = cholesky(_symmetric(cov(u))).U' \ (chol_Σy.U' \ cov(f, u))'
     Λ_ε = cholesky(Symmetric(A * A' + I))
     δ = chol_Σy.U' \ (y - mean(f))
 
@@ -304,5 +347,5 @@ function consistency_check(f, y, u)
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal, chol_Σy::Cholesky)
-    return sum(cov_diag(f.f, f.x) ./ diag(Σy))
+    return sum(var(f.f, f.x) ./ diag(Σy))
 end

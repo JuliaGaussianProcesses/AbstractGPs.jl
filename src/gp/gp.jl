@@ -53,16 +53,14 @@ true
 [1] - C. E. Rasmussen and C. Williams. "Gaussian processes for machine learning". 
 MIT Press. 2006.
 """
-struct GP{Tm<:MeanFunction, Tk<:Kernel} <: AbstractGP
+struct GP{Tm<:MeanFunction,Tk<:Kernel} <: AbstractGP
     mean::Tm
-    kernel::Tk 
+    kernel::Tk
 end
 
 GP(mean, kernel::Kernel) = GP(CustomMean(mean), kernel)
 GP(mean::Real, kernel::Kernel) = GP(ConstMean(mean), kernel)
 GP(kernel::Kernel) = GP(ZeroMean(), kernel)
-
-
 
 # AbstractGP interface implementation.
 
@@ -70,10 +68,6 @@ Statistics.mean(f::GP, x::AbstractVector) = _map(f.mean, x)
 
 Statistics.cov(f::GP, x::AbstractVector) = kernelmatrix(f.kernel, x)
 
-cov_diag(f::GP, x::AbstractVector) = kerneldiagmatrix(f.kernel, x)
+Statistics.var(f::GP, x::AbstractVector) = kernelmatrix_diag(f.kernel, x)
 
 Statistics.cov(f::GP, x::AbstractVector, x′::AbstractVector) = kernelmatrix(f.kernel, x, x′)
-
-mean_and_cov(f::GP, x::AbstractVector) = (mean(f, x), cov(f, x))
-
-mean_and_cov_diag(f::GP, x::AbstractVector) = (mean(f, x), cov_diag(f, x))

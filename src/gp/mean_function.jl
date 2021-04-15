@@ -16,7 +16,6 @@ end
 
 ZeroMean() = ZeroMean{Float64}()
 
-
 """
     ConstMean{T<:Real} <: MeanFunction
 
@@ -27,7 +26,6 @@ struct ConstMean{T<:Real} <: MeanFunction
 end
 
 _map(m::ConstMean, x::AbstractVector) = fill(m.c, length(x))
-
 
 """
     CustomMean{Tf} <: MeanFunction

@@ -15,7 +15,7 @@ function print_adjoints(adjoint_ad, adjoint_fd, rtol, atol)
     abs_err = abs.(adjoint_ad .- adjoint_fd)
     rel_err = abs_err ./ adjoint_ad
     display([adjoint_ad adjoint_fd abs_err rel_err])
-    println()
+    return println()
 end
 
 # # AbstractArrays.
@@ -38,23 +38,21 @@ function fd_isapprox(x_ad::Real, x_fd::Real, rtol, atol)
     return isapprox(x_ad, x_fd; rtol=rtol, atol=atol)
 end
 function fd_isapprox(x_ad::NamedTuple, x_fd, rtol, atol)
-    f = (x_ad, x_fd)->fd_isapprox(x_ad, x_fd, rtol, atol)
+    f = (x_ad, x_fd) -> fd_isapprox(x_ad, x_fd, rtol, atol)
     return all([f(getfield(x_ad, key), getfield(x_fd, key)) for key in keys(x_ad)])
 end
 function fd_isapprox(x_ad::Tuple, x_fd::Tuple, rtol, atol)
-    return all(map((x, x′)->fd_isapprox(x, x′, rtol, atol), x_ad, x_fd))
+    return all(map((x, x′) -> fd_isapprox(x, x′, rtol, atol), x_ad, x_fd))
 end
 function fd_isapprox(x_ad::Dict, x_fd::Dict, rtol, atol)
-    return all([fd_isapprox(get(()->nothing, x_ad, key), x_fd[key], rtol, atol) for
-        key in keys(x_fd)])
+    return all([
+        fd_isapprox(get(() -> nothing, x_ad, key), x_fd[key], rtol, atol) for
+        key in keys(x_fd)
+    ])
 end
 
 function adjoint_test(
-    f, ȳ, x...;
-    rtol=_rtol,
-    atol=_atol,
-    fdm=central_fdm(5, 1),
-    print_results=false,
+    f, ȳ, x...; rtol=_rtol, atol=_atol, fdm=central_fdm(5, 1), print_results=false
 )
     # Compute forwards-pass and j′vp.
     y, back = Zygote.pullback(f, x...)
@@ -100,7 +98,7 @@ function differentiable_mean_function_tests(
 
     # Check adjoint.
     @assert length(ȳ) == length(x)
-    adjoint_test(x->ew(m, x), ȳ, x; rtol=rtol, atol=atol)
+    return adjoint_test(x -> ew(m, x), ȳ, x; rtol=rtol, atol=atol)
 end
 
 # function differentiable_mean_function_tests(
@@ -118,11 +116,7 @@ end
 # end
 
 function differentiable_mean_function_tests(
-    rng::AbstractRNG,
-    m::MeanFunction,
-    x::AbstractVector;
-    rtol=_rtol,
-    atol=_atol,
+    rng::AbstractRNG, m::MeanFunction, x::AbstractVector; rtol=_rtol, atol=_atol
 )
     ȳ = randn(rng, length(x))
     return differentiable_mean_function_tests(m, ȳ, x; rtol=rtol, atol=atol)
@@ -141,11 +135,7 @@ self-consistent. `x` and `z` must be valid inputs for `f`. For tests to pass, th
 eigenvalue of `cov(f, x)` must be greater than `-eig_tol`.
 """
 function abstractgp_interface_tests(
-    f::AbstractGP,
-    x::AbstractVector,
-    z::AbstractVector;
-    eig_tol::Real=1e-12,
-    σ²::Real=1e-9,
+    f::AbstractGP, x::AbstractVector, z::AbstractVector; eig_tol::Real=1e-12, σ²::Real=1e-9
 )
     @assert length(x) ≠ length(z)
 
@@ -167,13 +157,13 @@ function abstractgp_interface_tests(
     @test size(C_xx) == (length(x), length(x))
 
     # Check that C_xx is positive definite.
-    @test minimum(eigvals(Symmetric(C_xx))) > -eig_tol
+    @test eigmin(Symmetric(C_xx)) > -eig_tol
 
     # Check that C_xx is consistent with cov(f, x, x).
     @test C_xx ≈ cov(f, x, x)
 
-    # Check that cov_diag works, is the correct size and type.
-    C_xx_diag = cov_diag(f, x)
+    # Check that var(f, x) works, is the correct size and type.
+    C_xx_diag = var(f, x)
     @test C_xx_diag isa AbstractVector{<:Real}
     @test length(C_xx_diag) == length(x)
 
@@ -187,11 +177,11 @@ function abstractgp_interface_tests(
         @test C ≈ cov(f, x)
     end
 
-    # Check that mean_and_cov_diag is consistent.
+    # Check that mean_and_var is consistent.
     let
-        m, c = mean_and_cov_diag(f, x)
+        m, c = mean_and_var(f, x)
         @test m ≈ mean(f, x)
-        @test c ≈ cov_diag(f, x)
+        @test c ≈ var(f, x)
     end
 
     # Construct a FiniteGP, and check that all standard methods defined on it at least run.
@@ -203,12 +193,12 @@ function abstractgp_interface_tests(
     @test first(mean_and_cov(fx)) ≈ mean(f, x)
     @test last(mean_and_cov(fx)) ≈ cov(f, x)
     @test mean.(marginals(fx)) ≈ mean(f, x)
-    @test var.(marginals(fx)) ≈ cov_diag(f, x) .+ diag(fx.Σy)
+    @test var.(marginals(fx)) ≈ var(f, x) .+ diag(fx.Σy)
 
     # Generate, compute logpdf, compare against VFE and DTC.
     y = rand(fx)
     @test length(y) == length(x)
     @test logpdf(fx, y) isa Real
-    @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
-    @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol=1e-5 atol=1e-5
+    @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
+    @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
 end

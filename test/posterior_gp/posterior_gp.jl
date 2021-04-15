@@ -19,7 +19,7 @@
 
     # Verify that posterior collapses around observations.
     @test mean(f_post, x) ≈ y
-    @test cov_diag(f_post, x) ≈ zeros(N_cond) rtol=1e-14 atol=1e-14
+    @test var(f_post, x) ≈ zeros(N_cond) rtol = 1e-14 atol = 1e-14
 
     # Check interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))
@@ -37,9 +37,8 @@
     f2 = GP(SqExponentialKernel())
     p_fx2 = posterior(f2(X, 0.1), y)
 
-    @test p_p_fx1.data.C.U ≈ p_fx2.data.C.U atol=1e-5
-    @test p_p_fx1.data.α ≈ p_fx2.data.α atol=1e-5
-    @test p_p_fx1.data.x ≈ p_fx2.data.x atol=1e-5
-    @test p_p_fx1.data.δ ≈ p_fx2.data.δ atol=1e-5
-
+    @test p_p_fx1.data.C.U ≈ p_fx2.data.C.U atol = 1e-5
+    @test p_p_fx1.data.α ≈ p_fx2.data.α atol = 1e-5
+    @test p_p_fx1.data.x ≈ p_fx2.data.x atol = 1e-5
+    @test p_p_fx1.data.δ ≈ p_fx2.data.δ atol = 1e-5
 end

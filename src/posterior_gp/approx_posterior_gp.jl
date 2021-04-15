@@ -1,7 +1,7 @@
 struct VFE end
 const DTC = VFE
 
-struct ApproxPosteriorGP{Tapprox, Tprior, Tdata} <: AbstractGP
+struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
     approx::Tapprox
     prior::Tprior
     data::Tdata
@@ -18,29 +18,19 @@ processes". In: Proceedings of the Twelfth International Conference on Artificia
 Intelligence and Statistics. 2009.
 """
 function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-    U_y = cholesky(Symmetric(fx.Σy)).U
-    U = cholesky(Symmetric(cov(u))).U
-    
+    U_y = _cholesky(_symmetric(fx.Σy)).U
+    U = cholesky(_symmetric(cov(u))).U
+
     B_εf = U' \ (U_y' \ cov(fx, u))'
 
     b_y = U_y' \ (y - mean(fx))
 
     D = B_εf * B_εf' + I
-    Λ_ε = cholesky(Symmetric(D))
+    Λ_ε = cholesky(_symmetric(D))
 
     m_ε = Λ_ε \ (B_εf * b_y)
 
-    cache = (
-        m_ε=m_ε,
-        Λ_ε=Λ_ε,
-        U=U,
-        α=U \ m_ε,
-        z=u.x,
-        b_y=b_y,
-        B_εf=B_εf,
-        x=fx.x,
-        Σy=fx.Σy,
-    )
+    cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, z=u.x, b_y=b_y, B_εf=B_εf, x=fx.x, Σy=fx.Σy)
     return ApproxPosteriorGP(VFE(), fx.f, cache)
 end
 
@@ -55,20 +45,18 @@ Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain 
 of pseudo-points.
 """
 function update_approx_posterior(
-    f_post_approx::ApproxPosteriorGP,
-    fx::FiniteGP,
-    y::AbstractVector{<:Real}
+    f_post_approx::ApproxPosteriorGP, fx::FiniteGP, y::AbstractVector{<:Real}
 )
     U = f_post_approx.data.U
     z = f_post_approx.data.z
 
-    U_y₂ = cholesky(Symmetric(fx.Σy)).U
+    U_y₂ = _cholesky(_symmetric(fx.Σy)).U
 
     temp = zeros(size(f_post_approx.data.Σy, 1), size(fx.Σy, 2))
     Σy = [f_post_approx.data.Σy temp; temp' fx.Σy]
 
     b_y = vcat(f_post_approx.data.b_y, U_y₂ \ (y - mean(fx)))
-    
+
     B_εf₂ = U' \ (U_y₂' \ cov(fx.f, fx.x, z))'
     B_εf = hcat(f_post_approx.data.B_εf, B_εf₂)
 
@@ -82,17 +70,7 @@ function update_approx_posterior(
     α = U \ m_ε
     x = vcat(f_post_approx.data.x, fx.x)
 
-    cache = (
-        m_ε=m_ε,
-        Λ_ε=Λ_ε,
-        U=U,
-        α=α,
-        z=z,
-        b_y=b_y,
-        B_εf=B_εf,
-        x=x,
-        Σy=Σy,
-    )
+    cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=α, z=z, b_y=b_y, B_εf=B_εf, x=x, Σy=Σy)
     return ApproxPosteriorGP(VFE(), fx.f, cache)
 end
 
@@ -105,25 +83,22 @@ end
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
 set of pseudo points. 
 """
-function update_approx_posterior(
-    f_post_approx::ApproxPosteriorGP,
-    u::FiniteGP,
-)
+function update_approx_posterior(f_post_approx::ApproxPosteriorGP, u::FiniteGP)
     U11 = f_post_approx.data.U
     C12 = cov(u.f, f_post_approx.data.z, u.x)
-    C22 = Symmetric(cov(u))
-    U = update_chol(Cholesky(U11,'U', 0), C12, C22).U
-    U22 = U[end-length(u)+1:end, end-length(u)+1:end]
-    U12 = U[1:length(f_post_approx.data.z), end-length(u)+1:end]
+    C22 = _symmetric(cov(u))
+    U = update_chol(Cholesky(U11, 'U', 0), C12, C22).U
+    U22 = U[(end - length(u) + 1):end, (end - length(u) + 1):end]
+    U12 = U[1:length(f_post_approx.data.z), (end - length(u) + 1):end]
 
     B_εf₁ = f_post_approx.data.B_εf
 
     Cu1f = cov(f_post_approx.prior, f_post_approx.data.z, f_post_approx.data.x)
     Cu2f = cov(f_post_approx.prior, u.x, f_post_approx.data.x)
 
-    U_y = cholesky(Symmetric(f_post_approx.data.Σy)).U
+    U_y = _cholesky(_symmetric(f_post_approx.data.Σy)).U
 
-    B_εf₂ = U22' \ (Cu2f * inv(U_y)   - U12' * B_εf₁)
+    B_εf₂ = U22' \ (Cu2f * inv(U_y) - U12' * B_εf₁)
     B_εf = vcat(B_εf₁, B_εf₂)
 
     Λ_ε = update_chol(f_post_approx.data.Λ_ε, B_εf₁ * B_εf₂', B_εf₂ * B_εf₂' + I)
@@ -143,12 +118,10 @@ function update_approx_posterior(
         b_y=f_post_approx.data.b_y,
         B_εf=B_εf,
         x=f_post_approx.data.x,
-        Σy=f_post_approx.data.Σy,   
+        Σy=f_post_approx.data.Σy,
     )
     return ApproxPosteriorGP(VFE(), f_post_approx.prior, cache)
 end
-
-LinearAlgebra.Symmetric(X::Diagonal) = X
 
 # AbstractGP interface implementation.
 
@@ -161,9 +134,9 @@ function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     return cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function cov_diag(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function Statistics.var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, f.data.z, x)
-    return cov_diag(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
+    return var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
 end
 
 function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector, y::AbstractVector)
@@ -172,16 +145,16 @@ function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector, y::Abstrac
     return cov(f.prior, x, y) - A_zx'A_zy + Xt_invA_Y(A_zx, f.data.Λ_ε, A_zy)
 end
 
-function mean_and_cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function StatsBase.mean_and_cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, f.data.z, x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     C_post = cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
     return m_post, C_post
 end
 
-function mean_and_cov_diag(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function StatsBase.mean_and_var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, f.data.z, x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
-    c_post = cov_diag(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
+    c_post = var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
     return m_post, c_post
 end

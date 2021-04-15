@@ -7,12 +7,11 @@
  - `Σy` is the observation noise
     
 """
-struct LatentGP{Tf<:AbstractGP, Tlik, TΣy}
+struct LatentGP{Tf<:AbstractGP,Tlik,TΣy}
     f::Tf
     lik::Tlik
     Σy::TΣy
 end
-
 
 """
     LatentFiniteGP(fx<:FiniteGP, lik)
@@ -22,7 +21,7 @@ end
  conditional likelihood distributions.
     
 """
-struct LatentFiniteGP{Tfx<:FiniteGP, Tlik}
+struct LatentFiniteGP{Tfx<:FiniteGP,Tlik}
     fx::Tfx
     lik::Tlik
 end

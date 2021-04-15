@@ -15,25 +15,21 @@ ispath(OUTPUT) && rm(OUTPUT; recursive=true)
 # add links to binder and nbviewer below the first heading of level 1
 function preprocess(content)
     sub = s"""
-        \0
-        #
-        # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/examples/@__NAME__.ipynb)
-        # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/examples/@__NAME__.ipynb)
-    """
-    return replace(content, r"^# # [^\n]*"m => sub; count=1)
+\0
+#
+# [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/examples/@__NAME__.ipynb)
+"""
+    return replace(content, r"^# # .*$"m => sub; count=1)
 end
 
 for file in readdir(EXAMPLES; join=true)
     endswith(file, ".jl") || continue
     Literate.markdown(file, OUTPUT; documenter=true, preprocess=preprocess)
-    Literate.notebook(file, OUTPUT)
+    Literate.notebook(file, OUTPUT; documenter=true)
 end
 
 DocMeta.setdocmeta!(
-    AbstractGPs,
-    :DocTestSetup,
-    :(using AbstractGPs, LinearAlgebra, Random);
-    recursive=true,
+    AbstractGPs, :DocTestSetup, :(using AbstractGPs, LinearAlgebra, Random); recursive=true
 )
 
 makedocs(;
@@ -41,16 +37,15 @@ makedocs(;
     format=Documenter.HTML(),
     repo="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/{commit}{path}#L{line}",
     sitename="AbstractGPs.jl",
-    pages = [
+    pages=[
         "Home" => "index.md",
-        "API" => "api.md",
-        "Examples" => joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
+        "The Main APIs" => "api.md",
+        "Concrete Features" => "concrete_features.md",
+        "Examples" =>
+            joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
     ],
-    strict=true,
-    checkdocs=:exports, 
+    # strict=true,
+    # checkdocs=:exports,
 )
 
-deploydocs(;
-    repo = "github.com/JuliaGaussianProcesses/AbstractGPs.jl.git",
-    push_preview = true,
-)
+deploydocs(; repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git", push_preview=true)

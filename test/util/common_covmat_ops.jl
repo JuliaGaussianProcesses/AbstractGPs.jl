@@ -1,4 +1,23 @@
 @testset "common_covmat_ops" begin
+    # Supporting utility functions.
+    @testset "_cholesky" begin
+        D = Diagonal(Fill(5.0, 10))
+        @test AbstractGPs._cholesky(D).U ≈ AbstractGPs._cholesky(collect(D)).U
+    end
+
+    @testset "_symmetric" begin
+        @testset "Matrix" begin
+            X = randn(5, 5)
+            @test AbstractGPs._symmetric(X) isa Symmetric
+            @test collect(AbstractGPs._symmetric(X)) == collect(Symmetric(X))
+        end
+        @testset "Diagonal" begin
+            X = Diagonal(randn(5))
+            @test AbstractGPs._symmetric(X) isa Diagonal
+            @test collect(AbstractGPs._symmetric(X)) == collect(Symmetric(X))
+        end
+    end
+
     @testset "update_chol" begin
         X = rand(5)
         y = rand(5)
@@ -13,10 +32,9 @@
         C12 = kernelmatrix(k, X[1:3], X[4:5])
         chol = AbstractGPs.update_chol(chol1, C12, C22)
 
-        @test U ≈ chol.U atol=1e-5
-        @test chol1.U ≈ chol.U[1:3, 1:3] atol=1e-5
+        @test U ≈ chol.U atol = 1e-5
+        @test chol1.U ≈ chol.U[1:3, 1:3] atol = 1e-5
     end
-
 
     # Set up some matrices and factorisations.
     rng, N, N′, P, Q = MersenneTwister(123456), 5, 3, 6, 2
