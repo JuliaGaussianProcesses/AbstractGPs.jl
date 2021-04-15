@@ -483,7 +483,7 @@ opt = Optim.optimize(loss_function(x_train, y_train), θ0, LBFGS())
 
 opt.minimizer
 
-# The optimized value of the inverse lengthscale is
+# The optimized value of the variance is
 
 softplus(opt.minimizer[1])
 
