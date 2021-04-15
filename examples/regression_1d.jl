@@ -507,9 +507,13 @@ logpdf(opt_p_fx(x_test), y_test)
 # We visualize the posterior with optimized parameters.
 
 scatter(
-    x_train, y_train;
-    xlim=(0,1), xlabel="x", ylabel="y",
-    title="posterior (optimized parameters)", label="Train Data",
+    x_train,
+    y_train;
+    xlim=(0,1),
+    xlabel="x",
+    ylabel="y",
+    title="posterior (optimized parameters)",
+    label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
 plot!(0:0.001:1, opt_p_fx; label=false)
