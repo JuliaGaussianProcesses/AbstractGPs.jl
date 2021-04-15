@@ -228,12 +228,11 @@ plt
 
 # #### DynamicHMC
 #
-# We repeat the inference with DynamicHMC.
+# We repeat the inference with DynamicHMC. DynamicHMC requires us to
+# implement the LogDensityProblems interface for `loglik_train`.
 
 using DynamicHMC
 using LogDensityProblems
-
-# We have to implement the LogDensityProblems interface for `loglik_train`.
 
 ## Log joint density
 function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
