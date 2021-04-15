@@ -459,7 +459,7 @@ logpdf(p_fx(x_test), y_test)
 # kernel parameters are positive with the softplus function ```math
 # f(x) = \log (1 + \exp x).```
 
-function objective_function(x, y)
+function loss_function(x, y)
     function negativelogmarginallikelihood(params)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
@@ -477,7 +477,7 @@ end
 # and obtain the following optimal parameters:
 
 θ0 = randn(2)
-opt = Optim.optimize(objective_function(x_train, y_train), θ0, LBFGS())
+opt = Optim.optimize(loss_function(x_train, y_train), θ0, LBFGS())
 
 #-
 
