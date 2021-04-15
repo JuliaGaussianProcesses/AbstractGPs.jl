@@ -64,15 +64,15 @@ for (m, f) in [
 ]
     @eval function $m.$f(::AbstractGP)
         return error(
-            "Ups! Looks like you tried to call `" *
+            "`" *
             string($f) *
-            "` on an AbstractGP object.
-You probably wanted to either call `" *
+            "(f::AbstractGP)` is not defined (and it should not be!).\n" *
+            "Please provide an `AbstractVector` of locations `x` at which you wish to compute your " *
             string($f) *
-            "` on a `FiniteGP` object (`f(x)`) or evaluate it with some samples, for example `" *
+            " vector(s), and call `" *
             string($f) *
-            "(f, x)`.
-For more details please have a look at the AbstractGPs docs.",
+            "(f(x))`\n" *
+            "For more details please have a look at the AbstractGPs docs.",
         )
     end
 end
