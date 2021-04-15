@@ -54,3 +54,9 @@ Compute both `mean(f(x))` and the diagonal elements of `cov(f(x))`. Sometimes mo
 than separately computation, particularly for posteriors.
 """
 StatsBase.mean_and_var(f::AbstractGP, x::AbstractVector) = (mean(f, x), var(f, x))
+
+for (m, f) in [(:Statistics, :mean), (:Statistics, :var), (:Statistics, :cov), (:StatsBase, :mean_and_cov), (:StatsBase, :mean_and_var)]
+    @eval $m.$f(::AbstractGP) = error("Ups! Looks like you tried to call `" * string($f) * "` on an AbstractGP object.
+You probably wanted to either call `" * string($f) * "` on a `FiniteGP` object (`f(x)`) or evaluate it with some samples, for example `" * string($f) * "(f, x)`.
+For more details please have a look at the AbstractGPs docs.")
+end
