@@ -104,19 +104,18 @@ plot!(0:0.001:1, p_fx; label=false)
 # f(x) = \log (1 + \exp x).
 # ```
 
-struct GPLoglikelihood{X,Y}
-    x::X
-    y::Y
+function gp_loglikelihood(x, y)
+    function loglikelihood(params)
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        f = GP(kernel)
+        fx = f(x, 0.1)
+        return logpdf(fx, y)
+    end
+    return loglikelihood
 end
 
-function (ℓ::GPLoglikelihood)(params)
-    kernel = softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
-    f = GP(kernel)
-    fx = f(ℓ.x, 0.1)
-    return logpdf(fx, ℓ.y)
-end
-
-const loglik_train = GPLoglikelihood(x_train, y_train)
+const loglik_train = gp_loglikelihood(x_train, y_train)
 #md nothing #hide
 
 # We define a Gaussian prior for the joint distribution of the two transformed kernel
@@ -201,20 +200,13 @@ vline!(mean_samples'; linewidth=2)
 # improvement over the log-likelihood of the test data with respect to the posterior
 # Gaussian process with default kernel parameters of value 1.
 
-struct GPPosterior{X,Y}
-    x::X
-    y::Y
-end
-
-function (g::GPPosterior)(p)
+function gp_posterior(x, y, p)
     kernel = softplus(p[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(p[2])))
     f = GP(kernel)
-    return posterior(f(g.x, 0.1), g.y)
+    return posterior(f(x, 0.1), y)
 end
 
-const gp_posterior = GPPosterior(x_train, y_train)
-
-mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
@@ -230,28 +222,29 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
 end
 plt
 
 # #### DynamicHMC
 #
-# We repeat the inference with DynamicHMC.
+# We repeat the inference with DynamicHMC. DynamicHMC requires us to
+# implement the LogDensityProblems interface for `loglik_train`.
 
 using DynamicHMC
 using LogDensityProblems
 
-# We have to implement the LogDensityProblems interface for `GPLogLikelihood`.
-
 ## Log joint density
-LogDensityProblems.logdensity(ℓ::GPLoglikelihood, params) = ℓ(params) + logprior(params)
+function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
+    return ℓ(params) + logprior(params)
+end
 
 ## The parameter space is two-dimensional
-LogDensityProblems.dimension(::GPLoglikelihood) = 2
+LogDensityProblems.dimension(::typeof(loglik_train)) = 2
 
-## `GPLoglikelihood` does not allow to evaluate derivatives of
+## `loglik_train` does not allow to evaluate derivatives of
 ## the log-likelihood function
-function LogDensityProblems.capabilities(::Type{<:GPLoglikelihood})
+function LogDensityProblems.capabilities(::Type{<:typeof(loglik_train)})
     return LogDensityProblems.LogDensityOrder{0}()
 end
 
@@ -291,7 +284,7 @@ vline!(mean_samples'; linewidth=2)
 # of the test data with respect to the posterior Gaussian process with default kernel
 # parameters.
 
-mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
@@ -307,7 +300,7 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
 end
 plt
 
@@ -350,7 +343,7 @@ vline!(mean_samples'; layout=2, labels="mean")
 # of the test data with respect to the posterior Gaussian process with default kernel
 # parameters.
 
-mean(logpdf(gp_posterior(p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
@@ -366,7 +359,7 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
 end
 plt
 
@@ -393,16 +386,15 @@ using Optim
 # f(x) = \frac{1}{1 + \exp{(-x)}}.
 # ```
 
-struct NegativeELBO{X,Y}
-    x::X
-    y::Y
-end
-
-function (g::NegativeELBO)(params)
-    kernel = softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
-    f = GP(kernel)
-    fx = f(g.x, 0.1)
-    return -elbo(fx, g.y, f(logistic.(params[3:end])))
+function objective_function(x, y)
+    function negative_elbo(params)
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        f = GP(kernel)
+        fx = f(x, 0.1)
+        return -elbo(fx, y, f(logistic.(params[3:end])))
+    end
+    return negative_elbo
 end
 #md nothing #hide
 
@@ -410,7 +402,7 @@ end
 # negative ELBO with the LBFGS algorithm and obtain the following optimal parameters:
 
 x0 = rand(7)
-opt = optimize(NegativeELBO(x_train, y_train), x0, LBFGS())
+opt = optimize(objective_function(x_train, y_train), x0, LBFGS())
 
 #-
 
