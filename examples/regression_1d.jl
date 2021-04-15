@@ -459,33 +459,25 @@ logpdf(p_fx(x_test), y_test)
 # kernel parameters are positive with the softplus function ```math
 # f(x) = \log (1 + \exp x).```
 
-struct NegativeGPLoglikelihood{X,Y}
-    x::X
-    y::Y
+function objective_function(x, y)
+    function negativelogmarginallikelihood(params)
+        kernel =
+            softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
+        f = GP(kernel)
+        fx = f(x, 0.1)
+        return -logpdf(fx, y)
+    end
+    return negativelogmarginallikelihood
 end
 
-function (ℓ::NegativeGPLoglikelihood)(params)
-    kernel = ScaledKernel(
-        transform(
-            Matern52Kernel(),
-            ScaleTransform(softplus(params[1]))
-        ),
-        softplus(params[2]),
-    )
-    f = GP(kernel)
-    fx = f(ℓ.x, 0.1)
-    return -logpdf(fx, ℓ.y)
-end
-
-const negloglik_train = NegativeGPLoglikelihood(x_train, y_train)
 #md nothing #hide
 
 # We randomly initialize the kernel parameters, and minimize the
-# negative negative log marginal likelihood with the LBFGS algorithm
+# negative log marginal likelihood with the LBFGS algorithm
 # and obtain the following optimal parameters:
 
 θ0 = randn(2)
-opt = Optim.optimize(negloglik_train, θ0, LBFGS())
+opt = Optim.optimize(objective_function(x_train, y_train), θ0, LBFGS())
 
 #-
 
@@ -503,13 +495,9 @@ softplus(opt.minimizer[2])
 # posterior. We can observe that there is a significant improvement over the
 # log-likelihood with the default kernel parameters of value 1.
 
-opt_kernel = ScaledKernel(
-    transform(
-        Matern52Kernel(),
-        ScaleTransform(softplus(opt.minimizer[1]))
-    ),
-    softplus(opt.minimizer[2]),
-)
+opt_kernel =
+    softplus(opt.minimizer[1]) *
+    (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
@@ -524,4 +512,4 @@ scatter(
     title="posterior (optimized parameters)", label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(opt_p_fx, 0:0.001:1; label=false)
+plot!(0:0.001:1, opt_p_fx; label=false)
