@@ -6,7 +6,7 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
 Distributions = "0.24"
-SampleChainsDynamicHMC = "0.1"
+SampleChainsDynamicHMC = "0.1, 0.2"
 Soss = "0.18.2"
 Turing = "0.14, 0.15"
 julia = "1.5"
