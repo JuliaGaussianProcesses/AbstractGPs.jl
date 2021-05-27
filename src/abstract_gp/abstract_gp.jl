@@ -54,3 +54,26 @@ Compute both `mean(f(x))` and the diagonal elements of `cov(f(x))`. Sometimes mo
 than separately computation, particularly for posteriors.
 """
 StatsBase.mean_and_var(f::AbstractGP, x::AbstractVector) = (mean(f, x), var(f, x))
+
+for (m, f) in [
+    (:Statistics, :mean),
+    (:Statistics, :var),
+    (:Statistics, :cov),
+    (:StatsBase, :mean_and_cov),
+    (:StatsBase, :mean_and_var),
+]
+    @eval function $m.$f(::AbstractGP)
+        return error(
+            "`",
+            $f,
+            "(f::AbstractGP)` is not defined (on purpose!).\n",
+            "Please provide an `AbstractVector` of locations `x` at which you wish to compute your ",
+            $f,
+            $((f === :mean_and_cov || f === :mean_and_var) ? " vectors" : " vector"),
+            ", and call `",
+            $f,
+            "(f(x))`\n",
+            "For more details please have a look at the AbstractGPs docs.",
+        )
+    end
+end

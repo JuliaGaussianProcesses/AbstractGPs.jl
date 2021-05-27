@@ -119,7 +119,6 @@ Existing implementations of this interface include
 1. [`CompositeGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/composite/composite_gp.jl#L7)
 1. [`GaussianProcessProbabilisticProgramme`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gaussian_process_probabilistic_programme.jl#L8)
 
-
 #### Required Methods
 
 ```@docs
@@ -158,6 +157,7 @@ _Do_ implement the [Primary Public API](@ref).
 Do _not_ implement the [Secondary Public API](@ref).
 
 [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) is an example of a package that does this -- see the [`LTISDE`](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl/blob/24343744cf60a50e09b301dee6f14b03cba7ccba/src/gp/lti_sde.jl#L7) implementation for an example.
+The same is true of the [`BayesianLinearRegressor`](https://github.com/JuliaGaussianProcesses/BayesianLinearRegressors.jl/blob/ea20b1bb0603d27c67b3751ad2cf26e271b7acaa/src/bayesian_linear_regression.jl#L11) type.
 
 
 
