@@ -1,4 +1,4 @@
-@testset "turing compat" begin
+@testset "Turing" begin
     @testset "GP regression" begin
         k = SqExponentialKernel()
         y = randn(3)
