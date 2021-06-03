@@ -1,4 +1,4 @@
-@testset "soss compat" begin
+@testset "Soss" begin
     @testset "GP regression" begin
         k = SqExponentialKernel()
         y = randn(3)

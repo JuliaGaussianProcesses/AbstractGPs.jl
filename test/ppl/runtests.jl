@@ -6,7 +6,7 @@ using Soss: Soss, For
 using Test
 using Turing: Turing
 
-@testset "compat" begin
+@testset "PPLs" begin
     include("turing.jl")
     println(" ")
     @info "Ran Turing tests"
