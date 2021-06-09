@@ -456,8 +456,8 @@ logpdf(p_fx(x_test), y_test)
 # We define a function which returns the negative log marginal
 # likelihood for different variance and inverse lengthscale parameters
 # of the Matern kernel and different pseudo-points. We ensure that the
-# kernel parameters are positive with the softplus function ```math
-# f(x) = \log (1 + \exp x).```
+# kernel parameters are positive with the softplus function
+# ``f(x) = \log (1 + \exp x)``.
 
 function loss_function(x, y)
     function negativelogmarginallikelihood(params)
