@@ -446,7 +446,7 @@ vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
 # ## Exact Gaussian Process Inference
 #
 # Here we use Type-II MLE to train the hyperparameters of the Gaussian process.
-# This mean that our loss function is the negative log marginal likelihood.
+# This means that our loss function is the negative log marginal likelihood.
 
 # We re-calculate the log-likelihood of the test dataset with the
 # default kernel parameters of value 1 for the sake of comparison.
