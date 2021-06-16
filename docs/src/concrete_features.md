@@ -113,7 +113,7 @@ plt1 = plot(x_test, f; ribbon_scale=3, label="", title="GP Prior") # Plots the p
 sampleplot!(plt1, x_test, f; samples=10, label="") # Plots 10 samples from the prior 
 # Alternatively you can call sampleplot(f(x_test);...)
 ## Plotting posterior prediction
-post_f_x = posterior(f(X), y)
+post_f_x = posterior(f(x), y) # Create a posterior from the data (x, y)
 plt2 = plot(x_test, post_f_x; label="", title="GP Posterior") # Plot the predictive probability from the posterior on x_test
 sampleplot!(plt2, x_test, post_f_x; label="")
 plot(plt1, plt2)
