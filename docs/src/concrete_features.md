@@ -96,3 +96,32 @@ u_p_fx = update_approx_posterior(p_fx1, f(x[8:10], 0.1), y[8:10])
 p_fx1 = approx_posterior(VFE(), f(X, 0.1), y, f(Z1))
 u_p_fx1 = update_approx_posterior(p_fx1, f(Z2))
 ```
+
+#### Plotting
+##### Plots.jl
+You can directly plot your GP prediction via [Plots.jl](https://github.com/JuliaPlots/Plots.jl).
+We provide two functions `plot` and `sampleplot` taking as arguments `X, AbstractGP` or `FiniteGP`
+```@example
+using Plots, AbstractGPs
+x_test = range(0, 5, length=100) # The grid we make predictions on
+x = rand(10) * 5 # Some training data
+y = sin.(x) # Some observations on x
+f = GP(SqExponentialKernel())
+## Plotting the prior
+plt1 = plot(x_test, f; ribbon_scale=3, label="", title="GP Prior") # Plots the prior mean with a ribbon of 3 std. dev. on x_test
+# Alternatively you could call plot(f(x_test);...)
+sampleplot!(plt1, x_test, f; samples=10, label="") # Plots 10 samples from the prior 
+# Alternatively you can call sampleplot(f(x_test);...)
+## Plotting posterior prediction
+post_f_x = posterior(f(X), y)
+plt2 = plot(x_test, post_f_x; label="", title="GP Posterior") # Plot the predictive probability from the posterior on x_test
+sampleplot!(plt2, x_test, post_f_x; label="")
+plot(plt1, plt2)
+savefig("plotting_predictions.svg") # hide
+nothing
+```
+[Plotting using Plots]!(plotting_predictions.svg)
+
+##### Makie.jl
+For using `Makie.jl` you can use the additional package [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl).
+[Plotting using AbstractGPsMakie]!(https://juliagaussianprocesses.github.io/AbstractGPsMakie.jl/dev/posterior_samples.svg)
