@@ -120,8 +120,8 @@ plot(plt1, plt2)
 savefig("plotting_predictions.svg") # hide
 nothing
 ```
-[Plotting using Plots]!(plotting_predictions.svg)
+![Plotting using Plots](plotting_predictions.svg)
 
 ##### Makie.jl
 For using `Makie.jl` you can use the additional package [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl).
-[Plotting using AbstractGPsMakie]!(https://juliagaussianprocesses.github.io/AbstractGPsMakie.jl/dev/posterior_samples.svg)
+![Plotting using AbstractGPsMakie](https://juliagaussianprocesses.github.io/AbstractGPsMakie.jl/dev/posterior_samples.svg)
