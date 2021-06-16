@@ -118,7 +118,7 @@ plt2 = plot(x_test, post_f_x; label="", title="GP Posterior") # Plot the predict
 sampleplot!(plt2, x_test, post_f_x; label="")
 plot(plt1, plt2)
 savefig("plotting_predictions.svg") # hide
-nothing
+nothing # hide
 ```
 ![Plotting using Plots](plotting_predictions.svg)
 
