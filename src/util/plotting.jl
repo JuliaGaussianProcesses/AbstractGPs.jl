@@ -35,7 +35,7 @@ The given example plots the mean with 3 std. dev. from the projection of the GP 
 
 Plot mean and std. dev from the finite projection `gp(x, 1e-9)` versus `x`.
 """
-plot(f::FiniteGP)
+RecipesBase.plot(f::FiniteGP)
 
 """
     sampleplot([x::AbstractVector, ]f::FiniteGP; samples=1)
