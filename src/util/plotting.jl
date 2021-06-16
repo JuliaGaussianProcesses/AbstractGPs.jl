@@ -16,6 +16,28 @@
 end
 
 """
+    plot([x::AbstractVector, ]f::FiniteGP; ribbon_scale=1)
+
+Plot the predictive mean as well as a ribbon with a width equal to `ribbon_scale` times the standard deviation versus x.
+
+Make sure to run `using Plots` before using this function
+
+# Example
+```julia
+using Plots
+gp = GP(SqExponentialKernel())
+plot(gp(rand(5)); ribbon_scale=3)
+```
+The given example plots the mean with 3 std. dev. from the projection of the GP `gp`.
+
+--- 
+    plot(x::AbstractVector, gp::AbstractGP; ribbon_scale=1)
+
+Plot mean and std. dev from the finite projection `gp(x, 1e-9)` versus `x`.
+"""
+plot(f::FiniteGP)
+
+"""
     sampleplot([x::AbstractVector, ]f::FiniteGP; samples=1)
 
 Plot samples from `f` versus `x` (default value: `f.x`).
