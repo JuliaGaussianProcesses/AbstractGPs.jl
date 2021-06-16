@@ -87,8 +87,8 @@ scatter(
     title="posterior (default parameters)",
     label="Train Data",
 )
-scatter!(x_test, y_test; label="Test Data")
 plot!(0:0.001:1, p_fx; label=false, ribbon_scale=2)
+scatter!(x_test, y_test; label="Test Data")
 
 # ## Markov Chain Monte Carlo
 #
@@ -208,7 +208,7 @@ end
 
 mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
-# We sample 10 functions from the posterior GP for the final 100 samples of kernel
+# We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
 
 plt = scatter(
@@ -220,10 +220,10 @@ plt = scatter(
     title="posterior (AdvancedHMC)",
     label="Train Data",
 )
-scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); samples=15)
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); samples=5)
 end
+scatter!(plt, x_test, y_test; label="Test Data")
 plt
 
 # #### DynamicHMC
