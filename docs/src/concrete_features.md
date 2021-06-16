@@ -103,5 +103,11 @@ You can directly plot your GP prediction via [Plots.jl](https://github.com/Julia
 We provide two functions `plot` and `sampleplot` taking as arguments `X, AbstractGP` or `FiniteGP`
 For example uses see the [One-dimensional regression](@ref) tutorial
 
+```@docs
+plot(::FiniteGP)
+sampleplot
+```
+
+
 ##### Makie.jl
 For using `Makie.jl` you can use the additional package [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl).
