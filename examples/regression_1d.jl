@@ -76,7 +76,7 @@ logpdf(fx, y_train)
 p_fx = posterior(fx, y_train)
 logpdf(p_fx(x_test), y_test)
 
-# We plot the posterior Gaussian process along with the observations.
+# We plot the posterior Gaussian process, i.e. the mean and 2 std. dev. on a grid along with the observations.
 
 scatter(
     x_train,
@@ -88,7 +88,7 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, p_fx; label=false)
+plot!(0:0.001:1, p_fx; label=false, ribbon_scale=2)
 
 # ## Markov Chain Monte Carlo
 #
@@ -208,7 +208,7 @@ end
 
 mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
-# We sample a function from the posterior GP for the final 100 samples of kernel
+# We sample 10 functions from the posterior GP for the final 100 samples of kernel
 # parameters.
 
 plt = scatter(
@@ -222,7 +222,7 @@ plt = scatter(
 )
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); samples=15)
 end
 plt
 
