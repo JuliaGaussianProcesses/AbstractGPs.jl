@@ -104,7 +104,7 @@ We provide two functions `plot` and `sampleplot` taking as arguments `X, Abstrac
 For example uses see the [One-dimensional regression](@ref) tutorial
 
 ```@docs
-Plots.plot(::FiniteGP)
+plot
 sampleplot
 ```
 
