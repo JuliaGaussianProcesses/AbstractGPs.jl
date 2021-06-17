@@ -12,7 +12,7 @@ using Plots
 default(; legend=:outertopright, size=(700, 400))
 
 using Random
-Random.seed!(1234)
+Random.seed!(42)
 #md nothing #hide
 
 # Load toy regression
