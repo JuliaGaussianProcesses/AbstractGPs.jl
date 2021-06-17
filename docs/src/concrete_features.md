@@ -1,3 +1,7 @@
+```@meta
+modules = ["Abs
+```
+
 ## Features
 
 ### Setup
@@ -104,7 +108,7 @@ We provide two functions `plot` and `sampleplot` taking as arguments `X, Abstrac
 For example uses see the [One-dimensional regression](@ref) tutorial
 
 ```@docs
-plot(::FiniteGP)
+RecipesBase.plot(::FiniteGP)
 sampleplot
 ```
 
