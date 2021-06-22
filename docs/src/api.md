@@ -64,15 +64,16 @@ If you are building something on top of AbstractGPs, try to implement it in term
 
 ```@docs
 rand
+rand!
 marginals
 logpdf(::AbstractGPs.FiniteGP, ::AbstractVector{<:Real})
 posterior(::AbstractGPs.FiniteGP, ::AbstractVector{<:Real})
 mean(::AbstractGPs.FiniteGP)
 var(::AbstractGPs.FiniteGP)
-
 ```
 
 #### Optional methods
+
 Default implementations are provided for these, but you may wish to specialise for performance.
 ```@docs
 mean_and_var(::AbstractGPs.FiniteGP)
