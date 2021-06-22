@@ -14,6 +14,7 @@ using RecipesBase
 using KernelFunctions: ColVecs, RowVecs
 
 export GP,
+    rand!,
     mean,
     cov,
     var,
