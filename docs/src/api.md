@@ -64,7 +64,7 @@ If you are building something on top of AbstractGPs, try to implement it in term
 
 ```@docs
 rand
-rand!
+Random.rand!
 marginals
 logpdf(::AbstractGPs.FiniteGP, ::AbstractVector{<:Real})
 posterior(::AbstractGPs.FiniteGP, ::AbstractVector{<:Real})
