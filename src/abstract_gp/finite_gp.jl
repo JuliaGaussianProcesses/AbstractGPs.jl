@@ -233,6 +233,43 @@ Random.rand(f::FiniteGP, N::Int) = rand(Random.GLOBAL_RNG, f, N)
 Random.rand(rng::AbstractRNG, f::FiniteGP) = vec(rand(rng, f, 1))
 Random.rand(f::FiniteGP) = vec(rand(f, 1))
 
+# in-place sampling
+"""
+    rand!(rng::AbstractRNG, f::FiniteGP, y::AbstractVecOrMat{<:Real})
+
+Obtain sample(s) from the marginals `f` using `rng` and write them to `y`.
+
+If `y` is a matrix, then each column corresponds to an independent sample.
+
+```jldoctest
+julia> f = GP(Matern32Kernel());
+
+julia> x = randn(11);
+
+julia> y = similar(x);
+
+julia> rand!(f(x), y);
+
+julia> rand!(MersenneTwister(123456), f(x), y);
+
+julia> ys = similar(x, length(x), 3);
+
+julia> rand!(f(x), ys);
+
+julia> rand!(MersenneTwister(123456), f(x), ys);
+```
+"""
+Random.rand!(::AbstractRNG, ::FiniteGP, ::AbstractVecOrMat{<:Real})
+
+# Distributions defines methods for `rand!` (and `rand`) that fall back to `_rand!`
+function Distributions._rand!(rng::AbstractRNG, f::FiniteGP, x::AbstractVecOrMat{<:Real})
+    m, C_mat = mean_and_cov(f)
+    C = cholesky(_symmetric(C_mat))
+    lmul!(C.U', randn!(rng, x))
+    x .+= m
+    return x
+end
+
 """
     logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
