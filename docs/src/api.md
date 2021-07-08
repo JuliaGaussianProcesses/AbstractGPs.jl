@@ -79,8 +79,6 @@ Default implementations are provided for these, but you may wish to specialise f
 mean_and_var(::AbstractGPs.FiniteGP)
 ```
 
-
-
 ### Secondary Public API
 
 While the covariance matrix of any multivariate Gaussian is defined, it is not always a good idea to actually compute it.
@@ -171,3 +169,24 @@ We don't have an example of this yet in Julia, however [GPyTorch](https://gpytor
 In this situation, implement _both_ the [Internal AbstractGPs API](@ref) _and_ the [FiniteGP APIs](@ref).
 
 In this situation you will benefit less from code reuse inside AbstractGPs, but will continue to benefit from the ability of others use your code, and to take advantage of any existing functionality which requires types which adhere to the AbstractGPs API.
+
+
+
+
+## Testing Utilities
+
+AbstractGPs provides some a number of consistency tests in the `AbstractGPs.TestUtils`
+module.
+These tests will ensure that, for example, the size and type of everything produced by an
+implementation of the API is of the correct, and consistent with the other methods.
+It will not ensure correctness in any absolute sense though (i.e. that `logpdf` indeed
+computes what you wanted it to compute).
+Consequently, these tests should be seen as a set of necessary conditions for your code to
+be correct.
+They are not, however, sufficient.
+
+```@docs
+AbstractGPs.TestUtils.test_finitegp_primary_public_interface
+AbstractGPs.TestUtils.test_finitegp_primary_and_secondary_public_interface
+AbstractGPs.TestUtils.test_internal_abstractgps_interface
+```
