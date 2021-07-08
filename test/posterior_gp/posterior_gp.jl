@@ -24,7 +24,7 @@
     # Check interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))
     b = randn(rng, N_b)
-    abstractgp_interface_tests(f_post, a, b)
+    TestUtils.test_internal_abstractgps_interface(rng, f_post, a, b)
 
     #Check sequential conditioning posterior
     X = rand(5)
