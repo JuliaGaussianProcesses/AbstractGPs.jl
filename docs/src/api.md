@@ -184,6 +184,11 @@ Consequently, these tests should be seen as a set of necessary conditions for yo
 be correct.
 They are not, however, sufficient.
 
+You should only need to run one of the following test suites.
+1. If you implement the [Primary Public API](@ref), run `test_finitegp_primary_public_interface`.
+1. If you implement both the [Primary Public API](@ref) and the [Secondary Public API](@ref), then run `test_finitegp_primary_and_secondary_public_interface`.
+1. If you implement the [Internal AbstractGPs API](@ref), run `test_internal_abstractgps_interface`.
+
 ```@docs
 AbstractGPs.TestUtils.test_finitegp_primary_public_interface
 AbstractGPs.TestUtils.test_finitegp_primary_and_secondary_public_interface
