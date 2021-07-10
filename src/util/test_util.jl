@@ -69,7 +69,7 @@ function test_finitegp_primary_public_interface(
 end
 
 """
-    test_finitegp_primary_public_interface(
+    test_finitegp_primary_and_secondary_public_interface(
         rng::AbstractRNG, fx::FiniteGP; atol::Real=1e-12
     )
 
