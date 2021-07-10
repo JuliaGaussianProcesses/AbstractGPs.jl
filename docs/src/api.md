@@ -175,11 +175,10 @@ In this situation you will benefit less from code reuse inside AbstractGPs, but 
 
 ## Testing Utilities
 
-AbstractGPs provides some a number of consistency tests in the `AbstractGPs.TestUtils`
-module.
+AbstractGPs provides several consistency tests in the `AbstractGPs.TestUtils` module.
 These tests will ensure that, for example, the size and type of everything produced by an
-implementation of the API is of the correct, and consistent with the other methods.
-It will not ensure correctness in any absolute sense though (i.e. that `logpdf` indeed
+implementation of the API is correct, and consistent with the other methods.
+It will not ensure correctness in any absolute sense though (e.g. that `logpdf` indeed
 computes what you wanted it to compute).
 Consequently, these tests should be seen as a set of necessary conditions for your code to
 be correct.
