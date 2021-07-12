@@ -24,7 +24,7 @@ but does not check that they come from the intended distribution.
 function test_finitegp_primary_public_interface(
     rng::AbstractRNG, fx::FiniteGP; atol::Real=1e-12
 )
-    # Check that `rand` works at all, and produces something of the correct shape.
+    # Check that `rand` works, and produces something of the correct shape.
     # Doesn't verify statistical properties.
     y = rand(rng, fx)
     @test y isa AbstractVector{<:Real}
@@ -77,7 +77,7 @@ end
 
 Basic consistency tests for both the Primary and Secondary Public FiniteGP APIs.
 Runs `test_finitegp_primary_public_interface` as part of these tests.
-You should run these tests of you implement both the primary and secondary public APIs --
+You should run these tests if you implement both the primary and secondary public APIs --
 see API section of the docs for more information about these APIs.
 
 These are consistency checks, not correctness tests in the absolute sense.
