@@ -189,6 +189,8 @@ You should only need to run one of the following test suites.
 1. If you implement both the [Primary Public API](@ref) and the [Secondary Public API](@ref), then run `test_finitegp_primary_and_secondary_public_interface`.
 1. If you implement the [Internal AbstractGPs API](@ref), run `test_internal_abstractgps_interface`.
 
+Also see [Which API should I implement?](@ref) for more information about the most appropriate API to implement.
+
 ```@docs
 AbstractGPs.TestUtils.test_finitegp_primary_public_interface
 AbstractGPs.TestUtils.test_finitegp_primary_and_secondary_public_interface
