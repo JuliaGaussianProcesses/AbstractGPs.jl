@@ -185,7 +185,7 @@ function test_internal_abstractgps_interface(
     fx = f(x, σ²)
     fz = f(z, σ²)
 
-    # Generate a sample, compute logpdf, compare against VFE and DTC.
+    # Generate a sample, compute logpdf, compare against the VFE and DTC approximations.
     y = rand(fx)
     @test length(y) == length(x)
     @test logpdf(fx, y) isa Real
