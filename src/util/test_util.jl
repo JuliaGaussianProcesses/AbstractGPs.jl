@@ -94,8 +94,11 @@ function test_finitegp_primary_and_secondary_public_interface(
     @test diag(cov(fx)) ≈ var(fx)
 
     # Check that `mean_and_cov` runs and is consistent with `mean` and `cov`.
-    @test mean_and_cov(fx)[1] ≈ mean(fx)
-    @test mean_and_cov(fx)[2] ≈ cov(fx)
+    let
+        m, C = mean_and_cov(fx)
+        @test m ≈ mean(fx)
+        @test C ≈ cov(fx)
+    end
 
     # Verify that `cov(fx)` is positive-definite.
     @test eigmin(cov(fx)) > -atol
