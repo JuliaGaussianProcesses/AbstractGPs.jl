@@ -190,8 +190,11 @@ function test_internal_abstractgps_interface(
     @test mean(fx) ≈ mean(f, x)
     @test cov(fx) ≈ cov(f, x) + fx.Σy
     @test cov(fx, fz) ≈ cov(f, x, z)
-    @test first(mean_and_cov(fx)) ≈ mean(f, x)
-    @test last(mean_and_cov(fx)) ≈ cov(f, x)
+    let
+        m, C = mean_and_cov(f, x)
+        @test m ≈ mean(f, x)
+        @test C ≈ cov(f, x)
+    end
     @test mean.(marginals(fx)) ≈ mean(f, x)
     @test var.(marginals(fx)) ≈ var(f, x) .+ diag(fx.Σy)
 
