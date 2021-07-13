@@ -96,3 +96,18 @@ u_p_fx = update_approx_posterior(p_fx1, f(x[8:10], 0.1), y[8:10])
 p_fx1 = approx_posterior(VFE(), f(X, 0.1), y, f(Z1))
 u_p_fx1 = update_approx_posterior(p_fx1, f(Z2))
 ```
+
+#### Plotting
+##### Plots.jl
+You can directly plot your GP prediction via [Plots.jl](https://github.com/JuliaPlots/Plots.jl).
+We provide two functions `plot` and `sampleplot` taking as arguments `X, AbstractGP` or `FiniteGP`
+For example uses see the [One-dimensional regression](@ref) tutorial
+
+```@docs
+plot
+sampleplot
+```
+
+
+##### Makie.jl
+For using `Makie.jl` you can use the additional package [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl).
