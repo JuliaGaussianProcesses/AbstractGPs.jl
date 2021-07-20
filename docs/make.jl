@@ -57,7 +57,6 @@ DocMeta.setdocmeta!(
 
 makedocs(;
     sitename="AbstractGPs.jl",
-    repo="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/{commit}{path}#L{line}",
     format=Documenter.HTML(),
     modules=[AbstractGPs],
     pages=[
