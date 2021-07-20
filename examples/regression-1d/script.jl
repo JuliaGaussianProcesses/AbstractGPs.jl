@@ -392,7 +392,9 @@ function objective_function(x, y)
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
         fx = f(x, 0.1)
-        return -elbo(fx, y, f(logistic.(params[3:end])))
+        z = logistic.(params[3:end])
+        fz = f(z, 1e-6)  # "observing" the latent process with some (small) amount of jitter improves numerical stability
+        return -elbo(fx, y, fz)
     end
     return negative_elbo
 end
