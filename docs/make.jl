@@ -69,7 +69,7 @@ makedocs(;
                 return joinpath("examples", x)
             end,
     ],
-    strict=true,
+    #strict=true,
     checkdocs=:exports,
     doctestfilters=[
         r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
