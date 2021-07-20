@@ -44,7 +44,8 @@ From a Julia REPL started in your example script's directory, you can run
 ```julia
 julia> ] activate .
 julia> ] add Literate
-julia> ] add AbstractGPs
+julia> # the following line adds an AbstractGPs dependency that is based on the local directories, not a hash:
+julia> ] dev ../..
 julia> # add any other example-specific dependencies
 ```
 to generate the project files.
