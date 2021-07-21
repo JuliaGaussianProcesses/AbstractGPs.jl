@@ -55,6 +55,9 @@ include(joinpath("latent_gp", "latent_gp.jl"))
 # Plotting utilities.
 include(joinpath("util", "plotting.jl"))
 
+# Testing utilities.
+include(joinpath("util", "test_util.jl"))
+
 # Deprecations.
 include("deprecations.jl")
 end # module

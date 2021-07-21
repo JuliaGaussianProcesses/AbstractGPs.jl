@@ -9,6 +9,7 @@ jobs:
   CompatHelper:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: "Install CompatHelper"
         run: |
           import Pkg
@@ -20,7 +21,14 @@ jobs:
       - name: "Run CompatHelper"
         run: |
           import CompatHelper
-          CompatHelper.main(; subdirs=["", "test", "test/ppl", "docs"])
+          subdirs = ["", "test", "docs"]
+          for f in readdir("examples"; join=true)
+              if isdir(f)
+                  push!(subdirs, joinpath("examples", basename(f)))
+              end
+          end
+          @info "CompatHelper directories" subdirs
+          CompatHelper.main(; subdirs=subdirs)
         shell: julia --color=yes {0}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

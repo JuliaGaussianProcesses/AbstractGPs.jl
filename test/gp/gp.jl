@@ -10,7 +10,7 @@
 
         @test mean(f, x) == AbstractGPs._map(m, x)
         @test cov(f, x) == kernelmatrix(k, x)
-        abstractgp_interface_tests(f, x, x′)
+        TestUtils.test_internal_abstractgps_interface(rng, f, x, x′)
     end
 
     # Check that mean-function specialisations work as expected.
