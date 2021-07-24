@@ -17,7 +17,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-ChainRulesCore = "0.10"
+ChainRulesCore = "0.10, 1"
 Distributions = "0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25"
 FillArrays = "0.7, 0.8, 0.9, 0.10, 0.11, 0.12"
 KernelFunctions = "0.9, 0.10"
