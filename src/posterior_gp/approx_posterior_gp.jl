@@ -12,8 +12,25 @@ end
 """
     posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
-Compute the optimal approximate posterior [1] over the process `f`, given observations `y`
-of `f` at `x`, and inducing points `u`, where `u = f(z)` for some inducing inputs `z`.
+Compute the optimal approximate posterior [1] over the process `f = fx.f`, given observations `y`
+of `f` at `x`, and inducing points `v.fz`.
+
+```jldoctest
+julia> f = GP(Matern52Kernel());
+
+julia> x = randn(1000);
+
+julia> z = range(-5.0, 5.0; length=13);
+
+julia> v = VFE(f(z));
+
+julia> y = rand(f(x, 0.1));
+
+julia> post = posterior(v, f(x, 0.1), y);
+
+julia> post(z) isa AbstractGPs.FiniteGP
+true
+```
 
 [1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
 processes". In: Proceedings of the Twelfth International Conference on Artificial
@@ -162,6 +179,87 @@ function StatsBase.mean_and_var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
     return m_post, c_post
 end
 
-elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real}) = elbo(fx, y, v.fz)
-
 inducing_points(f::ApproxPosteriorGP{VFE}) = f.approx.fz.x
+
+"""
+    elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+
+The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `fx`, and `fz`
+are inducing points, where `u = f(z)` for some `z`.
+
+
+```jldoctest
+julia> f = GP(Matern52Kernel());
+
+julia> x = randn(1000);
+
+julia> z = range(-5.0, 5.0; length=13);
+
+julia> v = VFE(f(z));
+
+julia> y = rand(f(x, 0.1));
+
+julia> elbo(v, f(x, 0.1), y) < logpdf(f(x, 0.1), y)
+true
+```
+
+[1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
+processes". In: Proceedings of the Twelfth International Conference on Artificial
+Intelligence and Statistics. 2009.
+"""
+function elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    _dtc, A = _compute_intermediates(fx, y, v.fz)
+    return _dtc - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
+end
+
+"""
+    dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+
+The Deterministic Training Conditional (DTC) [1]. `y` are observations of `fx`, and `fz`
+are inducing points.
+
+
+```jldoctest
+julia> f = GP(Matern52Kernel());
+
+julia> x = randn(1000);
+
+julia> z = range(-5.0, 5.0; length=256);
+
+julia> v = VFE(f(z));
+
+julia> y = rand(f(x, 0.1));
+
+julia> isapprox(dtc(v, f(x, 0.1), y), logpdf(f(x, 0.1), y); atol=1e-6, rtol=1e-6)
+true
+```
+
+[1] - M. Seeger, C. K. I. Williams and N. D. Lawrence. "Fast Forward Selection to Speed Up
+Sparse Gaussian Process Regression". In: Proceedings of the Ninth International Workshop on
+Artificial Intelligence and Statistics. 2003
+"""
+function dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    return first(_compute_intermediates(fx, y, v.fz))
+end
+
+# Factor out computations common to the `elbo` and `dtc`.
+function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
+    consistency_check(fx, y)
+    chol_Σy = _cholesky(fx.Σy)
+
+    A = cholesky(_symmetric(cov(fz))).U' \ (chol_Σy.U' \ cov(fx, fz))'
+    Λ_ε = cholesky(Symmetric(A * A' + I))
+    δ = chol_Σy.U' \ (y - mean(fx))
+
+    tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
+    _dtc = -(length(y) * typeof(tmp)(log(2π)) + tmp) / 2
+    return _dtc, A
+end
+
+function consistency_check(fx, y)
+    @assert length(fx) == size(y, 1)
+end
+
+function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
+    return sum(var(f.f, f.x) ./ diag(Σy))
+end
