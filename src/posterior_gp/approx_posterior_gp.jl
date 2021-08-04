@@ -1,5 +1,5 @@
-struct VFE
-    fz::FiniteGP
+struct VFE{Tfz<:FiniteGP}
+    fz::Tfz
 end
 const DTC = VFE
 
@@ -55,7 +55,7 @@ end
 
 """
     function update_posterior(
-        f_post_approx::ApproxPosteriorGP{VFE},
+        f_post_approx::ApproxPosteriorGP{<:VFE},
         fx::FiniteGP,
         y::AbstractVector{<:Real}
     )
@@ -64,7 +64,7 @@ Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain 
 of pseudo-points.
 """
 function update_posterior(
-    f_post_approx::ApproxPosteriorGP{VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
+    f_post_approx::ApproxPosteriorGP{<:VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
 )
     U = f_post_approx.data.U
     z = inducing_points(f_post_approx)
@@ -95,14 +95,14 @@ end
 
 """
     function update_approx_posterior(
-        f_post_approx::ApproxPosteriorGP,
+        f_post_approx::ApproxPosteriorGP{<:VFE},
         fz::FiniteGP,
     )
 
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
 set of pseudo points. 
 """
-function update_posterior(f_post_approx::ApproxPosteriorGP{VFE}, fz::FiniteGP)
+function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
     z = inducing_points(f_post_approx)
 
     U11 = f_post_approx.data.U
@@ -145,41 +145,41 @@ end
 
 # AbstractGP interface implementation.
 
-function Statistics.mean(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function Statistics.mean(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     return mean(f.prior, x) + cov(f.prior, x, inducing_points(f)) * f.data.α
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function Statistics.cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     return cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function Statistics.var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     return var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector, y::AbstractVector)
+function Statistics.cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector, y::AbstractVector)
     A_zx = f.data.U' \ cov(f.prior, inducing_points(f), x)
     A_zy = f.data.U' \ cov(f.prior, inducing_points(f), y)
     return cov(f.prior, x, y) - A_zx'A_zy + Xt_invA_Y(A_zx, f.data.Λ_ε, A_zy)
 end
 
-function StatsBase.mean_and_cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function StatsBase.mean_and_cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     C_post = cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
     return m_post, C_post
 end
 
-function StatsBase.mean_and_var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
+function StatsBase.mean_and_var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     c_post = var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
     return m_post, c_post
 end
 
-inducing_points(f::ApproxPosteriorGP{VFE}) = f.approx.fz.x
+inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.fz.x
 
 """
     elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
