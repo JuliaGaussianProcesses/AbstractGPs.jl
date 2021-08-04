@@ -23,8 +23,6 @@
     @test mean(f_post, x_test) ≈ mean(f_approx_post, x_test)
     @test cov(f_post, x_test) ≈ cov(f_approx_post, x_test)
 
-    @test elbo(VFE(fx), fx, y) ≈ elbo(fx, y, fx)
-
     # Verify that AbstractGP interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))
     b = randn(rng, N_b)
@@ -83,4 +81,16 @@
         @test u_p_fx1.data.x ≈ p_fx2.data.x atol = 1e-5
         @test u_p_fx1.data.Σy ≈ p_fx2.data.Σy atol = 1e-5
     end
+
+    @testset "elbo / dtc" begin
+        # Ensure that the elbo is close to the logpdf when appropriate.
+        @test elbo(VFE(fx), fx, y) isa Real
+        @test elbo(VFE(fx), fx, y) ≈ logpdf(fx, y)
+        @test elbo(VFE(fx), f(x .+ randn(rng, N_cond)), y) < elbo(VFE(fx), fx, y)
+
+        # Ensure that the dtc is close to the logpdf when appropriate.
+        @test dtc(VFE(fx), fx, y) isa Real
+        @test dtc(VFE(fx), fx, y) ≈ logpdf(fx, y)
+    end
+
 end

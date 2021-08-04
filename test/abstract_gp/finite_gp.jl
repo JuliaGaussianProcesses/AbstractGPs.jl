@@ -128,7 +128,7 @@ end
     #         )
     #     end
     # end
-    @testset "logpdf / loglikelihood / elbo / dtc" begin
+    @testset "logpdf / loglikelihood" begin
         rng = MersenneTwister(123456)
         N = 10
         S = 11
@@ -187,29 +187,6 @@ end
         #     α->sum(logpdf(FiniteGP(α * f, x, 1e-1), Ŷ)), l̄, randn(rng);
         #     atol=1e-8, rtol=1e-8,
         # )
-
-        # Ensure that the elbo is close to the logpdf when appropriate.
-        @test elbo(y, ŷ, fx) isa Real
-        @test elbo(y, ŷ, fx) ≈ logpdf(y, ŷ)
-        @test elbo(y, ŷ, f(x .+ randn(rng, N))) < elbo(y, ŷ, fx)
-
-        # # Check adjoint w.r.t. elbo is correct.
-        # adjoint_test(
-        #     (x, ŷ, σ)->elbo(FiniteGP(f, x, σ^2), ŷ, FiniteGP(f, x, 0)),
-        #     randn(rng), x, ŷ, σ;
-        #     atol=1e-6, rtol=1e-6,
-        # )
-
-        # Ensure that the dtc is close to the logpdf when appropriate.
-        @test dtc(y, ŷ, fx) isa Real
-        @test dtc(y, ŷ, fx) ≈ logpdf(y, ŷ)
-
-        # # Check adjoint w.r.t. dtc is correct.
-        # adjoint_test(
-        #     (x, ŷ, σ)->dtc(FiniteGP(f, x, σ^2), ŷ, FiniteGP(f, x, 0)),
-        #     randn(rng), x, ŷ, σ;
-        #     atol=1e-6, rtol=1e-6,
-        # )
     end
     @testset "Type Stability - $T" for T in [Float64, Float32]
         rng = MersenneTwister(123456)
@@ -223,7 +200,6 @@ end
         y = rand(rng, fx)
         @test y isa Vector{T}
         @test logpdf(fx, y) isa T
-        @test elbo(fx, y, u) isa T
     end
 end
 
