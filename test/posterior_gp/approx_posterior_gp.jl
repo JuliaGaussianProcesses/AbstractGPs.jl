@@ -28,7 +28,7 @@
     # Verify that AbstractGP interface is implemented fully and consistently.
     a = collect(range(-1.0, 1.0; length=N_a))
     b = randn(rng, N_b)
-    abstractgp_interface_tests(f_approx_post, a, b)
+    TestUtils.test_internal_abstractgps_interface(rng, f_approx_post, a, b)
 
     @testset "update_posterior (new observation)" begin
         rng = MersenneTwister(1)

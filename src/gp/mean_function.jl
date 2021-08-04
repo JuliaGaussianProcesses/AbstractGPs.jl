@@ -10,7 +10,7 @@ struct ZeroMean{T<:Real} <: MeanFunction end
 _map(::ZeroMean{T}, x::AbstractVector) where {T} = zeros(T, length(x))
 
 function ChainRulesCore.rrule(::typeof(_map), m::ZeroMean, x::AbstractVector)
-    map_ZeroMean_pullback(Δ) = (NO_FIELDS, NO_FIELDS, Zero())
+    map_ZeroMean_pullback(Δ) = (NoTangent(), NoTangent(), ZeroTangent())
     return _map(m, x), map_ZeroMean_pullback
 end
 

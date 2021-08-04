@@ -1,50 +1,80 @@
+### Process examples
+# Always rerun examples
+const EXAMPLES_OUT = joinpath(@__DIR__, "src", "examples")
+ispath(EXAMPLES_OUT) && rm(EXAMPLES_OUT; recursive=true)
+mkpath(EXAMPLES_OUT)
+
+# Install and precompile all packages
+# Workaround for https://github.com/JuliaLang/Pkg.jl/issues/2219
+examples = filter!(isdir, readdir(joinpath(@__DIR__, "..", "examples"); join=true))
+let script = "using Pkg; Pkg.activate(ARGS[1]); Pkg.instantiate()"
+    for example in examples
+        if !success(`$(Base.julia_cmd()) -e $script $example`)
+            error(
+                "project environment of example ",
+                basename(example),
+                " could not be instantiated",
+            )
+        end
+    end
+end
+# Run examples asynchronously
+processes = let literatejl = joinpath(@__DIR__, "literate.jl")
+    map(examples) do example
+        return run(
+            pipeline(
+                `$(Base.julia_cmd()) $literatejl $(basename(example)) $EXAMPLES_OUT`;
+                stdin=devnull,
+                stdout=devnull,
+                stderr=stderr,
+            );
+            wait=false,
+        )::Base.Process
+    end
+end
+
+# Check that all examples were run successfully
+isempty(processes) || success(processes) || error("some examples were not run successfully")
+
+### Build documentation
 using Documenter
 
-# Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
-if haskey(ENV, "GITHUB_ACTIONS")
-    ENV["JULIA_DEBUG"] = "Documenter"
-end
+using AbstractGPs
+# If any features of AbstractGPs depend on optional packages (e.g. via @require),
+# make sure to load them here in order to generate the full API documentation.
 
-using Literate, AbstractGPs
-
-EXAMPLES = joinpath(@__DIR__, "..", "examples")
-OUTPUT = joinpath(@__DIR__, "src", "examples")
-
-ispath(OUTPUT) && rm(OUTPUT; recursive=true)
-
-# add links to binder and nbviewer below the first heading of level 1
-function preprocess(content)
-    sub = s"""
-\0
-#
-# [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/examples/@__NAME__.ipynb)
-"""
-    return replace(content, r"^# # .*$"m => sub; count=1)
-end
-
-for file in readdir(EXAMPLES; join=true)
-    endswith(file, ".jl") || continue
-    Literate.markdown(file, OUTPUT; documenter=true, preprocess=preprocess)
-    Literate.notebook(file, OUTPUT; documenter=true)
-end
-
+# Doctest setup
 DocMeta.setdocmeta!(
-    AbstractGPs, :DocTestSetup, :(using AbstractGPs, LinearAlgebra, Random); recursive=true
+    AbstractGPs,
+    :DocTestSetup,
+    quote
+        using AbstractGPs
+        using LinearAlgebra
+        using Random
+    end;  # we have to load all packages used (implicitly) within jldoctest blocks in the API docstrings
+    recursive=true,
 )
 
 makedocs(;
-    modules=[AbstractGPs],
-    format=Documenter.HTML(),
-    repo="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/{commit}{path}#L{line}",
     sitename="AbstractGPs.jl",
+    format=Documenter.HTML(),
+    modules=[AbstractGPs],
     pages=[
         "Home" => "index.md",
-        "API" => "api.md",
+        "The Main APIs" => "api.md",
+        "Concrete Features" => "concrete_features.md",
         "Examples" =>
-            joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
+            map(filter!(filename -> endswith(filename, ".md"), readdir(EXAMPLES_OUT))) do x
+                return joinpath("examples", x)
+            end,
     ],
-    strict=true,
+    #strict=true,
     checkdocs=:exports,
+    doctestfilters=[
+        r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
+        r"(Array{[a-zA-Z0-9]+,\s?1}|Vector{[a-zA-Z0-9]+})",
+        r"(Array{[a-zA-Z0-9]+,\s?2}|Matrix{[a-zA-Z0-9]+})",
+    ],
 )
 
 deploydocs(; repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git", push_preview=true)
