@@ -19,7 +19,8 @@ using AbstractGPs:
     diag_Xt_invA_X,
     diag_Xt_invA_Y,
     Xtinv_A_Xinv,
-    tr_At_A
+    tr_At_A,
+    inducing_points
 
 using Documenter
 using ChainRulesCore
