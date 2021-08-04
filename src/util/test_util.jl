@@ -203,9 +203,9 @@ function test_internal_abstractgps_interface(
     y = rand(fx)
     @test length(y) == length(x)
     @test logpdf(fx, y) isa Real
-    @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
-    @test elbo(fx, y, fz) <= logpdf(fx, y)
-    @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
+    @test elbo(VFE(f(x)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
+    @test elbo(VFE(f(z)), fx, y) <= logpdf(fx, y)
+    @test dtc(VFE(f(x)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
 end
 
 end

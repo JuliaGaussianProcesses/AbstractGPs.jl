@@ -83,14 +83,18 @@
     end
 
     @testset "elbo / dtc" begin
+        x = collect(range(-1.0, 1.0; length=N_cond))
+        f = GP(SqExponentialKernel())
+        fx = f(x, 0.1)
+        y = rand(rng, fx)
+
         # Ensure that the elbo is close to the logpdf when appropriate.
-        @test elbo(VFE(fx), fx, y) isa Real
-        @test elbo(VFE(fx), fx, y) ≈ logpdf(fx, y)
-        @test elbo(VFE(fx), f(x .+ randn(rng, N_cond)), y) < elbo(VFE(fx), fx, y)
+        @test elbo(VFE(f(x)), fx, y) isa Real
+        @test elbo(VFE(f(x)), fx, y) ≈ logpdf(fx, y)
+        @test elbo(VFE(f(x .+ randn(rng, N_cond))), fx, y) < elbo(VFE(f(x)), fx, y)
 
         # Ensure that the dtc is close to the logpdf when appropriate.
-        @test dtc(VFE(fx), fx, y) isa Real
-        @test dtc(VFE(fx), fx, y) ≈ logpdf(fx, y)
+        @test dtc(VFE(f(x)), fx, y) isa Real
+        @test dtc(VFE(f(x)), fx, y) ≈ logpdf(fx, y)
     end
-
 end
