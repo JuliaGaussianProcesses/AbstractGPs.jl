@@ -16,7 +16,7 @@
     f_post = posterior(fx, y)
 
     # Construct optimal approximate posterior.
-    f_approx_post = posterior(VFE(fx), fx, y)
+    f_approx_post = posterior(VFE(x, 1e-12), fx, y)
 
     # Verify that approximate posterior ≈ posterior at various inputs.
     x_test = randn(rng, 100)
@@ -37,11 +37,11 @@
         f = GP(SqExponentialKernel())
 
         # online learning
-        p_fx1 = posterior(VFE(f(Z)), f(X[1:7], 0.1), y[1:7])
+        p_fx1 = posterior(VFE(Z), f(X[1:7], 0.1), y[1:7])
         u_p_fx1 = update_posterior(p_fx1, f(X[8:10], 0.1), y[8:10])
 
         # batch learning
-        p_fx2 = posterior(VFE(f(Z)), f(X, 0.1), y)
+        p_fx2 = posterior(VFE(Z), f(X, 0.1), y)
 
         @test inducing_points(u_p_fx1) ≈ inducing_points(p_fx2) atol = 1e-5
         @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol = 1e-5
@@ -65,11 +65,11 @@
         f = GP(SqExponentialKernel())
 
         # Sequentially adding pseudo points
-        p_fx1 = posterior(VFE(f(Z1)), f(X, 0.1), y)
-        u_p_fx1 = update_posterior(p_fx1, f(Z2))
+        p_fx1 = posterior(VFE(Z1), f(X, 0.1), y)
+        u_p_fx1 = update_posterior(p_fx1, Z2)
 
         # Adding all pseudo-points at once
-        p_fx2 = posterior(VFE(f(Z)), f(X, 0.1), y)
+        p_fx2 = posterior(VFE(Z), f(X, 0.1), y)
 
         @test inducing_points(u_p_fx1) ≈ inducing_points(p_fx2) atol = 1e-5
         @test u_p_fx1.data.m_ε ≈ p_fx2.data.m_ε atol = 1e-5
@@ -89,12 +89,12 @@
         y = rand(rng, fx)
 
         # Ensure that the elbo is close to the logpdf when appropriate.
-        @test elbo(VFE(f(x)), fx, y) isa Real
-        @test elbo(VFE(f(x)), fx, y) ≈ logpdf(fx, y)
-        @test elbo(VFE(f(x .+ randn(rng, N_cond))), fx, y) < elbo(VFE(f(x)), fx, y)
+        @test elbo(VFE(x), fx, y) isa Real
+        @test elbo(VFE(x), fx, y) ≈ logpdf(fx, y)
+        @test elbo(VFE(x .+ randn(rng, N_cond)), fx, y) < elbo(VFE(x), fx, y)
 
         # Ensure that the dtc is close to the logpdf when appropriate.
-        @test dtc(VFE(f(x)), fx, y) isa Real
-        @test dtc(VFE(f(x)), fx, y) ≈ logpdf(fx, y)
+        @test dtc(VFE(x), fx, y) isa Real
+        @test dtc(VFE(x), fx, y) ≈ logpdf(fx, y)
     end
 end

@@ -1,6 +1,25 @@
-struct VFE{Tfz<:FiniteGP}
-    fz::Tfz
+"""
+    VFE{Tz<:AbstractVector, Tj<:Real}
+
+The "Variational Free Energy" sparse approximation [1], used to construct an
+approximate posterior with inducing inputs `z`. See [`posterior(v::VFE,
+fx::FiniteGP, y::AbstractVector{<:Real})`](@ref) for a usage example.
+
+[1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
+processes". In: Proceedings of the Twelfth International Conference on Artificial
+Intelligence and Statistics. 2009.
+"""
+struct VFE{Tz<:AbstractVector, Tj<:Real}
+    z::Tz
+    jitter::Tj
 end
+
+const default_jitter = default_σ²
+
+function VFE(z::AbstractVector, jitter=default_jitter)
+    return VFE(z, jitter)
+end
+
 const DTC = VFE
 
 struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
@@ -13,7 +32,7 @@ end
     posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
 Compute the optimal approximate posterior [1] over the process `f = fx.f`, given observations `y`
-of `f` at `x`, and inducing points `v.fz`.
+of `f` at `x`, and inducing points `v.z`.
 
 ```jldoctest
 julia> f = GP(Matern52Kernel());
@@ -22,7 +41,7 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=13);
 
-julia> v = VFE(f(z));
+julia> v = VFE(z);
 
 julia> y = rand(f(x, 0.1));
 
@@ -37,10 +56,12 @@ processes". In: Proceedings of the Twelfth International Conference on Artificia
 Intelligence and Statistics. 2009.
 """
 function posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    U_y = _cholesky(_symmetric(fx.Σy)).U
-    U = cholesky(_symmetric(cov(v.fz))).U
+    fz = fx.f(v.z, v.jitter)
 
-    B_εf = U' \ (U_y' \ cov(fx, v.fz))'
+    U_y = _cholesky(_symmetric(fx.Σy)).U
+    U = cholesky(_symmetric(cov(fz))).U
+
+    B_εf = U' \ (U_y' \ cov(fx, fz))'
 
     b_y = U_y' \ (y - mean(fx))
 
@@ -95,27 +116,27 @@ end
 
 """
     function update_approx_posterior(
-        f_post_approx::ApproxPosteriorGP{<:VFE},
-        fz::FiniteGP,
-    )
+        f_post_approx::ApproxPosteriorGP{<:VFE{T}},
+        z::T,
+    ) where T<:AbstractVector
 
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
-set of pseudo points. 
+set of pseudo-points.
 """
-function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
-    z = inducing_points(f_post_approx)
+function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE{T}}, z::T) where T<:AbstractVector
+    z_old = inducing_points(f_post_approx)
 
     U11 = f_post_approx.data.U
-    C12 = cov(fz.f, z, fz.x)
-    C22 = _symmetric(cov(fz))
+    C12 = cov(f_post_approx.prior, z_old, z)
+    C22 = _symmetric(cov(f_post_approx.prior, z))
     U = update_chol(Cholesky(U11, 'U', 0), C12, C22).U
-    U22 = U[(end - length(fz) + 1):end, (end - length(fz) + 1):end]
-    U12 = U[1:length(z), (end - length(fz) + 1):end]
+    U22 = U[(end - length(z) + 1):end, (end - length(z) + 1):end]
+    U12 = U[1:length(z_old), (end - length(z) + 1):end]
 
     B_εf₁ = f_post_approx.data.B_εf
 
-    Cu1f = cov(f_post_approx.prior, z, f_post_approx.data.x)
-    Cu2f = cov(f_post_approx.prior, fz.x, f_post_approx.data.x)
+    Cu1f = cov(f_post_approx.prior, z_old, f_post_approx.data.x)
+    Cu2f = cov(f_post_approx.prior, z, f_post_approx.data.x)
 
     U_y = _cholesky(_symmetric(f_post_approx.data.Σy)).U
 
@@ -128,7 +149,7 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
 
     α = U \ m_ε
 
-    z_ = vcat(z, fz.x)
+    z_ = vcat(z_old, z)
 
     cache = (
         m_ε=m_ε,
@@ -140,7 +161,7 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
         x=f_post_approx.data.x,
         Σy=f_post_approx.data.Σy,
     )
-    return ApproxPosteriorGP(VFE(f_post_approx.prior(z_)), f_post_approx.prior, cache)
+    return ApproxPosteriorGP(VFE(z_, f_post_approx.approx.jitter), f_post_approx.prior, cache)
 end
 
 # AbstractGP interface implementation.
@@ -179,13 +200,13 @@ function StatsBase.mean_and_var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     return m_post, c_post
 end
 
-inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.fz.x
+inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.z
 
 """
     elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
-The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `fx`, and `fz`
-are inducing points, where `u = f(z)` for some `z`.
+The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `fx`, and `v.z`
+are inducing points.
 
 
 ```jldoctest
@@ -195,7 +216,7 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=13);
 
-julia> v = VFE(f(z));
+julia> v = VFE(z);
 
 julia> y = rand(f(x, 0.1));
 
@@ -208,14 +229,14 @@ processes". In: Proceedings of the Twelfth International Conference on Artificia
 Intelligence and Statistics. 2009.
 """
 function elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    _dtc, A = _compute_intermediates(fx, y, v.fz)
+    _dtc, A = _compute_intermediates(fx, y, fx.f(v.z, v.jitter))
     return _dtc - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
 end
 
 """
     dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
-The Deterministic Training Conditional (DTC) [1]. `y` are observations of `fx`, and `fz`
+The Deterministic Training Conditional (DTC) [1]. `y` are observations of `fx`, and `v.z`
 are inducing points.
 
 
@@ -226,7 +247,7 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=256);
 
-julia> v = VFE(f(z));
+julia> v = VFE(z);
 
 julia> y = rand(f(x, 0.1));
 
@@ -239,7 +260,7 @@ Sparse Gaussian Process Regression". In: Proceedings of the Ninth International 
 Artificial Intelligence and Statistics. 2003
 """
 function dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    return first(_compute_intermediates(fx, y, v.fz))
+    return first(_compute_intermediates(fx, y, fx.f(v.z, v.jitter)))
 end
 
 # Factor out computations common to the `elbo` and `dtc`.
