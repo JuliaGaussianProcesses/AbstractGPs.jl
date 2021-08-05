@@ -9,7 +9,7 @@ fx::FiniteGP, y::AbstractVector{<:Real})`](@ref) for a usage example.
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-struct VFE{Tz<:AbstractVector, Tj<:Real}
+struct VFE{Tz<:AbstractVector,Tj<:Real}
     z::Tz
     jitter::Tj
 end
@@ -123,7 +123,9 @@ end
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
 set of pseudo-points.
 """
-function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE{T}}, z::T) where T<:AbstractVector
+function update_posterior(
+    f_post_approx::ApproxPosteriorGP{<:VFE{T}}, z::T
+) where {T<:AbstractVector}
     z_old = inducing_points(f_post_approx)
 
     U11 = f_post_approx.data.U
@@ -161,7 +163,9 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE{T}}, z::T) wher
         x=f_post_approx.data.x,
         Σy=f_post_approx.data.Σy,
     )
-    return ApproxPosteriorGP(VFE(z_, f_post_approx.approx.jitter), f_post_approx.prior, cache)
+    return ApproxPosteriorGP(
+        VFE(z_, f_post_approx.approx.jitter), f_post_approx.prior, cache
+    )
 end
 
 # AbstractGP interface implementation.
