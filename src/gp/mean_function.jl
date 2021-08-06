@@ -7,7 +7,7 @@ Returns `zero(T)` everywhere.
 """
 struct ZeroMean{T<:Real} <: MeanFunction end
 
-_map(::ZeroMean{T}, x::AbstractVector) where {T} = zeros(T, length(x))
+_map(::ZeroMean{T}, x::AbstractVector) where {T} = Zeros{T}(length(x))
 
 function ChainRulesCore.rrule(::typeof(_map), m::ZeroMean, x::AbstractVector)
     map_ZeroMean_pullback(Δ) = (NoTangent(), NoTangent(), ZeroTangent())
@@ -25,7 +25,7 @@ struct ConstMean{T<:Real} <: MeanFunction
     c::T
 end
 
-_map(m::ConstMean, x::AbstractVector) = fill(m.c, length(x))
+_map(m::ConstMean, x::AbstractVector) = Fill(m.c, length(x))
 
 """
     CustomMean{Tf} <: MeanFunction

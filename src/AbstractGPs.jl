@@ -10,6 +10,9 @@ using Random
 using Statistics
 using StatsBase
 using RecipesBase
+using Functors
+using Distances
+using GPUArrays
 
 using KernelFunctions: ColVecs, RowVecs
 
@@ -57,6 +60,9 @@ include(joinpath("util", "plotting.jl"))
 
 # Testing utilities.
 include(joinpath("util", "test_util.jl"))
+
+# GPU compatibility
+include(joinpath("util", "gpu.jl"))
 
 # Deprecations.
 include("deprecations.jl")

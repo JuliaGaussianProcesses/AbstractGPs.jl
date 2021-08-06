@@ -10,6 +10,8 @@ struct FiniteGP{Tf<:AbstractGP,Tx<:AbstractVector,TΣ} <: AbstractMvNormal
     Σy::TΣ
 end
 
+@functor FiniteGP
+
 function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::AbstractVector{<:Real})
     return FiniteGP(f, x, Diagonal(σ²))
 end
@@ -17,7 +19,7 @@ end
 const default_σ² = 1e-18
 
 function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
-    return FiniteGP(f, x, Fill(σ², length(x)))
+    return FiniteGP(f, x, (similar(x) .= σ²))
 end
 
 function FiniteGP(
