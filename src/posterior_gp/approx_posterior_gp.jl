@@ -82,7 +82,7 @@ end
     )
 
 Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain the same 
-of pseudo-points.
+set of pseudo-points.
 """
 function update_posterior(
     f_post_approx::ApproxPosteriorGP{<:VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
@@ -115,7 +115,7 @@ function update_posterior(
 end
 
 """
-    function update_approx_posterior(
+    function update_posterior(
         f_post_approx::ApproxPosteriorGP{<:VFE{T}},
         z::T,
     ) where T<:AbstractVector
@@ -264,7 +264,8 @@ Sparse Gaussian Process Regression". In: Proceedings of the Ninth International 
 Artificial Intelligence and Statistics. 2003
 """
 function dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    return first(_compute_intermediates(fx, y, fx.f(v.z, v.jitter)))
+    _dtc, _ = _compute_intermediates(fx, y, fx.f(v.z, v.jitter))
+    return _dtc
 end
 
 # Factor out computations common to the `elbo` and `dtc`.
@@ -282,7 +283,7 @@ function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::Fin
 end
 
 function consistency_check(fx, y)
-    @assert length(fx) == size(y, 1)
+    @assert length(fx) == length(y)
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
