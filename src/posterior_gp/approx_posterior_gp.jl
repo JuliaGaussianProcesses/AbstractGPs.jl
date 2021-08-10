@@ -1,5 +1,5 @@
 """
-    VFE{Tz<:AbstractVector, Tj<:Real}
+    VFE(z::AbstractVector; jitter=default_jitter)
 
 The "Variational Free Energy" sparse approximation [1], used to construct an
 approximate posterior with inducing inputs `z`. See [`posterior(v::VFE,
@@ -16,9 +16,7 @@ end
 
 const default_jitter = default_σ²
 
-function VFE(z::AbstractVector, jitter=default_jitter)
-    return VFE(z, jitter)
-end
+VFE(z::AbstractVector; jitter=default_jitter) = VFE(z, jitter)
 
 const DTC = VFE
 
