@@ -393,7 +393,7 @@ function objective_function(x, y)
         f = GP(kernel)
         fx = f(x, 0.1)
         z = logistic.(params[3:end])
-        approx = VFE(z; jitter=1e-6)
+        approx = VFE(z; jitter=1e-6) # "observing" the latent process with some (small) amount of jitter improves numerical stability
         return -elbo(approx, fx, y)
     end
     return negative_elbo
