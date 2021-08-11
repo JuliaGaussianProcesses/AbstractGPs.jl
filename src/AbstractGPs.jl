@@ -10,6 +10,7 @@ using Random
 using Statistics
 using StatsBase
 using RecipesBase
+using IrrationalConstants
 
 using KernelFunctions: ColVecs, RowVecs
 

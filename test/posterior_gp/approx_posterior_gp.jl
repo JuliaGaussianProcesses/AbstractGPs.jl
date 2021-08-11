@@ -83,7 +83,7 @@
     end
 
     @testset "elbo / dtc" begin
-        x = collect(range(-1.0, 1.0; length=N_cond))
+        x = collect(Float64, range(-1.0, 1.0; length=N_cond))
         f = GP(SqExponentialKernel())
         fx = f(x, 0.1)
         y = rand(rng, fx)
@@ -91,10 +91,27 @@
         # Ensure that the elbo is close to the logpdf when appropriate.
         @test elbo(VFE(x), fx, y) isa Real
         @test elbo(VFE(x), fx, y) ≈ logpdf(fx, y)
-        @test elbo(VFE(x .+ randn(rng, N_cond)), fx, y) < elbo(VFE(x), fx, y)
+        @test elbo(VFE(x .+ randn(rng, N_cond)), fx, y) < logpdf(fx, y)
 
         # Ensure that the dtc is close to the logpdf when appropriate.
         @test dtc(VFE(x), fx, y) isa Real
         @test dtc(VFE(x), fx, y) ≈ logpdf(fx, y)
+    end
+
+    @testset "Type Stability - $T" for T in [Float64, Float32]
+        x = collect(T, range(-1.0, 1.0; length=N_cond))
+        f = GP(T(0), SqExponentialKernel())
+        fx = f(x, T(0.1))
+        y = rand(rng, fx)
+        jitter = T(1e-12)
+
+        @test elbo(VFE(x, jitter), fx, y) isa T
+        @test dtc(VFE(x, jitter), fx, y) isa T
+
+        post = posterior(VFE(x, jitter), fx, y)
+        p_fx = post(x, jitter)
+
+        @test rand(rng, p_fx) isa Vector{T}
+        @test logpdf(p_fx, y) isa T
     end
 end

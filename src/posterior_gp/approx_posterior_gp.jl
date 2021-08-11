@@ -278,7 +278,7 @@ function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::Fin
     δ = chol_Σy.U' \ (y - mean(fx))
 
     tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
-    _dtc = -(length(y) * typeof(tmp)(log(2π)) + tmp) / 2
+    _dtc = -(length(y) * typeof(tmp)(log2π) + tmp) / 2
     return _dtc, A
 end
 
