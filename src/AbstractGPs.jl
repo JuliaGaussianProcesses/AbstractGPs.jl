@@ -10,7 +10,7 @@ using Random
 using Statistics
 using StatsBase
 using RecipesBase
-using IrrationalConstants
+using IrrationalConstants: log2π
 
 using KernelFunctions: ColVecs, RowVecs
 
