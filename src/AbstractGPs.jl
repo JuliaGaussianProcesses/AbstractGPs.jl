@@ -43,7 +43,7 @@ include("finite_gp_projection.jl")
 
 # Basic GP object.
 include("mean_function.jl")
-include("gp_prior.jl")
+include("base_gp.jl")
 
 # Efficient exact posterior GP implementation
 include("exact_gpr_posterior.jl")
