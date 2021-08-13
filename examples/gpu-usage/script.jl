@@ -12,7 +12,7 @@ using Plots
 default(; legend=:outertopright, size=(700, 400))
 
 using Random
-Random.seed!(1234)
+Random.seed!(4321)
 #md nothing #hide
 
 # First, a function to create the kernel.
@@ -42,7 +42,7 @@ cov(fx) isa CuArray
 # Create an objective function and optimise the kernel parameters and inducing
 # points
 
-jitter = 1e-5
+jitter = 1e-4
 function objective_function(x, y)
     function negative_elbo(params)
         kernel = make_kernel(params[1])
