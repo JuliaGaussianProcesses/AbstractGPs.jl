@@ -1,27 +1,41 @@
 # TODO: these should be in KernelFunctions
-function KernelFunctions.pairwise(::SqEuclidean, x::AbstractGPUArray{<:Real, 2}, y::AbstractGPUArray{<:Real, 2}, kwargs...)
+function KernelFunctions.pairwise(
+    ::SqEuclidean, x::AbstractGPUArray{<:Real,2}, y::AbstractGPUArray{<:Real,2}, kwargs...
+)
     return sum(abs2, x; dims=1)' .+ sum(abs2, y; dims=1) .- 2x'y
 end
 
-KernelFunctions.pairwise(d::SqEuclidean, x::AbstractGPUArray{<:Real, 2}, kwargs...) = KernelFunctions.pairwise(d, x, x)
+function KernelFunctions.pairwise(d::SqEuclidean, x::AbstractGPUArray{<:Real,2}, kwargs...)
+    return KernelFunctions.pairwise(d, x, x)
+end
 
-KernelFunctions.pairwise(::Euclidean, x::AbstractGPUArray{<:Real, 2}, y::AbstractGPUArray{<:Real, 2}; kwargs...) = .√KernelFunctions.pairwise(SqEuclidean(), x, y)
-KernelFunctions.pairwise(d::Euclidean, x::AbstractGPUArray{<:Real, 2}; kwargs...) = KernelFunctions.pairwise(d, x, x)
+function KernelFunctions.pairwise(
+    ::Euclidean, x::AbstractGPUArray{<:Real,2}, y::AbstractGPUArray{<:Real,2}; kwargs...
+)
+    return .√KernelFunctions.pairwise(SqEuclidean(), x, y)
+end
+function KernelFunctions.pairwise(d::Euclidean, x::AbstractGPUArray{<:Real,2}; kwargs...)
+    return KernelFunctions.pairwise(d, x, x)
+end
 
-function KernelFunctions.pairwise(::Euclidean, x::AbstractGPUArray, y::AbstractGPUArray; kwargs...)
+function KernelFunctions.pairwise(
+    ::Euclidean, x::AbstractGPUArray, y::AbstractGPUArray; kwargs...
+)
     return .√KernelFunctions.pairwise(SqEuclidean(), reshape(x, 1, :), reshape(y, 1, :))
 end
-KernelFunctions.pairwise(d::Euclidean, x::AbstractGPUArray; kwargs...) = KernelFunctions.pairwise(d, x, x)
+function KernelFunctions.pairwise(d::Euclidean, x::AbstractGPUArray; kwargs...)
+    return KernelFunctions.pairwise(d, x, x)
+end
 
 #TODO: overload colwise for var(fx)
 
 # Temporarily needed until var(fx) is working
-function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal{<:Any, <:AbstractGPUArray}, chol_Σy::Cholesky)
+function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal{<:Any,<:AbstractGPUArray}, chol_Σy::Cholesky)
     return sum(diag(cov(f.f, f.x)) ./ diag(Σy))
 end
 
 # Fixes a bug with cholesky of Diagonal CuArrays
-function _cholesky(X::Diagonal{<:Real,T}) where T<:AbstractGPUArray
+function _cholesky(X::Diagonal{<:Real,T}) where {T<:AbstractGPUArray}
     # Bit of a hack - should maybe specialise to CuArray?
     return cholesky(T.name.wrapper(X))
 end
