@@ -2,9 +2,9 @@
     LatentGP(f<:GP, lik, Σy)
 
  - `f` is a `AbstractGP`.
- - `lik` is the log likelihood function which maps sample from f to corresposing 
+ - `lik` is the log likelihood function which maps samples from `f` to the corresponding 
  conditional likelihood distributions.
- - `Σy` is the observation noise
+ - `Σy` is the observation noise; this represents the jitter used to avoid numeric instability and should generally be small.
     
 """
 struct LatentGP{Tf<:AbstractGP,Tlik,TΣy}
@@ -17,7 +17,7 @@ end
     LatentFiniteGP(fx<:FiniteGP, lik)
 
  - `fx` is a `FiniteGP`.
- - `lik` is the log likelihood function which maps sample from f to corresposing 
+ - `lik` is the log likelihood function which maps samples from `f` to the corresponding 
  conditional likelihood distributions.
     
 """
@@ -40,7 +40,7 @@ end
 ```math
     log p(y, f; x)
 ```
-Returns the joint log density of the gaussian process output `f` and real output `y`.
+The joint log density of the Gaussian process output `f` and observation `y`.
 """
 function Distributions.logpdf(lfgp::LatentFiniteGP, y::NamedTuple{(:f, :y)})
     return logpdf(lfgp.fx, y.f) + logpdf(lfgp.lik(y.f), y.y)
