@@ -2,9 +2,9 @@
     LatentGP(f<:GP, lik, Σy)
 
  - `f` is a `AbstractGP`.
- - `lik` is the log likelihood function which maps samples from `f` to the corresponding 
- conditional likelihood distributions.
- - `Σy` is the observation noise; this represents the jitter used to avoid numeric instability and should generally be small.
+ - `lik` is the likelihood function which maps samples from `f` to the corresponding
+ conditional likelihood distributions (i.e., `lik` must return a `Distribution` compatible with the observations).
+ - `Σy` is the noise under which the latent GP is "observed"; this represents the jitter used to avoid numeric instability and should generally be small.
     
 """
 struct LatentGP{Tf<:AbstractGP,Tlik,TΣy}
@@ -17,8 +17,8 @@ end
     LatentFiniteGP(fx<:FiniteGP, lik)
 
  - `fx` is a `FiniteGP`.
- - `lik` is the log likelihood function which maps samples from `f` to the corresponding 
- conditional likelihood distributions.
+ - `lik` is the likelihood function which maps samples from `f` to the corresponding
+ conditional likelihood distributions (i.e., `lik` must return a `Distribution` compatible with the observations).
     
 """
 struct LatentFiniteGP{Tfx<:FiniteGP,Tlik}
