@@ -37,20 +37,24 @@ export GP,
 # Various bits of utility functionality.
 include(joinpath("util", "common_covmat_ops.jl"))
 
-# AbstractGP interface and FiniteGP interface.
-include(joinpath("abstract_gp", "abstract_gp.jl"))
-include(joinpath("abstract_gp", "finite_gp.jl"))
+# AbstractGP interface.
+include("abstract_gp.jl")
 
-# Basic GP object.
-include(joinpath("gp", "mean_function.jl"))
-include(joinpath("gp", "gp.jl"))
+# FiniteGP object that describes the projection of a GP at points x.
+include("finite_gp_projection.jl")
 
-# Efficient exact and approximate posterior GP implementations.
-include(joinpath("posterior_gp", "posterior_gp.jl"))
-include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
+# Basic GP object, e.g. to define the prior.
+include("mean_function.jl")
+include("base_gp.jl")
 
-# LatentGP object to accomodate GPs with non-gaussian likelihoods.
-include(joinpath("latent_gp", "latent_gp.jl"))
+# Efficient exact posterior GP implementation.
+include("exact_gpr_posterior.jl")
+
+# Approximate sparse GP inference for Gaussian likelihood.
+include("sparse_approximations.jl")
+
+# LatentGP and LatentFiniteGP objects to accommodate GPs with non-Gaussian likelihoods.
+include("latent_gp.jl")
 
 # Plotting utilities.
 include(joinpath("util", "plotting.jl"))
@@ -60,4 +64,5 @@ include(joinpath("util", "test_util.jl"))
 
 # Deprecations.
 include("deprecations.jl")
+
 end # module
