@@ -19,7 +19,7 @@ end
 const default_σ² = 1e-18
 
 function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
-    return FiniteGP(f, x, (similar(x) .= σ²))
+    return FiniteGP(f, x, _fill_like(x, σ²))
 end
 
 function FiniteGP(

@@ -40,7 +40,10 @@ function _cholesky(X::Diagonal{<:Real,T}) where {T<:AbstractGPUArray}
     return cholesky(T.name.wrapper(X))
 end
 
-## If we want to use FillArrays for fx.Σy, something like the following is needed in cov(fx):
+_fill_like(x::AbstractVector, σ²) = similar(x) .= σ²
+_fill_like(x::Union{ColVecs,RowVecs}, σ²) = similar(x[1], length(x)) .= σ²
+
+# # If we want to use FillArrays for fx.Σy, something like the following is needed in cov(fx):
 
 # _add_broadcasted(A, B) = A .+ B
 
@@ -50,7 +53,7 @@ end
 # end
 # _add_broadcasted(B::Diagonal{T, <:FillArrays.AbstractFill}, A::AbstractGPUArray) where T = _add_broadcasted(A, B)
 
-## A more general approach?
+# # A more general approach?
 # const WrappedFillArray{T,N} = Adapt.WrappedArray{T, N, FillArrays.AbstractFill,FillArrays.AbstractFill{T,N}}
 # function _add_broadcasted(A::AbstractGPUArray, B::WrappedFillArray) where T
 #     Base.materialize(Base.broadcasted(Base.BroadcastStyle(typeof(A)), +, A, B))

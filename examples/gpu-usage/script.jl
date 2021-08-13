@@ -3,10 +3,10 @@
 # ## Setup
 
 using AbstractGPs
-using StatsFuns
 using CUDA
 using Optim
 using Functors
+using LogExpFunctions
 
 using Plots
 default(; legend=:outertopright, size=(700, 400))
