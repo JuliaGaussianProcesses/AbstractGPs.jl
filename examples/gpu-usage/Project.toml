@@ -1,0 +1,16 @@
+[deps]
+AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+Functors = "d9f16b24-f501-4c13-a1f2-28368ffc5196"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+
+[compat]
+AbstractGPs = "0.3"
+CUDA = "3"
+Functors = "0.2"
+Literate = "2.5"
+Optim = "1"
+Plots = "1"
