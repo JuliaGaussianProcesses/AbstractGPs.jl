@@ -24,9 +24,10 @@ make_kernel(ℓ_inv) = Matern52Kernel() ∘ ScaleTransform(ℓ_inv)
 
 # Next, sample some data from a GP
 
+lik_noise = 0.01
 f = GP(make_kernel(1.0))
 x = rand(20)
-fx = f(x, 0.01)
+fx = f(x, lik_noise)
 y = rand(fx)
 #md nothing #hide
 
@@ -41,19 +42,20 @@ cov(fx) isa CuArray
 # Create an objective function and optimise the kernel parameters and inducing
 # points
 
+jitter = 1e-5
 function objective_function(x, y)
     function negative_elbo(params)
         kernel = make_kernel(params[1])
         f = GP(kernel)
-        fx = f(x, 0.01)
+        fx = f(x, lik_noise)
         z = logistic.(params[2:end])
-        fz = f(z, 1e-6)  # "observing" the latent process with some (small) amount of jitter improves numerical stability
+        fz = f(z, jitter)  # "observing" the latent process with some (small) amount of jitter improves numerical stability
         return -elbo(fx, y, fz)
     end
     return negative_elbo
 end
 
-x0 = cu(rand(6))
+x0 = cu(rand(6) * 2)
 # TODO: this doesn't work with CUDA.allowscalar(false) because of Optim
 opt = optimize(objective_function(x, y), x0, LBFGS())
 #md nothing #hide
@@ -62,8 +64,8 @@ opt = optimize(objective_function(x, y), x0, LBFGS())
 
 opt_kernel = make_kernel(opt.minimizer[1])
 opt_f = GP(opt_kernel)
-opt_fx = opt_f(x, 0.01)
-ap = approx_posterior(VFE(), opt_fx, y, opt_f(logistic.(opt.minimizer[2:end]), 1e-6))
+opt_fx = opt_f(x, lik_noise)
+ap = approx_posterior(VFE(), opt_fx, y, opt_f(logistic.(opt.minimizer[2:end]), jitter))
 
 # Plot the optimised posterior (requires some casting to and from CuArrays)
 
