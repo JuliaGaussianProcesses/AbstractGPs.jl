@@ -65,7 +65,7 @@ GP(kernel::Kernel) = GP(ZeroMean(), kernel)
 
 # AbstractGP interface implementation.
 
-Statistics.mean(f::GP, x::AbstractVector) = _map(f.mean, x)
+Statistics.mean(f::GP, x::AbstractVector) = _map_meanfunction(f.mean, x)
 
 Statistics.cov(f::GP, x::AbstractVector) = kernelmatrix(f.kernel, x)
 
