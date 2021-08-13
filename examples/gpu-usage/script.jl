@@ -1,35 +1,51 @@
+# # A Minimal Working Example of AbstractGPs on CUDA
+#
+# ## Setup
+
 using AbstractGPs
-import AbstractGPs: FiniteGP
 using StatsFuns
 using CUDA
 using Optim
 using Functors
 
-# %%
-# N.B. can't use a ScaledKernel because of the hardcoded Vector -
+using Plots
+default(; legend=:outertopright, size=(700, 400))
+
+using Random
+Random.seed!(1234)
+#md nothing #hide
+
+# First, a function to create the kernel.
+# N.B. we can't use a ScaledKernel because of the hardcoded Vector -
 # https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/299
+
 make_kernel(ℓ_inv) = Matern52Kernel() ∘ ScaleTransform(ℓ_inv)
+#md nothing #hide
 
-f = GP(make_kernel(2.0))
+# Next, sample some data from a GP
 
-x = rand(10)
-fx = f(x)
+f = GP(make_kernel(1.0))
+x = rand(20)
+fx = f(x, 0.01)
 y = rand(fx)
+#md nothing #hide
 
-# %%
+# Move everything to the GPU and compute the covariance
+
 gpu(f) = fmap(cu, f)
 
 x, y = gpu(x), gpu(y)
-fx = fx |> gpu
+fx = f(x)
+cov(fx) isa CuArray
 
-cov(fx)
+# Create an objective function and optimise the kernel parameters and inducing
+# points
 
-# %%
 function objective_function(x, y)
     function negative_elbo(params)
         kernel = make_kernel(params[1])
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, 0.01)
         z = logistic.(params[2:end])
         fz = f(z, 1e-6)  # "observing" the latent process with some (small) amount of jitter improves numerical stability
         return -elbo(fx, y, fz)
@@ -37,20 +53,20 @@ function objective_function(x, y)
     return negative_elbo
 end
 
-# %%
 x0 = cu(rand(6))
-# TODO: this doesn't work with CUDA.allowscalar(false)
+# TODO: this doesn't work with CUDA.allowscalar(false) because of Optim
 opt = optimize(objective_function(x, y), x0, LBFGS())
+#md nothing #hide
 
+# Construct the approximate posterior using the optimised parameters
 
-# %%
 opt_kernel = make_kernel(opt.minimizer[1])
 opt_f = GP(opt_kernel)
-opt_fx = opt_f(x, 0.1)
-ap = approx_posterior(VFE(), opt_fx, y, opt_f(logistic.(opt.minimizer[2:end])))
+opt_fx = opt_f(x, 0.01)
+ap = approx_posterior(VFE(), opt_fx, y, opt_f(logistic.(opt.minimizer[2:end]), 1e-6))
 
-# %%
-using Plots
+# Plot the optimised posterior (requires some casting to and from CuArrays)
+
 scatter(
     Array(x),
     Array(y);
