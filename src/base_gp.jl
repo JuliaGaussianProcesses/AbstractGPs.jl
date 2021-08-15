@@ -6,7 +6,6 @@ A Gaussian Process (GP) with known `mean` and `kernel`. See e.g. [1] for an intr
 # Zero Mean
 If only one argument is provided, assume the mean to be zero everywhere:
 
-
 ```jldoctest
 julia> f = GP(Matern32Kernel());
 
@@ -21,8 +20,9 @@ true
 
 ### Constant Mean
 
-If a `Real` is provided as the first argument, assume the mean function is constant with
-that value
+If a `Real` is provided as the first argument, assume the mean function is
+constant with that value.
+
 ```jldoctest
 julia> f = GP(5.0, Matern32Kernel());
 
@@ -38,6 +38,7 @@ true
 ### Custom Mean
 
 Provide an arbitrary function to compute the mean:
+
 ```jldoctest
 julia> f = GP(x -> sin(x) + cos(x / 2), Matern32Kernel());
 
@@ -64,7 +65,7 @@ GP(kernel::Kernel) = GP(ZeroMean(), kernel)
 
 # AbstractGP interface implementation.
 
-Statistics.mean(f::GP, x::AbstractVector) = _map(f.mean, x)
+Statistics.mean(f::GP, x::AbstractVector) = _map_meanfunction(f.mean, x)
 
 Statistics.cov(f::GP, x::AbstractVector) = kernelmatrix(f.kernel, x)
 

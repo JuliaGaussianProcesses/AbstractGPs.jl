@@ -7,11 +7,14 @@ Returns `zero(T)` everywhere.
 """
 struct ZeroMean{T<:Real} <: MeanFunction end
 
-_map(::ZeroMean{T}, x::AbstractVector) where {T} = zeros(T, length(x))
+"""
+This is an AbstractGPs-internal workaround for AD issues; ideally we would just extend Base.map
+"""
+_map_meanfunction(::ZeroMean{T}, x::AbstractVector) where {T} = zeros(T, length(x))
 
-function ChainRulesCore.rrule(::typeof(_map), m::ZeroMean, x::AbstractVector)
+function ChainRulesCore.rrule(::typeof(_map_meanfunction), m::ZeroMean, x::AbstractVector)
     map_ZeroMean_pullback(Δ) = (NoTangent(), NoTangent(), ZeroTangent())
-    return _map(m, x), map_ZeroMean_pullback
+    return _map_meanfunction(m, x), map_ZeroMean_pullback
 end
 
 ZeroMean() = ZeroMean{Float64}()
@@ -25,7 +28,7 @@ struct ConstMean{T<:Real} <: MeanFunction
     c::T
 end
 
-_map(m::ConstMean, x::AbstractVector) = fill(m.c, length(x))
+_map_meanfunction(m::ConstMean, x::AbstractVector) = fill(m.c, length(x))
 
 """
     CustomMean{Tf} <: MeanFunction
@@ -37,4 +40,4 @@ struct CustomMean{Tf} <: MeanFunction
     f::Tf
 end
 
-_map(f::CustomMean, x::AbstractVector) = map(f.f, x)
+_map_meanfunction(f::CustomMean, x::AbstractVector) = map(f.f, x)
