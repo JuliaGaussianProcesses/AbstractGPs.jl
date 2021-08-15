@@ -133,7 +133,7 @@ version = "0.21.2"
 
 [[KernelFunctions]]
 deps = ["ChainRulesCore", "Compat", "CompositionsBase", "Distances", "FillArrays", "Functors", "IrrationalConstants", "LinearAlgebra", "LogExpFunctions", "Random", "Requires", "SpecialFunctions", "StatsBase", "TensorCore", "Test", "ZygoteRules"]
-path = "../dev/KernelFunctions"
+git-tree-sha1 = "02cd613d45ae11ebe60fc6c8ffa624a61ea5fd44"
 uuid = "ec8451be-7e33-11e9-00cf-bbf324bd1392"
 version = "0.10.14"
 
