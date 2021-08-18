@@ -50,13 +50,13 @@ z = randn(rng, 4)
 #### Evidence Lower BOund (ELBO)
 We provide a ready implentation of elbo w.r.t to the pseudo points. We can perform Variational Inference on pseudo-points by maximizing the ELBO term w.r.t pseudo-points `z` and any kernel parameters. For more information, see [examples](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/tree/master/examples). 
 ```julia
-elbo(VFE(z), fx, y)
+elbo(VFE(f(z)), fx, y)
 ```
 
 #### Construct the approximate posterior process implied by the VFE approximation.
 The optimal pseudo-points obtained above can be used to create a approximate/sparse posterior. This can be used like a regular posterior in many cases.
 ```julia
-f_approx_posterior = posterior(VFE(z), fx, y)
+f_approx_posterior = posterior(VFE(f(z)), fx, y)
 ```
 
 #### An approximate posterior process is yet another `AbstractGP`, so you can do things with it like
@@ -87,11 +87,11 @@ p_p_fx = posterior(p_fx(x[4:10], 0.1), y[4:10])
 Z1 = rand(rng, 4)
 Z2 = rand(rng, 3)
 Z = vcat(Z1, Z2)
-p_fx1 = posterior(VFE(Z), f(x[1:7], 0.1), y[1:7])
+p_fx1 = posterior(VFE(f(Z)), f(x[1:7], 0.1), y[1:7])
 u_p_fx1 = update_posterior(p_fx1, f(x[8:10], 0.1), y[8:10])
 ```
 ##### Adding pseudo-points in an sequential fashion
 ```julia
-p_fx2 = posterior(VFE(Z1), f(x, 0.1), y)
-u_p_fx2 = update_posterior(p_fx2, Z2)
+p_fx2 = posterior(VFE(f(Z1)), f(x, 0.1), y)
+u_p_fx2 = update_posterior(p_fx2, f(Z2))
 ```

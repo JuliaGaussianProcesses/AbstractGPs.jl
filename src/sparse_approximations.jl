@@ -1,24 +1,17 @@
 """
-    VFE(z::AbstractVector; jitter=default_jitter)
+    VFE(fz::FiniteGP)
 
 The "Variational Free Energy" sparse approximation [1], used to construct an
-approximate posterior with inducing inputs `z`. See [`posterior(v::VFE,
-fx::FiniteGP, y::AbstractVector{<:Real})`](@ref) for a usage example. The
-`jitter` term is added to the diagonal of the covariance matrix of the inducing
-points to aid numerical stability.
+approximate posterior with inducing inputs `fz.x`. See [`posterior(v::VFE,
+fx::FiniteGP, y::AbstractVector{<:Real})`](@ref) for a usage example.
 
 [1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-struct VFE{Tz<:AbstractVector,Tj<:Real}
-    z::Tz
-    jitter::Tj
+struct VFE{Tfz<:FiniteGP}
+    fz::Tfz
 end
-
-const default_jitter = default_σ²
-
-VFE(z::AbstractVector; jitter=default_jitter) = VFE(z, jitter)
 
 const DTC = VFE
 
@@ -41,7 +34,7 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=13);
 
-julia> v = VFE(z);
+julia> v = VFE(f(z));
 
 julia> y = rand(f(x, 0.1));
 
@@ -55,13 +48,13 @@ true
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-function posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    fz = fx.f(v.z, v.jitter)
+function posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert vfe.fz.f == fx.f
 
     U_y = _cholesky(_symmetric(fx.Σy)).U
-    U = cholesky(_symmetric(cov(fz))).U
+    U = cholesky(_symmetric(cov(vfe.fz))).U
 
-    B_εf = U' \ (U_y' \ cov(fx, fz))'
+    B_εf = U' \ (U_y' \ cov(fx, vfe.fz))'
 
     b_y = U_y' \ (y - mean(fx))
 
@@ -71,7 +64,7 @@ function posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
     m_ε = Λ_ε \ (B_εf * b_y)
 
     cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, b_y=b_y, B_εf=B_εf, x=fx.x, Σy=fx.Σy)
-    return ApproxPosteriorGP(v, fx.f, cache)
+    return ApproxPosteriorGP(vfe, fx.f, cache)
 end
 
 """
@@ -87,6 +80,8 @@ set of pseudo-points.
 function update_posterior(
     f_post_approx::ApproxPosteriorGP{<:VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
 )
+    @assert f_post_approx.prior == fx.f
+
     U = f_post_approx.data.U
     z = inducing_points(f_post_approx)
 
@@ -116,17 +111,18 @@ end
 
 """
     function update_posterior(
-        f_post_approx::ApproxPosteriorGP{<:VFE{T}},
-        z::T,
-    ) where T<:AbstractVector
+        f_post_approx::ApproxPosteriorGP{<:VFE},
+        z::FiniteGP,
+    )
 
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
 set of pseudo-points.
 """
-function update_posterior(
-    f_post_approx::ApproxPosteriorGP{<:VFE{T}}, z::T
-) where {T<:AbstractVector}
+function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
+    @assert f_post_approx.prior == fz.f
+
     z_old = inducing_points(f_post_approx)
+    z = fz.x
 
     U11 = f_post_approx.data.U
     C12 = cov(f_post_approx.prior, z_old, z)
@@ -151,7 +147,9 @@ function update_posterior(
 
     α = U \ m_ε
 
-    z_ = vcat(z_old, z)
+    z_new = vcat(z_old, z)
+    vfe = f_post_approx.approx
+    fz_new = vfe.fz.f(z_new, vfe.fz.Σy)
 
     cache = (
         m_ε=m_ε,
@@ -164,7 +162,7 @@ function update_posterior(
         Σy=f_post_approx.data.Σy,
     )
     return ApproxPosteriorGP(
-        VFE(z_, f_post_approx.approx.jitter), f_post_approx.prior, cache
+        VFE(fz_new), f_post_approx.prior, cache
     )
 end
 
@@ -204,10 +202,10 @@ function StatsBase.mean_and_var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
     return m_post, c_post
 end
 
-inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.z
+inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.fz.x
 
 """
-    elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
 The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `fx`, and `v.z`
 are inducing points.
@@ -220,7 +218,7 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=13);
 
-julia> v = VFE(z);
+julia> v = VFE(f(z));
 
 julia> y = rand(f(x, 0.1));
 
@@ -232,8 +230,9 @@ true
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-function elbo(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    _dtc, A = _compute_intermediates(fx, y, fx.f(v.z, v.jitter))
+function elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert vfe.fz.f == fx.f
+    _dtc, A = _compute_intermediates(fx, y, vfe.fz)
     return _dtc - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
 end
 
@@ -251,7 +250,7 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=256);
 
-julia> v = VFE(z);
+julia> v = VFE(f(z));
 
 julia> y = rand(f(x, 0.1));
 
@@ -263,8 +262,9 @@ true
 Sparse Gaussian Process Regression". In: Proceedings of the Ninth International Workshop on
 Artificial Intelligence and Statistics. 2003
 """
-function dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    _dtc, _ = _compute_intermediates(fx, y, fx.f(v.z, v.jitter))
+function dtc(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert vfe.fz.f == fx.f
+    _dtc, _ = _compute_intermediates(fx, y, vfe.fz)
     return _dtc
 end
 
