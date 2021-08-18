@@ -161,9 +161,7 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
         x=f_post_approx.data.x,
         Σy=f_post_approx.data.Σy,
     )
-    return ApproxPosteriorGP(
-        VFE(fz_new), f_post_approx.prior, cache
-    )
+    return ApproxPosteriorGP(VFE(fz_new), f_post_approx.prior, cache)
 end
 
 # AbstractGP interface implementation.
