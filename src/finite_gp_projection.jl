@@ -2,7 +2,7 @@
     FiniteGP{Tf<:AbstractGP, Tx<:AbstractVector, TΣy}
 
 The finite-dimensional projection of the AbstractGP `f` at `x`. Assumed to be observed under
-Gaussian noise with zero mean and covariance matrix `Σ`
+Gaussian noise with zero mean and covariance matrix `Σy`
 """
 struct FiniteGP{Tf<:AbstractGP,Tx<:AbstractVector,TΣ} <: AbstractMvNormal
     f::Tf
@@ -35,7 +35,6 @@ Base.length(f::FiniteGP) = length(f.x)
 
 Compute the mean vector of `fx`.
 
-
 ```jldoctest
 julia> f = GP(Matern52Kernel());
 
@@ -53,7 +52,6 @@ Statistics.mean(fx::FiniteGP) = mean(fx.f, fx.x)
 Compute the covariance matrix of `fx`.
 
 ## Noise-free observations
-
 
 ```jldoctest cov_finitegp
 julia> f = GP(Matern52Kernel());
@@ -203,7 +201,7 @@ end
     rand(rng::AbstractRNG, f::FiniteGP, N::Int=1)
 
 Obtain `N` independent samples from the marginals `f` using `rng`. Single-sample methods
-produce a `length(f)` vector. Multi-sample methods produce a `length(f)` x `N` `Matrix`.
+produce a `length(f)` vector. Multi-sample methods produce a `length(f)` × `N` `Matrix`.
 
 
 ```jldoctest
@@ -273,7 +271,7 @@ end
 """
     logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
-The logpdf of `y` under `f` if is `y isa AbstractVector`. logpdf of each column of `y` if
+The logpdf of `y` under `f` if `y isa AbstractVector`. The logpdf of each column of `y` if
 `y isa Matrix`.
 
 
