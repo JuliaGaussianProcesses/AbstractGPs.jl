@@ -49,7 +49,7 @@ processes". In: Proceedings of the Twelfth International Conference on Artificia
 Intelligence and Statistics. 2009.
 """
 function posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    @assert vfe.fz.f == fx.f
+    @assert vfe.fz.f === fx.f
 
     U_y = _cholesky(_symmetric(fx.Σy)).U
     U = cholesky(_symmetric(cov(vfe.fz))).U
@@ -80,7 +80,7 @@ set of pseudo-points.
 function update_posterior(
     f_post_approx::ApproxPosteriorGP{<:VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
 )
-    @assert f_post_approx.prior == fx.f
+    @assert f_post_approx.prior === fx.f
 
     U = f_post_approx.data.U
     z = inducing_points(f_post_approx)
@@ -119,7 +119,7 @@ Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the
 set of pseudo-points.
 """
 function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
-    @assert f_post_approx.prior == fz.f
+    @assert f_post_approx.prior === fz.f
 
     z_old = inducing_points(f_post_approx)
     z = fz.x
@@ -229,7 +229,7 @@ processes". In: Proceedings of the Twelfth International Conference on Artificia
 Intelligence and Statistics. 2009.
 """
 function elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    @assert vfe.fz.f == fx.f
+    @assert vfe.fz.f === fx.f
     _dtc, A = _compute_intermediates(fx, y, vfe.fz)
     return _dtc - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
 end
@@ -261,7 +261,7 @@ Sparse Gaussian Process Regression". In: Proceedings of the Ninth International 
 Artificial Intelligence and Statistics. 2003
 """
 function dtc(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    @assert vfe.fz.f == fx.f
+    @assert vfe.fz.f === fx.f
     _dtc, _ = _compute_intermediates(fx, y, vfe.fz)
     return _dtc
 end
