@@ -2,7 +2,7 @@
     FiniteGP{Tf<:AbstractGP, Tx<:AbstractVector, TΣy}
 
 The finite-dimensional projection of the AbstractGP `f` at `x`. Assumed to be observed under
-Gaussian noise with zero mean and covariance matrix `Σ`
+Gaussian noise with zero mean and covariance matrix `Σy`
 """
 struct FiniteGP{Tf<:AbstractGP,Tx<:AbstractVector,TΣ} <: AbstractMvNormal
     f::Tf
@@ -35,7 +35,6 @@ Base.length(f::FiniteGP) = length(f.x)
 
 Compute the mean vector of `fx`.
 
-
 ```jldoctest
 julia> f = GP(Matern52Kernel());
 
@@ -53,7 +52,6 @@ Statistics.mean(fx::FiniteGP) = mean(fx.f, fx.x)
 Compute the covariance matrix of `fx`.
 
 ## Noise-free observations
-
 
 ```jldoctest cov_finitegp
 julia> f = GP(Matern52Kernel());
@@ -203,7 +201,7 @@ end
     rand(rng::AbstractRNG, f::FiniteGP, N::Int=1)
 
 Obtain `N` independent samples from the marginals `f` using `rng`. Single-sample methods
-produce a `length(f)` vector. Multi-sample methods produce a `length(f)` x `N` `Matrix`.
+produce a `length(f)` vector. Multi-sample methods produce a `length(f)` × `N` `Matrix`.
 
 
 ```jldoctest
@@ -233,10 +231,47 @@ Random.rand(f::FiniteGP, N::Int) = rand(Random.GLOBAL_RNG, f, N)
 Random.rand(rng::AbstractRNG, f::FiniteGP) = vec(rand(rng, f, 1))
 Random.rand(f::FiniteGP) = vec(rand(f, 1))
 
+# in-place sampling
+"""
+    rand!(rng::AbstractRNG, f::FiniteGP, y::AbstractVecOrMat{<:Real})
+
+Obtain sample(s) from the marginals `f` using `rng` and write them to `y`.
+
+If `y` is a matrix, then each column corresponds to an independent sample.
+
+```jldoctest
+julia> f = GP(Matern32Kernel());
+
+julia> x = randn(11);
+
+julia> y = similar(x);
+
+julia> rand!(f(x), y);
+
+julia> rand!(MersenneTwister(123456), f(x), y);
+
+julia> ys = similar(x, length(x), 3);
+
+julia> rand!(f(x), ys);
+
+julia> rand!(MersenneTwister(123456), f(x), ys);
+```
+"""
+Random.rand!(::AbstractRNG, ::FiniteGP, ::AbstractVecOrMat{<:Real})
+
+# Distributions defines methods for `rand!` (and `rand`) that fall back to `_rand!`
+function Distributions._rand!(rng::AbstractRNG, f::FiniteGP, x::AbstractVecOrMat{<:Real})
+    m, C_mat = mean_and_cov(f)
+    C = cholesky(_symmetric(C_mat))
+    lmul!(C.U', randn!(rng, x))
+    x .+= m
+    return x
+end
+
 """
     logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
-The logpdf of `y` under `f` if is `y isa AbstractVector`. logpdf of each column of `y` if
+The logpdf of `y` under `f` if `y isa AbstractVector`. The logpdf of each column of `y` if
 `y isa Matrix`.
 
 
@@ -269,83 +304,4 @@ function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
     return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
-end
-
-"""
-    elbo(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-
-The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `f`, and `u`
-are pseudo-points, where `u = f(z)` for some `z`.
-
-
-```jldoctest
-julia> f = GP(Matern52Kernel());
-
-julia> x = randn(1000);
-
-julia> z = range(-5.0, 5.0; length=13);
-
-julia> y = rand(f(x, 0.1));
-
-julia> elbo(f(x, 0.1), y, f(z)) < logpdf(f(x, 0.1), y)
-true
-```
-
-[1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
-processes". In: Proceedings of the Twelfth International Conference on Artificial
-Intelligence and Statistics. 2009.
-"""
-function elbo(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-    _dtc, chol_Σy, A = _compute_intermediates(f, y, u)
-    return _dtc - (tr_Cf_invΣy(f, f.Σy, chol_Σy) - sum(abs2, A)) / 2
-end
-
-"""
-    dtc(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-
-The Deterministic Training Conditional (DTC) [1]. `y` are observations of `f`, and `u`
-are pseudo-points.
-
-
-```jldoctest
-julia> f = GP(Matern52Kernel());
-
-julia> x = randn(1000);
-
-julia> z = range(-5.0, 5.0; length=256);
-
-julia> y = rand(f(x, 0.1));
-
-julia> isapprox(dtc(f(x, 0.1), y, f(z)), logpdf(f(x, 0.1), y); atol=1e-3, rtol=1e-3)
-true
-```
-
-[1] - M. Seeger, C. K. I. Williams and N. D. Lawrence. "Fast Forward Selection to Speed Up
-Sparse Gaussian Process Regression". In: Proceedings of the Ninth International Workshop on
-Artificial Intelligence and Statistics. 2003
-"""
-function dtc(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-    return first(_compute_intermediates(f, y, u))
-end
-
-# Factor out computations common to the `elbo` and `dtc`.
-function _compute_intermediates(f::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-    consistency_check(f, y, u)
-    chol_Σy = _cholesky(f.Σy)
-
-    A = cholesky(_symmetric(cov(u))).U' \ (chol_Σy.U' \ cov(f, u))'
-    Λ_ε = cholesky(Symmetric(A * A' + I))
-    δ = chol_Σy.U' \ (y - mean(f))
-
-    tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
-    _dtc = -(length(y) * typeof(tmp)(log(2π)) + tmp) / 2
-    return _dtc, chol_Σy, A
-end
-
-function consistency_check(f, y, u)
-    @assert length(f) == size(y, 1)
-end
-
-function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal, chol_Σy::Cholesky)
-    return sum(var(f.f, f.x) ./ diag(Σy))
 end

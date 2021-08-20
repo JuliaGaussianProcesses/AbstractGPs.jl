@@ -73,7 +73,7 @@ end
 Test _very_ basic consistency properties of the mean function `m`.
 """
 function mean_function_tests(m::MeanFunction, x::AbstractVector)
-    @test AbstractGPs._map(m, x) isa AbstractVector
+    @test AbstractGPs._map_meanfunction(m, x) isa AbstractVector
     @test length(ew(m, x)) == length(x)
 end
 
@@ -120,85 +120,4 @@ function differentiable_mean_function_tests(
 )
     ȳ = randn(rng, length(x))
     return differentiable_mean_function_tests(m, ȳ, x; rtol=rtol, atol=atol)
-end
-
-"""
-    abstractgp_interface_tests(
-        f::AbstractGP,
-        x::AbstractVector,
-        z::AbstractVector;
-        atol=1e-12,
-    )
-
-Check that the `AbstractGP` interface is at least implemented for `f` and is
-self-consistent. `x` and `z` must be valid inputs for `f`. For tests to pass, the minimum
-eigenvalue of `cov(f, x)` must be greater than `-eig_tol`.
-"""
-function abstractgp_interface_tests(
-    f::AbstractGP, x::AbstractVector, z::AbstractVector; eig_tol::Real=1e-12, σ²::Real=1e-9
-)
-    @assert length(x) ≠ length(z)
-
-    # Verify that `mean` works and is the correct length and type.
-    m = mean(f, x)
-    @test m isa AbstractVector{<:Real}
-    @test length(m) == length(x)
-
-    # Verify that cov(f, x, z) works, is the correct size and type.
-    C_xy = cov(f, x, z)
-    @test C_xy isa AbstractMatrix{<:Real}
-    @test size(C_xy) == (length(x), length(z))
-
-    # Reversing arguments transposes the return.
-    @test C_xy ≈ cov(f, z, x)'
-
-    # Verify cov(f, x) works, is the correct size and type.
-    C_xx = cov(f, x)
-    @test size(C_xx) == (length(x), length(x))
-
-    # Check that C_xx is positive definite.
-    @test eigmin(Symmetric(C_xx)) > -eig_tol
-
-    # Check that C_xx is consistent with cov(f, x, x).
-    @test C_xx ≈ cov(f, x, x)
-
-    # Check that var(f, x) works, is the correct size and type.
-    C_xx_diag = var(f, x)
-    @test C_xx_diag isa AbstractVector{<:Real}
-    @test length(C_xx_diag) == length(x)
-
-    # Check C_xx_diag is consistent with cov(f, x).
-    @test C_xx_diag ≈ diag(C_xx)
-
-    # Check that mean_and_cov is consistent.
-    let
-        m, C = mean_and_cov(f, x)
-        @test m ≈ mean(f, x)
-        @test C ≈ cov(f, x)
-    end
-
-    # Check that mean_and_var is consistent.
-    let
-        m, c = mean_and_var(f, x)
-        @test m ≈ mean(f, x)
-        @test c ≈ var(f, x)
-    end
-
-    # Construct a FiniteGP, and check that all standard methods defined on it at least run.
-    fx = f(x, σ²)
-    fz = f(z, σ²)
-    @test mean(fx) ≈ mean(f, x)
-    @test cov(fx) ≈ cov(f, x) + fx.Σy
-    @test cov(fx, fz) ≈ cov(f, x, z)
-    @test first(mean_and_cov(fx)) ≈ mean(f, x)
-    @test last(mean_and_cov(fx)) ≈ cov(f, x)
-    @test mean.(marginals(fx)) ≈ mean(f, x)
-    @test var.(marginals(fx)) ≈ var(f, x) .+ diag(fx.Σy)
-
-    # Generate, compute logpdf, compare against VFE and DTC.
-    y = rand(fx)
-    @test length(y) == length(x)
-    @test logpdf(fx, y) isa Real
-    @test elbo(fx, y, f(x)) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
-    @test dtc(fx, y, f(x)) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
 end

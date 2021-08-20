@@ -368,7 +368,7 @@ plt
 # Sanity check for the Evidence Lower BOund (ELBO) implemented according to
 # M. K. Titsias's _Variational learning of inducing variables in sparse Gaussian processes_.
 
-elbo(fx, y_train, f(rand(5)))
+elbo(VFE(f(rand(5))), fx, y_train)
 
 # We use the LBFGS algorithm to maximize the given ELBO. It is provided by the Julia
 # package [Optim.jl](https://github.com/JuliaNLSolvers/Optim.jl).
@@ -386,13 +386,17 @@ using Optim
 # f(x) = \frac{1}{1 + \exp{(-x)}}.
 # ```
 
+jitter = 1e-6  # "observing" the latent process with some (small) amount of jitter improves numerical stability
+
 function objective_function(x, y)
     function negative_elbo(params)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
         fx = f(x, 0.1)
-        return -elbo(fx, y, f(logistic.(params[3:end])))
+        z = logistic.(params[3:end])
+        approx = VFE(f(z, jitter))
+        return -elbo(approx, fx, y)
     end
     return negative_elbo
 end
@@ -425,7 +429,7 @@ opt_kernel =
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
-ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
+ap = posterior(VFE(opt_f(logistic.(opt.minimizer[3:end]), jitter)), opt_fx, y_train)
 logpdf(ap(x_test), y_test)
 
 # We visualize the approximate posterior with optimized parameters.

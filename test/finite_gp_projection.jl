@@ -48,6 +48,14 @@ end
         @test size(rand(rng, fx, 10)) == (length(x), 10)
         @test length(rand(fx)) == length(x)
         @test size(rand(fx, 10)) == (length(x), 10)
+
+        # Check that `rand!` calls do not error
+        y = similar(x)
+        rand!(rng, fx, y)
+        rand!(fx, y)
+        ys = similar(x, length(x), 10)
+        rand!(rng, fx, ys)
+        rand!(fx, ys)
     end
     @testset "rand (statistical)" begin
         rng = MersenneTwister(123456)
@@ -55,14 +63,19 @@ end
         m0 = 1
         S = 100_000
         x = range(-3.0, 3.0; length=N)
-        f = FiniteGP(GP(1, SqExponentialKernel()), x, 1e-12)
+        f = FiniteGP(GP(m0, SqExponentialKernel()), x, 1e-12)
 
         # Check mean + covariance estimates approximately converge for single-GP sampling.
-        f̂ = rand(rng, f, S)
-        @test maximum(abs.(mean(f̂; dims=2) - mean(f))) < 1e-2
+        f̂1 = rand(rng, f, S)
+        f̂2 = similar(f̂1)
+        rand!(rng, f, f̂2)
 
-        Σ′ = (f̂ .- mean(f)) * (f̂ .- mean(f))' ./ S
-        @test mean(abs.(Σ′ - cov(f))) < 1e-2
+        for f̂ in (f̂1, f̂2)
+            @test maximum(abs.(mean(f̂; dims=2) - mean(f))) < 1e-2
+
+            Σ′ = (f̂ .- mean(f)) * (f̂ .- mean(f))' ./ S
+            @test mean(abs.(Σ′ - cov(f))) < 1e-2
+        end
     end
     # @testset "rand (gradients)" begin
     #     rng, N, S = MersenneTwister(123456), 10, 3
@@ -115,7 +128,7 @@ end
     #         )
     #     end
     # end
-    @testset "logpdf / loglikelihood / elbo / dtc" begin
+    @testset "logpdf / loglikelihood" begin
         rng = MersenneTwister(123456)
         N = 10
         S = 11
@@ -174,29 +187,6 @@ end
         #     α->sum(logpdf(FiniteGP(α * f, x, 1e-1), Ŷ)), l̄, randn(rng);
         #     atol=1e-8, rtol=1e-8,
         # )
-
-        # Ensure that the elbo is close to the logpdf when appropriate.
-        @test elbo(y, ŷ, fx) isa Real
-        @test elbo(y, ŷ, fx) ≈ logpdf(y, ŷ)
-        @test elbo(y, ŷ, f(x .+ randn(rng, N))) < elbo(y, ŷ, fx)
-
-        # # Check adjoint w.r.t. elbo is correct.
-        # adjoint_test(
-        #     (x, ŷ, σ)->elbo(FiniteGP(f, x, σ^2), ŷ, FiniteGP(f, x, 0)),
-        #     randn(rng), x, ŷ, σ;
-        #     atol=1e-6, rtol=1e-6,
-        # )
-
-        # Ensure that the dtc is close to the logpdf when appropriate.
-        @test dtc(y, ŷ, fx) isa Real
-        @test dtc(y, ŷ, fx) ≈ logpdf(y, ŷ)
-
-        # # Check adjoint w.r.t. dtc is correct.
-        # adjoint_test(
-        #     (x, ŷ, σ)->dtc(FiniteGP(f, x, σ^2), ŷ, FiniteGP(f, x, 0)),
-        #     randn(rng), x, ŷ, σ;
-        #     atol=1e-6, rtol=1e-6,
-        # )
     end
     @testset "Type Stability - $T" for T in [Float64, Float32]
         rng = MersenneTwister(123456)
@@ -210,7 +200,6 @@ end
         y = rand(rng, fx)
         @test y isa Vector{T}
         @test logpdf(fx, y) isa T
-        @test elbo(fx, y, u) isa T
     end
 end
 

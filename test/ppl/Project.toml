@@ -1,4 +1,5 @@
 [deps]
+AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 SampleChainsDynamicHMC = "6d9fd711-e8b2-4778-9c70-c1dfb499d4c4"
 Soss = "8ce77f84-9b61-11e8-39ff-d17a774bf41c"
@@ -6,7 +7,7 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
 Distributions = "0.24"
-SampleChainsDynamicHMC = "0.2"
-Soss = "0.19"
+SampleChainsDynamicHMC = "0.2, 0.3"
+Soss = "0.19, 0.20"
 Turing = "0.16"
 julia = "1.5"
