@@ -1,6 +1,27 @@
-## Features
+# Features
 
-### Setup
+## Plotting
+
+### Plots.jl
+
+We provide functions for plotting samples and predictions of Gaussian processes with [Plots.jl](https://github.com/JuliaPlots/Plots.jl). You can see some examples in the [One-dimensional regression](@ref) tutorial.
+
+```@docs
+AbstractGPs.RecipesBase.plot(::AbstractVector, ::AbstractGPs.FiniteGP)
+AbstractGPs.RecipesBase.plot(::AbstractGPs.FiniteGP)
+AbstractGPs.RecipesBase.plot(::AbstractVector, ::AbstractGPs.AbstractGP)
+sampleplot
+```
+
+### Makie.jl
+
+You can use the Julia package [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl) to plot Gaussian processes with [Makie.jl](https://github.com/JuliaPlots/Makie.jl).
+
+![posterior animation](https://juliagaussianprocesses.github.io/AbstractGPsMakie.jl/stable/posterior_animation.mp4)
+
+
+## Setup
+
 ```julia
 using AbstractGPs, Random
 rng = MersenneTwister(0)
@@ -95,18 +116,3 @@ u_p_fx1 = update_posterior(p_fx1, f(x[8:10], 0.1), y[8:10])
 p_fx2 = posterior(VFE(f(Z1)), f(x, 0.1), y)
 u_p_fx2 = update_posterior(p_fx2, f(Z2))
 ```
-
-#### Plotting
-##### Plots.jl
-You can directly plot your GP prediction via [Plots.jl](https://github.com/JuliaPlots/Plots.jl).
-We provide two functions `plot` and `sampleplot` taking as arguments `X, AbstractGP` or `FiniteGP`
-For example uses see the [One-dimensional regression](@ref) tutorial
-
-```@docs
-plot
-sampleplot
-```
-
-
-##### Makie.jl
-For using `Makie.jl` you can use the additional package [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl).
