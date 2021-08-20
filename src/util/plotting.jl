@@ -16,37 +16,67 @@
 end
 
 """
-    plot([x::AbstractVector, ]f::FiniteGP; ribbon_scale=1)
+    plot(x::AbstractVector, f::FiniteGP; ribbon_scale=1, kwargs...)
+    plot!([plot, ]x::AbstractVector, f::FiniteGP; ribbon_scale=1, kwargs...)
 
-Plot the predictive mean as well as a ribbon with a width equal to `ribbon_scale` times the standard deviation versus x.
+Plot the predictive mean for the projection `f` of a Gaussian process and a ribbon of
+`ribbon_scale` standard deviations around it versus `x`.
 
-Make sure to run `using Plots` before using this function
+!!! note
+    Make sure to load [Plots.jl](https://github.com/JuliaPlots/Plots.jl) before you use
+    this function.
 
-# Example
+# Examples
+
+Plot the mean and a ribbon of 3 standard deviations:
+
 ```julia
 using Plots
+
 gp = GP(SqExponentialKernel())
 plot(gp(rand(5)); ribbon_scale=3)
 ```
-The given example plots the mean with 3 std. dev. from the projection of the GP `gp`.
-
---- 
-    plot(x::AbstractVector, gp::AbstractGP; ribbon_scale=1)
-
-Plot mean and std. dev from the finite projection `gp(x, 1e-9)` versus `x`.
 """
-RecipesBase.plot(f::FiniteGP)
+RecipesBase.plot(::AbstractVector, ::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(::AbstractVector, ::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(::RecipesBase.AbstractPlot, ::AbstractVector, ::FiniteGP; kwargs...)
 
 """
-    sampleplot([x::AbstractVector, ]f::FiniteGP; samples=1)
+    plot(f::FiniteGP; kwargs...)
+    plot!([plot, ]f::FiniteGP; kwargs...)
 
-Plot samples from `f` versus `x` (default value: `f.x`).
+Plot the predictive mean and a ribbon around it for the projection `f` of a Gaussian
+process versus `f.x`.
+"""
+RecipesBase.plot(::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(::RecipesBase.AbstractPlot, ::FiniteGP; kwargs...)
 
-Make sure to run `using Plots` before using this function.
+"""
+    plot(x::AbstractVector, gp::AbstractGP; kwargs...)
+    plot!([plot, ]x::AbstractVector, gp::AbstractGP; kwargs...)
+
+Plot the predictive mean and a ribbon around it for the projection `gp(x)` of the Gaussian
+process `gp`.
+"""
+RecipesBase.plot(::AbstractVector, ::AbstractGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(::AbstractVector, ::AbstractGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(::RecipesBase.AbstractPlot, ::AbstractVector, ::AbstractGP; kwargs...)
+
+"""
+    sampleplot([x::AbstractVector=f.x, ]f::FiniteGP; samples=1, kwargs...)
+
+Plot samples from the projection `f` of a Gaussian process versus `x`.
+
+!!! note
+    Make sure to load [Plots.jl](https://github.com/JuliaPlots/Plots.jl) before you use
+    this function.
 
 # Example
+
 ```julia
 using Plots
+
 gp = GP(SqExponentialKernel())
 sampleplot(gp(rand(5)); samples=10, markersize=5)
 ```
@@ -54,7 +84,7 @@ The given example plots 10 samples from the projection of the GP `gp`. The `mark
 from default of 0.5 to 5.
 
 ---
-    sampleplot(x::AbstractVector, gp::AbstractGP; samples=1)
+    sampleplot(x::AbstractVector, gp::AbstractGP; samples=1, kwargs...)
 
 Plot samples from the finite projection `gp(x, 1e-9)` versus `x`.
 """
