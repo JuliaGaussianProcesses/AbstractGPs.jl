@@ -10,6 +10,7 @@ using Random
 using Statistics
 using StatsBase
 using RecipesBase
+using IrrationalConstants: log2π
 
 using KernelFunctions: ColVecs, RowVecs
 
@@ -26,10 +27,9 @@ export GP,
     elbo,
     dtc,
     posterior,
-    approx_posterior,
     VFE,
     DTC,
-    update_approx_posterior,
+    update_posterior,
     LatentGP,
     ColVecs,
     RowVecs
