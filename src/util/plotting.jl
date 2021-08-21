@@ -38,8 +38,12 @@ plot(gp(rand(5)); ribbon_scale=3)
 ```
 """
 RecipesBase.plot(::AbstractVector, ::FiniteGP; kwargs...)
-@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(::AbstractVector, ::FiniteGP; kwargs...)
-@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(::RecipesBase.AbstractPlot, ::AbstractVector, ::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(
+    ::AbstractVector, ::FiniteGP; kwargs...
+)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(
+    ::RecipesBase.AbstractPlot, ::AbstractVector, ::FiniteGP; kwargs...
+)
 
 """
     plot(f::FiniteGP; kwargs...)
@@ -50,7 +54,9 @@ process versus `f.x`.
 """
 RecipesBase.plot(::FiniteGP; kwargs...)
 @doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(::FiniteGP; kwargs...)
-@doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(::RecipesBase.AbstractPlot, ::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(
+    ::RecipesBase.AbstractPlot, ::FiniteGP; kwargs...
+)
 
 """
     plot(x::AbstractVector, gp::AbstractGP; kwargs...)
@@ -60,8 +66,12 @@ Plot the predictive mean and a ribbon around it for the projection `gp(x)` of th
 process `gp`.
 """
 RecipesBase.plot(::AbstractVector, ::AbstractGP; kwargs...)
-@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(::AbstractVector, ::AbstractGP; kwargs...)
-@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(::RecipesBase.AbstractPlot, ::AbstractVector, ::AbstractGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(
+    ::AbstractVector, ::AbstractGP; kwargs...
+)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(
+    ::RecipesBase.AbstractPlot, ::AbstractVector, ::AbstractGP; kwargs...
+)
 
 """
     sampleplot([x::AbstractVector=f.x, ]f::FiniteGP; samples=1, kwargs...)
