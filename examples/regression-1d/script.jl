@@ -12,7 +12,7 @@ using Plots
 default(; legend=:outertopright, size=(700, 400))
 
 using Random
-Random.seed!(1234)
+Random.seed!(42)
 #md nothing #hide
 
 # Load toy regression
@@ -76,7 +76,8 @@ logpdf(fx, y_train)
 p_fx = posterior(fx, y_train)
 logpdf(p_fx(x_test), y_test)
 
-# We plot the posterior Gaussian process along with the observations.
+# We plot the posterior Gaussian process (its mean and a ribbon of 2 standard deviations
+# around it) on a grid along with the observations.
 
 scatter(
     x_train,
@@ -88,7 +89,7 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, p_fx; label=false)
+plot!(0:0.001:1, p_fx; label=false, ribbon_scale=2)
 
 # ## Markov Chain Monte Carlo
 #
@@ -208,7 +209,7 @@ end
 
 mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
-# We sample a function from the posterior GP for the final 100 samples of kernel
+# We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
 
 plt = scatter(
@@ -220,10 +221,10 @@ plt = scatter(
     title="posterior (AdvancedHMC)",
     label="Train Data",
 )
-scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); samples=5)
 end
+scatter!(plt, x_test, y_test; label="Test Data")
 plt
 
 # #### DynamicHMC
@@ -444,7 +445,7 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, ap; label=false)
+plot!(0:0.001:1, ap; label=false, ribbon_scale=2)
 vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
 
 # ## Exact Gaussian Process Inference
@@ -520,4 +521,4 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, opt_p_fx; label=false)
+plot!(0:0.001:1, opt_p_fx; label=false, ribbon_scale=2)
