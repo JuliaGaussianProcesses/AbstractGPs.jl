@@ -76,7 +76,8 @@ logpdf(fx, y_train)
 p_fx = posterior(fx, y_train)
 logpdf(p_fx(x_test), y_test)
 
-# We plot the posterior Gaussian process, i.e. the mean and 2 std. dev. on a grid along with the observations.
+# We plot the posterior Gaussian process (its mean and a ribbon of 2 standard deviations
+# around it) on a grid along with the observations.
 
 scatter(
     x_train,
@@ -87,8 +88,8 @@ scatter(
     title="posterior (default parameters)",
     label="Train Data",
 )
-plot!(0:0.001:1, p_fx; label=false, ribbon_scale=2)
 scatter!(x_test, y_test; label="Test Data")
+plot!(0:0.001:1, p_fx; label=false, ribbon_scale=2)
 
 # ## Markov Chain Monte Carlo
 #
@@ -444,7 +445,7 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, ap; label=false)
+plot!(0:0.001:1, ap; label=false, ribbon_scale=2)
 vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
 
 # ## Exact Gaussian Process Inference
@@ -520,4 +521,4 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, opt_p_fx; label=false)
+plot!(0:0.001:1, opt_p_fx; label=false, ribbon_scale=2)
