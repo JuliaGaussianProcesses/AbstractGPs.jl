@@ -127,10 +127,6 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     # Set default attributes
     seriestype --> :line
     linealpha --> 0.2
-    markershape --> :circle
-    markerstrokewidth --> 0.0
-    markersize --> 0.5
-    markeralpha --> 0.3
     seriescolor --> "red"
     label := col_label
 
