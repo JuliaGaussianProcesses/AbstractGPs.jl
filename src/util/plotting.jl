@@ -82,7 +82,10 @@ Plot samples from the projection `f` of a Gaussian process versus `x`.
     Make sure to load [Plots.jl](https://github.com/JuliaPlots/Plots.jl) before you use
     this function.
 
-This recipe handles the `label` argument in a custom way: when plotting multiple samples and `label` is a string, only a single element is added to the legend. To give each sample the same legend entry, pass an explicit column matrix, e.g. `label=fill("sample", (1, samples))`.
+This recipe handles the `label` argument in a custom way: when plotting
+multiple samples and `label` is a string, only a single element is added to the
+legend. To give each sample the same legend entry, pass an explicit column
+matrix, e.g. `label=fill("sample", (1, samples))`.
 
 # Example
 
