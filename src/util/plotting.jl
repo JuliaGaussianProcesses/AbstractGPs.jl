@@ -115,7 +115,7 @@ SamplePlot((f,)::Tuple{<:FiniteGP}) = SamplePlot((f.x, f))
 SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e-9),))
 
 @recipe function f(sp::SamplePlot)
-    nsamples::Int = get(plotattributes, :samples, 1)
+    nsamples::Int = pop!(plotattributes, :samples, 1)
     samples = rand(sp.f, nsamples)
 
     # Set default attributes
