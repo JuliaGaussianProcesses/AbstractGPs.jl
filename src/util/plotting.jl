@@ -4,7 +4,7 @@
     length(x) == length(gp.x) ||
         throw(DimensionMismatch("length of `x` and `gp.x` has to be equal"))
     scale::Float64 = pop!(plotattributes, :ribbon_scale, 1.0)
-    scale > 0.0 || error("`bandwidth` keyword argument must be non-negative")
+    scale >= 0.0 || error("`ribbon_scale` keyword argument must be non-negative")
 
     # compute marginals
     μ, σ2 = mean_and_var(gp)
