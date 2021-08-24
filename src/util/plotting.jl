@@ -122,7 +122,7 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     samples = rand(sp.f, nsamples)
 
     flat_x = repeat(vcat(sp.x, NaN), nsamples)
-    flat_f = vcat(samples, fill(NaN, 1, nsamples)) |> vec
+    flat_f = vec(vcat(samples, fill(NaN, 1, nsamples)))
 
     # Set default attributes
     #seriestype --> :line
