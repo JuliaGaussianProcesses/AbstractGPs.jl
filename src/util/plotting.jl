@@ -118,6 +118,12 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     nsamples::Int = pop!(plotattributes, :samples, 1)
     samples = rand(sp.f, nsamples)
 
+    col_label = pop!(plotattributes, :label, "")
+    if col_label isa String
+        # blank labels for all but first column, e.g. ["samples" "" "" ...]
+        col_label = [col_label fill("", nsamples - 1)...]
+    end
+
     # Set default attributes
     seriestype --> :line
     linealpha --> 0.2
@@ -126,7 +132,7 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     markersize --> 0.5
     markeralpha --> 0.3
     seriescolor --> "red"
-    label --> ""
+    label := col_label
 
     return sp.x, samples
 end
