@@ -88,10 +88,10 @@ Plot samples from the projection `f` of a Gaussian process versus `x`.
 using Plots
 
 gp = GP(SqExponentialKernel())
-sampleplot(gp(rand(5)); samples=10, markersize=5)
+sampleplot(gp(rand(5)); samples=10, linealpha=1.0)
 ```
-The given example plots 10 samples from the projection of the GP `gp`. The `markersize` is modified
-from default of 0.5 to 5.
+The given example plots 10 samples from the projection of the GP `gp`.
+The `linealpha` is modified from default of 0.2 to 1.
 
 ---
     sampleplot(x::AbstractVector, gp::AbstractGP; samples=1, kwargs...)
