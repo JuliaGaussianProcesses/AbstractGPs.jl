@@ -121,13 +121,14 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     nsamples::Int = pop!(plotattributes, :samples, 1)
     samples = rand(sp.f, nsamples)
 
-    flat_x = vcat(Iterators.flatten(zip(Iterators.repeated(sp.x), fill(NaN, nsamples)))...)
-    flat_f = vcat(Iterators.flatten(zip(eachcol(samples), Iterators.repeated([NaN])))...)
+    flat_x = repeat(vcat(sp.x, NaN), nsamples)
+    flat_f = vcat(samples, fill(NaN, 1, nsamples)) |> vec
 
     # Set default attributes
-    seriestype --> :line
+    #seriestype --> :line
     linealpha --> 0.2
     seriescolor --> "red"
+    label --> ""
 
     return flat_x, flat_f
 end
