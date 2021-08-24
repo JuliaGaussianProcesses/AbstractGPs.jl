@@ -82,10 +82,8 @@ Plot samples from the projection `f` of a Gaussian process versus `x`.
     Make sure to load [Plots.jl](https://github.com/JuliaPlots/Plots.jl) before you use
     this function.
 
-This recipe handles the `label` argument in a custom way: when plotting
-multiple samples and `label` is a string, only a single element is added to the
-legend. To give each sample the same legend entry, pass an explicit column
-matrix, e.g. `label=fill("sample", (1, samples))`.
+When plotting multiple samples, these are treated as a _single_ series (i.e.,
+only a single entry will be added to the legend when providing a `label`).
 
 # Example
 
@@ -123,17 +121,13 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     nsamples::Int = pop!(plotattributes, :samples, 1)
     samples = rand(sp.f, nsamples)
 
-    col_label = pop!(plotattributes, :label, "")
-    if col_label isa String
-        # blank labels for all but first column, e.g. ["samples" "" "" ...]
-        col_label = [col_label fill("", nsamples - 1)...]
-    end
+    flat_x = vcat(Iterators.flatten(zip(Iterators.repeated(sp.x), fill(NaN, nsamples)))...)
+    flat_f = vcat(Iterators.flatten(zip(eachcol(samples), Iterators.repeated([NaN])))...)
 
     # Set default attributes
     seriestype --> :line
     linealpha --> 0.2
     seriescolor --> "red"
-    label := col_label
 
-    return sp.x, samples
+    return flat_x, flat_f
 end
