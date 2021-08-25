@@ -3,10 +3,9 @@
     x = rand(10)
     y = rand(10)
 
-    lgp = LatentGP(gp, x -> MvNormal(x, 0.1), 1e-5)
+    lgp = LatentGP(gp, x -> (f -> MvNormal(f, 0.1)), 1e-5)
     @test lgp isa LatentGP
     @test lgp.f isa AbstractGPs.AbstractGP
-    @test lgp.Σy isa Real
 
     lfgp = lgp(x)
     @test lfgp isa AbstractGPs.LatentFiniteGP
