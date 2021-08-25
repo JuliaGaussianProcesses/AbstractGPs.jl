@@ -26,7 +26,7 @@ struct LatentFiniteGP{Tfx<:FiniteGP,Tlik}
     lik::Tlik
 end
 
-(lgp::LatentGP)(x) = LatentFiniteGP(lgp.f(x, lgp.Σy), lgp.lik)
+(lgp::LatentGP)(x) = LatentFiniteGP(lgp.f(x, lgp.Σy), lgp.lik(x))
 
 function Distributions.rand(rng::AbstractRNG, lfgp::LatentFiniteGP)
     f = rand(rng, lfgp.fx)
