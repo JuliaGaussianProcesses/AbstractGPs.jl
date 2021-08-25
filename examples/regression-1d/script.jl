@@ -289,15 +289,8 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (DynamicHMC)",
-    label="Train Data",
-)
+plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (DynamicHMC)")
+scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
     sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
@@ -348,15 +341,8 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (EllipticalSliceSampling)",
-    label="Train Data",
-)
+plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (EllipticalSliceSampling)")
+scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
     sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
