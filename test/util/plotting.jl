@@ -12,7 +12,7 @@
     @test plt2.n == 1
     plt2_x = plt2.series_list[1].plotattributes[:x]
     plt2_y = plt2.series_list[1].plotattributes[:y]
-    @test isequal(plt2_x, vcat(z, NaN, z, NaN, z, NaN))
+    @test isequal(plt2_x, vcat(x, NaN, x, NaN, x, NaN))
     @test length(plt2_y) == length(plt2_x)
     @test isnan(plt2_y[length(z) + 1]) && isnan(plt2_y[2length(z) + 2])
 
