@@ -126,7 +126,7 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
 
     # Set default attributes
     #seriestype --> :line
-    linealpha --> 0.2
+    linealpha --> 0.35
     seriescolor --> "red"
     label --> ""
 
