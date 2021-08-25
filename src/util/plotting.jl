@@ -85,6 +85,8 @@ Plot samples from the projection `f` of a Gaussian process versus `x`.
 When plotting multiple samples, these are treated as a _single_ series (i.e.,
 only a single entry will be added to the legend when providing a `label`).
 
+The seriescolor is red by default.
+
 # Example
 
 ```julia
@@ -94,7 +96,7 @@ gp = GP(SqExponentialKernel())
 sampleplot(gp(rand(5)); samples=10, linealpha=1.0)
 ```
 The given example plots 10 samples from the projection of the GP `gp`.
-The `linealpha` is modified from default of 0.2 to 1.
+The `linealpha` is modified from default of 0.35 to 1.
 
 ---
     sampleplot(x::AbstractVector, gp::AbstractGP; samples=1, kwargs...)
@@ -125,7 +127,6 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
     flat_f = vec(vcat(samples, fill(NaN, 1, nsamples)))
 
     # Set default attributes
-    #seriestype --> :line
     linealpha --> 0.35
     seriescolor --> "red"
     label --> ""
