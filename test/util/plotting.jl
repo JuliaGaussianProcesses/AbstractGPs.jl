@@ -6,18 +6,20 @@
     z = rand(10)
     plt1 = sampleplot(z, gp)
     @test plt1.n == 1
-    @test plt1.series_list[1].plotattributes[:x] == sort(z)
+    @test plt1.series_list[1].plotattributes[:x] == vcat(z, NaN)
 
-    plt2 = sampleplot(gp; samples=10)
-    @test plt2.n == 10
-    sort_x = sort(x)
-    @test all(series.plotattributes[:x] == sort_x for series in plt2.series_list)
+    plt2 = sampleplot(gp; samples=3)
+    @test plt2.n == 1
+    plt2_x = plt2.series_list[1].plotattributes[:x]
+    plt2_y = plt2.series_list[1].plotattributes[:y]
+    @test plt2_x == vcat(z, NaN, z, NaN, z, NaN)
+    @test length(plt2_y) == length(plt2_x)
+    @test isnan(plt2_y[length(z) + 1]) && isnan(plt2_y[2length(z) + 2])
 
-    z = rand(7)
-    plt3 = sampleplot(z, f; samples=8)
-    @test plt3.n == 8
-    sort_z = sort(z)
-    @test all(series.plotattributes[:x] == sort_z for series in plt3.series_list)
+    z3 = rand(7)
+    plt3 = sampleplot(z3, f; samples=2)
+    @test plt3.n == 1
+    @test plt3.series_list[1].plotattributes[:x] == vcat(z3, NaN, z3, NaN)
 
     # Check recipe dispatches for `FiniteGP`s
     rec = RecipesBase.apply_recipe(Dict{Symbol,Any}(), gp)
