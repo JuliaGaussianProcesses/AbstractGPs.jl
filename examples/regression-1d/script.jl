@@ -63,7 +63,7 @@ y_test = y[9:end]
 f = GP(Matern52Kernel())
 #md nothing #hide
 
-# We create a finite dimentional projection at the inputs of the training dataset
+# We create a finite dimensional projection at the inputs of the training dataset
 # observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
 # log-likelihood of the outputs of the training dataset.
 
