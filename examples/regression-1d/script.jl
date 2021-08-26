@@ -212,19 +212,19 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (AdvancedHMC)",
-    label="Train Data",
-)
-for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); samples=5)
+plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (AdvancedHMC)")
+for (i, p) in enumerate(samples[(end - 100):end])
+    sampleplot!(
+        plt,
+        0:0.02:1,
+        gp_posterior(x_train, y_train, p);
+        samples=5,
+        seriescolor="red",
+        label=(i == 1 ? "samples" : nothing),
+    )
 end
-scatter!(plt, x_test, y_test; label="Test Data")
+scatter!(plt, x_train, y_train; label="Train Data", markercolor=1)
+scatter!(plt, x_test, y_test; label="Test Data", markercolor=2)
 plt
 
 # #### DynamicHMC
@@ -290,18 +290,11 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (DynamicHMC)",
-    label="Train Data",
-)
+plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (DynamicHMC)")
+scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
 
@@ -349,18 +342,13 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (EllipticalSliceSampling)",
-    label="Train Data",
+plt = plot(;
+    xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (EllipticalSliceSampling)"
 )
+scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
 
