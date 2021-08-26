@@ -219,6 +219,7 @@ for (i, p) in enumerate(samples[(end - 100):end])
         0:0.02:1,
         gp_posterior(x_train, y_train, p);
         samples=5,
+        seriescolor="red",
         label=(i == 1 ? "samples" : nothing),
     )
 end
@@ -293,7 +294,7 @@ plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (DynamicHMC)"
 scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
 
@@ -347,7 +348,7 @@ plt = plot(;
 scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
 
