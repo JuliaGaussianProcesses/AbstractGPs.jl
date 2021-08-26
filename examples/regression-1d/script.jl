@@ -63,7 +63,7 @@ y_test = y[9:end]
 f = GP(Matern52Kernel())
 #md nothing #hide
 
-# We create a finite dimentional projection at the inputs of the training dataset
+# We create a finite dimensional projection at the inputs of the training dataset
 # observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
 # log-likelihood of the outputs of the training dataset.
 
@@ -341,7 +341,9 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (EllipticalSliceSampling)")
+plt = plot(;
+    xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (EllipticalSliceSampling)"
+)
 scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
