@@ -85,8 +85,6 @@ Plot samples from the projection `f` of a Gaussian process versus `x`.
 When plotting multiple samples, these are treated as a _single_ series (i.e.,
 only a single entry will be added to the legend when providing a `label`).
 
-The seriescolor is red by default.
-
 # Example
 
 ```julia
@@ -128,7 +126,6 @@ SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e
 
     # Set default attributes
     linealpha --> 0.35
-    seriescolor --> "red"
     label --> ""
 
     return flat_x, flat_f
