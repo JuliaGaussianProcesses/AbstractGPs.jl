@@ -18,6 +18,6 @@ template is unclear, just mention it! -->
 
 **Breaking changes**
 <!-- If this PR breaks backwards-compatibility, please start the PR title with `**BREAKING**`! -->
-<!-- Describe any changes that are not backwards-compatible, -->
+<!-- In this section, describe any changes that are not backwards-compatible, -->
 <!-- why it is worth breaking backwards compatiblity, -->
 <!-- and how a user would have to address these changes in their downstream code. -->
