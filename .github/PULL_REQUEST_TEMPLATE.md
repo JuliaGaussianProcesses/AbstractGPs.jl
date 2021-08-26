@@ -17,6 +17,7 @@ template is unclear, just mention it! -->
 <!-- A clear and concise description of any alternative solutions or features you've considered. -->
 
 **Breaking changes**
+<!-- If this PR breaks backwards-compatibility, please start the PR title with `**BREAKING**`! -->
 <!-- Describe any changes that are not backwards-compatible, -->
 <!-- why it is worth breaking backwards compatiblity, -->
 <!-- and how a user would have to address these changes in their downstream code. -->
