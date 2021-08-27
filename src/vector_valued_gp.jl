@@ -73,3 +73,20 @@ function Distributions.logpdf(vx::FiniteVectorValuedGP, Y::AbstractMatrix{<:Real
     # Compute logpdf using FiniteGP.
     return logpdf(fx, y)
 end
+
+function posterior(vx::FiniteVectorValuedGP, Y::AbstractMatrix{<:Real})
+
+    # Construct equivalent FiniteGP.
+    x_f = KernelFunctions.MOInputIsotopicByOutputs(vx.x, vx.v.num_outputs)
+    f = vx.v.f
+    fx = f(x_f, vx.Σy)
+
+    # Construct flattened-version of observations.
+    y = vec(Y)
+
+    # Construct posterior AbstractGP
+    f_post = posterior(fx, y)
+
+    # Construct a new vector-valued GP.
+    return VectorValuedGP(f_post, vx.v.num_outputs)
+end

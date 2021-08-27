@@ -11,4 +11,6 @@
     rng = MersenneTwister(123456)
     Y = rand(rng, vx)
     logpdf(vx, Y)
+
+    v_post = posterior(vx, Y)
 end
