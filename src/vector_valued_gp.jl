@@ -13,8 +13,6 @@ struct FiniteVectorValuedGP{Tv<:VectorValuedGP, Tx<:AbstractVector, TΣy<:Real}
     Σy::TΣy
 end
 
-Base.length(f::FiniteVectorValuedGP) = length(f.x)
-
 (f::VectorValuedGP)(x...) = FiniteVectorValuedGP(f, x...)
 
 function Statistics.mean(vx::FiniteVectorValuedGP)
