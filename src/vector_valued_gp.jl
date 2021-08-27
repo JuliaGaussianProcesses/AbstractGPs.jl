@@ -7,7 +7,7 @@ end
 # I gave up figuring out how to properly subtype MatrixDistribution, but I want this to
 # subtype a distribution type which indicates that samples from this distribution produces
 # matrix of size num_features x num_outputs, or something like that.
-struct FiniteVectorValuedGP{Tv<:VectorValuedGP, Tx<:AbstractVector, TΣy<:Real}
+struct FiniteVectorValuedGP{Tv<:VectorValuedGP,Tx<:AbstractVector,TΣy<:Real}
     v::Tv
     x::Tx
     Σy::TΣy
