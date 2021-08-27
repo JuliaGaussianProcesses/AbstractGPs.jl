@@ -5,7 +5,7 @@ can understand your intent and the proposed changes. If anything about this
 template is unclear, just mention it! -->
 
 **Summary**
-<!-- link to any GitHub issues this relates to -->
+<!-- Summary of what & why - explain your motivation and/or link to any GitHub issues this relates to -->
 
 **Proposed changes**
 <!-- Large PRs should ideally be preceded by a design discussion on a separate issue! -->
