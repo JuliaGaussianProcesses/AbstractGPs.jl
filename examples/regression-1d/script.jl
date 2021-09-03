@@ -12,7 +12,7 @@ using Plots
 default(; legend=:outertopright, size=(700, 400))
 
 using Random
-Random.seed!(1234)
+Random.seed!(42)
 #md nothing #hide
 
 # Load toy regression
@@ -63,7 +63,7 @@ y_test = y[9:end]
 f = GP(Matern52Kernel())
 #md nothing #hide
 
-# We create a finite dimentional projection at the inputs of the training dataset
+# We create a finite dimensional projection at the inputs of the training dataset
 # observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
 # log-likelihood of the outputs of the training dataset.
 
@@ -76,7 +76,8 @@ logpdf(fx, y_train)
 p_fx = posterior(fx, y_train)
 logpdf(p_fx(x_test), y_test)
 
-# We plot the posterior Gaussian process along with the observations.
+# We plot the posterior Gaussian process (its mean and a ribbon of 2 standard deviations
+# around it) on a grid along with the observations.
 
 scatter(
     x_train,
@@ -88,7 +89,7 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, p_fx; label=false)
+plot!(0:0.001:1, p_fx; label=false, ribbon_scale=2)
 
 # ## Markov Chain Monte Carlo
 #
@@ -208,22 +209,22 @@ end
 
 mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 
-# We sample a function from the posterior GP for the final 100 samples of kernel
+# We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (AdvancedHMC)",
-    label="Train Data",
-)
-scatter!(plt, x_test, y_test; label="Test Data")
-for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (AdvancedHMC)")
+for (i, p) in enumerate(samples[(end - 100):end])
+    sampleplot!(
+        plt,
+        0:0.02:1,
+        gp_posterior(x_train, y_train, p);
+        samples=5,
+        seriescolor="red",
+        label=(i == 1 ? "samples" : nothing),
+    )
 end
+scatter!(plt, x_train, y_train; label="Train Data", markercolor=1)
+scatter!(plt, x_test, y_test; label="Test Data", markercolor=2)
 plt
 
 # #### DynamicHMC
@@ -289,18 +290,11 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (DynamicHMC)",
-    label="Train Data",
-)
+plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (DynamicHMC)")
+scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
 
@@ -348,18 +342,13 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
 
-plt = scatter(
-    x_train,
-    y_train;
-    xlim=(0, 1),
-    xlabel="x",
-    ylabel="y",
-    title="posterior (EllipticalSliceSampling)",
-    label="Train Data",
+plt = plot(;
+    xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (EllipticalSliceSampling)"
 )
+scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
 for p in samples[(end - 100):end]
-    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p))
+    sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
 
@@ -368,7 +357,7 @@ plt
 # Sanity check for the Evidence Lower BOund (ELBO) implemented according to
 # M. K. Titsias's _Variational learning of inducing variables in sparse Gaussian processes_.
 
-elbo(fx, y_train, f(rand(5)))
+elbo(VFE(f(rand(5))), fx, y_train)
 
 # We use the LBFGS algorithm to maximize the given ELBO. It is provided by the Julia
 # package [Optim.jl](https://github.com/JuliaNLSolvers/Optim.jl).
@@ -386,6 +375,8 @@ using Optim
 # f(x) = \frac{1}{1 + \exp{(-x)}}.
 # ```
 
+jitter = 1e-6  # "observing" the latent process with some (small) amount of jitter improves numerical stability
+
 function objective_function(x, y)
     function negative_elbo(params)
         kernel =
@@ -393,8 +384,8 @@ function objective_function(x, y)
         f = GP(kernel)
         fx = f(x, 0.1)
         z = logistic.(params[3:end])
-        fz = f(z, 1e-6)  # "observing" the latent process with some (small) amount of jitter improves numerical stability
-        return -elbo(fx, y, fz)
+        approx = VFE(f(z, jitter))
+        return -elbo(approx, fx, y)
     end
     return negative_elbo
 end
@@ -427,7 +418,7 @@ opt_kernel =
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
-ap = approx_posterior(VFE(), opt_fx, y_train, opt_f(logistic.(opt.minimizer[3:end])))
+ap = posterior(VFE(opt_f(logistic.(opt.minimizer[3:end]), jitter)), opt_fx, y_train)
 logpdf(ap(x_test), y_test)
 
 # We visualize the approximate posterior with optimized parameters.
@@ -442,7 +433,7 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, ap; label=false)
+plot!(0:0.001:1, ap; label=false, ribbon_scale=2)
 vline!(logistic.(opt.minimizer[3:end]); label="Pseudo-points")
 
 # ## Exact Gaussian Process Inference
@@ -518,4 +509,4 @@ scatter(
     label="Train Data",
 )
 scatter!(x_test, y_test; label="Test Data")
-plot!(0:0.001:1, opt_p_fx; label=false)
+plot!(0:0.001:1, opt_p_fx; label=false, ribbon_scale=2)

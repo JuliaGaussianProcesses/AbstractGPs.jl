@@ -20,6 +20,7 @@ using AbstractGPs:
     diag_Xt_invA_Y,
     Xtinv_A_Xinv,
     tr_At_A,
+    inducing_points,
     TestUtils
 
 using Documenter

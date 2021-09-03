@@ -1,4 +1,18 @@
-struct VFE end
+"""
+    VFE(fz::FiniteGP)
+
+The "Variational Free Energy" sparse approximation [1], used to construct an
+approximate posterior with inducing inputs `fz.x`. See [`posterior(v::VFE,
+fx::FiniteGP, y::AbstractVector{<:Real})`](@ref) for a usage example.
+
+[1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
+processes". In: Proceedings of the Twelfth International Conference on Artificial
+Intelligence and Statistics. 2009.
+"""
+struct VFE{Tfz<:FiniteGP}
+    fz::Tfz
+end
+
 const DTC = VFE
 
 struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
@@ -8,20 +22,39 @@ struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
 end
 
 """
-    approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
+    posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
-Compute the optimal approximate posterior [1] over the process `f`, given observations `y`
-of `f` at `x`, and inducing points `u`, where `u = f(z)` for some inducing inputs `z`.
+Compute the optimal approximate posterior [1] over the process `f = fx.f`, given observations `y`
+of `f` at `x`, and inducing points `v.z`.
+
+```jldoctest
+julia> f = GP(Matern52Kernel());
+
+julia> x = randn(1000);
+
+julia> z = range(-5.0, 5.0; length=13);
+
+julia> v = VFE(f(z));
+
+julia> y = rand(f(x, 0.1));
+
+julia> post = posterior(v, f(x, 0.1), y);
+
+julia> post(z) isa AbstractGPs.FiniteGP
+true
+```
 
 [1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::FiniteGP)
-    U_y = _cholesky(_symmetric(fx.Σy)).U
-    U = cholesky(_symmetric(cov(u))).U
+function posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert vfe.fz.f === fx.f
 
-    B_εf = U' \ (U_y' \ cov(fx, u))'
+    U_y = _cholesky(_symmetric(fx.Σy)).U
+    U = cholesky(_symmetric(cov(vfe.fz))).U
+
+    B_εf = U' \ (U_y' \ cov(fx, vfe.fz))'
 
     b_y = U_y' \ (y - mean(fx))
 
@@ -30,25 +63,27 @@ function approx_posterior(::VFE, fx::FiniteGP, y::AbstractVector{<:Real}, u::Fin
 
     m_ε = Λ_ε \ (B_εf * b_y)
 
-    cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, z=u.x, b_y=b_y, B_εf=B_εf, x=fx.x, Σy=fx.Σy)
-    return ApproxPosteriorGP(VFE(), fx.f, cache)
+    cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=U \ m_ε, b_y=b_y, B_εf=B_εf, x=fx.x, Σy=fx.Σy)
+    return ApproxPosteriorGP(vfe, fx.f, cache)
 end
 
 """
-    function update_approx_posterior(
-        f_post_approx::ApproxPosteriorGP,
+    function update_posterior(
+        f_post_approx::ApproxPosteriorGP{<:VFE},
         fx::FiniteGP,
         y::AbstractVector{<:Real}
     )
 
 Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain the same 
-of pseudo-points.
+set of pseudo-points.
 """
-function update_approx_posterior(
-    f_post_approx::ApproxPosteriorGP, fx::FiniteGP, y::AbstractVector{<:Real}
+function update_posterior(
+    f_post_approx::ApproxPosteriorGP{<:VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
 )
+    @assert f_post_approx.prior === fx.f
+
     U = f_post_approx.data.U
-    z = f_post_approx.data.z
+    z = inducing_points(f_post_approx)
 
     U_y₂ = _cholesky(_symmetric(fx.Σy)).U
 
@@ -71,30 +106,35 @@ function update_approx_posterior(
     x = vcat(f_post_approx.data.x, fx.x)
 
     cache = (m_ε=m_ε, Λ_ε=Λ_ε, U=U, α=α, z=z, b_y=b_y, B_εf=B_εf, x=x, Σy=Σy)
-    return ApproxPosteriorGP(VFE(), fx.f, cache)
+    return ApproxPosteriorGP(f_post_approx.approx, fx.f, cache)
 end
 
 """
-    function update_approx_posterior(
-        f_post_approx::ApproxPosteriorGP,
-        u::FiniteGP,
+    function update_posterior(
+        f_post_approx::ApproxPosteriorGP{<:VFE},
+        z::FiniteGP,
     )
 
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
-set of pseudo points. 
+set of pseudo-points.
 """
-function update_approx_posterior(f_post_approx::ApproxPosteriorGP, u::FiniteGP)
+function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
+    @assert f_post_approx.prior === fz.f
+
+    z_old = inducing_points(f_post_approx)
+    z = fz.x
+
     U11 = f_post_approx.data.U
-    C12 = cov(u.f, f_post_approx.data.z, u.x)
-    C22 = _symmetric(cov(u))
+    C12 = cov(f_post_approx.prior, z_old, z)
+    C22 = _symmetric(cov(f_post_approx.prior, z))
     U = update_chol(Cholesky(U11, 'U', 0), C12, C22).U
-    U22 = U[(end - length(u) + 1):end, (end - length(u) + 1):end]
-    U12 = U[1:length(f_post_approx.data.z), (end - length(u) + 1):end]
+    U22 = U[(end - length(z) + 1):end, (end - length(z) + 1):end]
+    U12 = U[1:length(z_old), (end - length(z) + 1):end]
 
     B_εf₁ = f_post_approx.data.B_εf
 
-    Cu1f = cov(f_post_approx.prior, f_post_approx.data.z, f_post_approx.data.x)
-    Cu2f = cov(f_post_approx.prior, u.x, f_post_approx.data.x)
+    Cu1f = cov(f_post_approx.prior, z_old, f_post_approx.data.x)
+    Cu2f = cov(f_post_approx.prior, z, f_post_approx.data.x)
 
     U_y = _cholesky(_symmetric(f_post_approx.data.Σy)).U
 
@@ -107,54 +147,143 @@ function update_approx_posterior(f_post_approx::ApproxPosteriorGP, u::FiniteGP)
 
     α = U \ m_ε
 
-    z = vcat(f_post_approx.data.z, u.x)
+    z_new = vcat(z_old, z)
+    vfe = f_post_approx.approx
+    fz_new = vfe.fz.f(z_new, vfe.fz.Σy)
 
     cache = (
         m_ε=m_ε,
         Λ_ε=Λ_ε,
         U=U,
         α=α,
-        z=z,
         b_y=f_post_approx.data.b_y,
         B_εf=B_εf,
         x=f_post_approx.data.x,
         Σy=f_post_approx.data.Σy,
     )
-    return ApproxPosteriorGP(VFE(), f_post_approx.prior, cache)
+    return ApproxPosteriorGP(VFE(fz_new), f_post_approx.prior, cache)
 end
 
 # AbstractGP interface implementation.
 
-function Statistics.mean(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
-    return mean(f.prior, x) + cov(f.prior, x, f.data.z) * f.data.α
+function Statistics.mean(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+    return mean(f.prior, x) + cov(f.prior, x, inducing_points(f)) * f.data.α
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
-    A = f.data.U' \ cov(f.prior, f.data.z, x)
+function Statistics.cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+    A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     return cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
-    A = f.data.U' \ cov(f.prior, f.data.z, x)
+function Statistics.var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+    A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     return var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector, y::AbstractVector)
-    A_zx = f.data.U' \ cov(f.prior, f.data.z, x)
-    A_zy = f.data.U' \ cov(f.prior, f.data.z, y)
+function Statistics.cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector, y::AbstractVector)
+    A_zx = f.data.U' \ cov(f.prior, inducing_points(f), x)
+    A_zy = f.data.U' \ cov(f.prior, inducing_points(f), y)
     return cov(f.prior, x, y) - A_zx'A_zy + Xt_invA_Y(A_zx, f.data.Λ_ε, A_zy)
 end
 
-function StatsBase.mean_and_cov(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
-    A = f.data.U' \ cov(f.prior, f.data.z, x)
+function StatsBase.mean_and_cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+    A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     C_post = cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
     return m_post, C_post
 end
 
-function StatsBase.mean_and_var(f::ApproxPosteriorGP{VFE}, x::AbstractVector)
-    A = f.data.U' \ cov(f.prior, f.data.z, x)
+function StatsBase.mean_and_var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+    A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     c_post = var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
     return m_post, c_post
+end
+
+inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.fz.x
+
+"""
+    elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+
+The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `fx`, and `v.z`
+are inducing points.
+
+
+```jldoctest
+julia> f = GP(Matern52Kernel());
+
+julia> x = randn(1000);
+
+julia> z = range(-5.0, 5.0; length=13);
+
+julia> v = VFE(f(z));
+
+julia> y = rand(f(x, 0.1));
+
+julia> elbo(v, f(x, 0.1), y) < logpdf(f(x, 0.1), y)
+true
+```
+
+[1] - M. K. Titsias. "Variational learning of inducing variables in sparse Gaussian
+processes". In: Proceedings of the Twelfth International Conference on Artificial
+Intelligence and Statistics. 2009.
+"""
+function elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert vfe.fz.f === fx.f
+    _dtc, A = _compute_intermediates(fx, y, vfe.fz)
+    return _dtc - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
+end
+
+"""
+    dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+
+The Deterministic Training Conditional (DTC) [1]. `y` are observations of `fx`, and `v.z`
+are inducing points.
+
+
+```jldoctest
+julia> f = GP(Matern52Kernel());
+
+julia> x = randn(1000);
+
+julia> z = range(-5.0, 5.0; length=256);
+
+julia> v = VFE(f(z));
+
+julia> y = rand(f(x, 0.1));
+
+julia> isapprox(dtc(v, f(x, 0.1), y), logpdf(f(x, 0.1), y); atol=1e-6, rtol=1e-6)
+true
+```
+
+[1] - M. Seeger, C. K. I. Williams and N. D. Lawrence. "Fast Forward Selection to Speed Up
+Sparse Gaussian Process Regression". In: Proceedings of the Ninth International Workshop on
+Artificial Intelligence and Statistics. 2003
+"""
+function dtc(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert vfe.fz.f === fx.f
+    _dtc, _ = _compute_intermediates(fx, y, vfe.fz)
+    return _dtc
+end
+
+# Factor out computations common to the `elbo` and `dtc`.
+function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
+    consistency_check(fx, y)
+    chol_Σy = _cholesky(fx.Σy)
+
+    A = cholesky(_symmetric(cov(fz))).U' \ (chol_Σy.U' \ cov(fx, fz))'
+    Λ_ε = cholesky(Symmetric(A * A' + I))
+    δ = chol_Σy.U' \ (y - mean(fx))
+
+    tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
+    _dtc = -(length(y) * typeof(tmp)(log2π) + tmp) / 2
+    return _dtc, A
+end
+
+function consistency_check(fx, y)
+    @assert length(fx) == length(y)
+end
+
+function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
+    return sum(var(f.f, f.x) ./ diag(Σy))
 end
