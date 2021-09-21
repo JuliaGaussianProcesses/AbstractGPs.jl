@@ -27,7 +27,7 @@ The first is to implement methods directly on `Finite{<:MyNewGP}` -- this is det
 The second is to implement some methods directly involving `MyNewGP`, and utilise default `FiniteGP` methods implemented in terms of these -- this is detailed in the [Internal AbstractGPs API](@ref).
 For example, the first method involves implementing methods like `AbstractGPs.mean(fx::FiniteGP{<:MyNewGP})`, while the second involves `AbstractGPs.mean(f::MyNewGP, x::AbstractVector)`.
 
-The second interface is generally easier to implement, but sometimes it isn't always appropriate.
+The second interface is generally easier to implement, but isn't always the best choice.
 See [Which API should I implement?](@ref) for further discussion.
 
 
@@ -81,6 +81,7 @@ mean_and_var(::AbstractGPs.FiniteGP)
 
 ### Secondary Public API
 
+Observe that the Primary Public API does _not_ include a function to compute the covariance matrix of a `FiniteGP`.
 While the covariance matrix of any multivariate Gaussian is defined, it is not always a good idea to actually compute it.
 Fortunately, it's often the case that you're not actually interested in the covariance matrix per-se, rather the other quantities that you might use it to compute (`logpdf`, `rand`, `posterior`).
 This is similar to the well-known observation that you rarely need the inverse of a matrix, you just need to compute the inverse multiplied by something, so it's considered good practice to avoid ever explicitly computing the inverse of a matrix so as to avoid the numerical issues associated with it.
@@ -105,6 +106,7 @@ mean_and_cov(::AbstractGPs.FiniteGP)
 ## Internal AbstractGPs API
 
 This functionality is not intended to be used directly by the users, or those building functionality on top of this package -- they should interact with [Primary Public API](@ref).
+If you believe you really do need to interact with this level of the API, please open an issue to discuss as you may have a use-case that was missed during the design of this API.
 
 As discussed at the top of this page, instances of subtypes of `AbstractGP` represent Gaussian processes -- collections of jointly-Gaussian random variables, which may be infinite-dimensional.
 

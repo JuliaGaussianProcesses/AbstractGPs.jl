@@ -17,6 +17,8 @@ jobs:
           version: '1'
       - name: Install dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        env:
+          JULIA_PKG_SERVER: ''
       - name: Build and deploy
         env:
           GKSwstype: nul # turn off GR's interactive plotting for notebooks
