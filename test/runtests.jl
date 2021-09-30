@@ -20,6 +20,7 @@ using AbstractGPs:
     diag_Xt_invA_Y,
     Xtinv_A_Xinv,
     tr_At_A,
+    inducing_points,
     TestUtils
 
 using Documenter
@@ -45,34 +46,34 @@ include("test_util.jl")
 @testset "AbstractGPs" begin
     if GROUP == "All" || GROUP == "AbstractGPs"
         @testset "util" begin
-            include(joinpath("util", "common_covmat_ops.jl"))
-            include(joinpath("util", "plotting.jl"))
+            include("util/common_covmat_ops.jl")
+            include("util/plotting.jl")
         end
         println(" ")
         @info "Ran util tests"
 
         @testset "abstract_gp" begin
-            include(joinpath("abstract_gp", "abstract_gp.jl"))
-            include(joinpath("abstract_gp", "finite_gp.jl"))
+            include("abstract_gp.jl")
+            include("finite_gp_projection.jl")
         end
         println(" ")
         @info "Ran abstract_gp tests"
 
         @testset "gp" begin
-            include(joinpath("gp", "mean_functions.jl"))
-            include(joinpath("gp", "gp.jl"))
+            include("mean_function.jl")
+            include("base_gp.jl")
         end
         println(" ")
         @info "Ran gp tests"
 
         @testset "posterior_gp" begin
-            include(joinpath("posterior_gp", "posterior_gp.jl"))
-            include(joinpath("posterior_gp", "approx_posterior_gp.jl"))
+            include("exact_gpr_posterior.jl")
+            include("sparse_approximations.jl")
         end
         println(" ")
         @info "Ran posterior_gp tests"
 
-        include(joinpath("latent_gp", "latent_gp.jl"))
+        include("latent_gp.jl")
         println(" ")
         @info "Ran latent_gp tests"
 
@@ -87,7 +88,14 @@ include("test_util.jl")
                 :(using AbstractGPs, Random, Documenter, LinearAlgebra);
                 recursive=true,
             )
-            doctest(AbstractGPs)
+            doctest(
+                AbstractGPs;
+                doctestfilters=[
+                    r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
+                    r"(Array{[a-zA-Z0-9]+,\s?1}|\s?Vector{[a-zA-Z0-9]+})",
+                    r"(Array{[a-zA-Z0-9]+,\s?2}|\s?Matrix{[a-zA-Z0-9]+})",
+                ],
+            )
         end
     end
 
@@ -95,6 +103,6 @@ include("test_util.jl")
         Pkg.activate("ppl")
         Pkg.develop(PackageSpec(; path=PKGDIR))
         Pkg.instantiate()
-        include(joinpath("ppl", "runtests.jl"))
+        include("ppl/runtests.jl")
     end
 end

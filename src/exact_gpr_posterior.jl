@@ -6,7 +6,7 @@ end
 """
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
 
-Constructs the posterior distribution over `fx.f` given observations `y` at `x` made under
+Construct the posterior distribution over `fx.f` given observations `y` at `x` made under
 noise `fx.Σy`. This is another `AbstractGP` object. See chapter 2 of [1] for a recap on
 exact inference in GPs. This posterior process has mean function
 ```julia
@@ -16,7 +16,7 @@ and kernel
 ```julia
 k_posterior(x, z) = k(x, z) - k(x, fx.x) inv(cov(fx)) k(fx.x, z)
 ```
-where `m` and `k` are the mean function and kernel of `fx.f` respectively.
+where `m` and `k` are the mean function and kernel of `fx.f`, respectively.
 """
 function posterior(fx::FiniteGP, y::AbstractVector{<:Real})
     m, C_mat = mean_and_cov(fx)
@@ -29,9 +29,9 @@ end
 """
     posterior(fx::FiniteGP{<:PosteriorGP}, y::AbstractVector{<:Real})
 
-Constructs the posterior distribution over `fx.f` when `f` is itself a `PosteriorGP` by
-updating the cholesky factorisation of the covariance matrix and avoiding recomputing it
-from original covariance matrix. It does this by using `update_chol` functionality.
+Construct the posterior distribution over `fx.f` when `f` is itself a `PosteriorGP` by
+updating the Cholesky factorisation of the covariance matrix and avoiding recomputing it
+from the original covariance matrix. It does this by using `update_chol` functionality.
 
 Other aspects are similar to a regular posterior.
 """

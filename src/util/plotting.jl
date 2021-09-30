@@ -4,7 +4,7 @@
     length(x) == length(gp.x) ||
         throw(DimensionMismatch("length of `x` and `gp.x` has to be equal"))
     scale::Float64 = pop!(plotattributes, :ribbon_scale, 1.0)
-    scale > 0.0 || error("`bandwidth` keyword argument must be non-negative")
+    scale >= 0.0 || error("`ribbon_scale` keyword argument must be non-negative")
 
     # compute marginals
     μ, σ2 = mean_and_var(gp)
@@ -16,23 +16,88 @@
 end
 
 """
-    sampleplot([x::AbstractVector, ]f::FiniteGP; samples=1)
+    plot(x::AbstractVector, f::FiniteGP; ribbon_scale=1, kwargs...)
+    plot!([plot, ]x::AbstractVector, f::FiniteGP; ribbon_scale=1, kwargs...)
 
-Plot samples from `f` versus `x` (default value: `f.x`).
+Plot the predictive mean for the projection `f` of a Gaussian process and a ribbon of
+`ribbon_scale` standard deviations around it versus `x`.
 
-Make sure to run `using Plots` before using this function.
+!!! note
+    Make sure to load [Plots.jl](https://github.com/JuliaPlots/Plots.jl) before you use
+    this function.
 
-# Example
+# Examples
+
+Plot the mean and a ribbon of 3 standard deviations:
+
 ```julia
 using Plots
+
 gp = GP(SqExponentialKernel())
-sampleplot(gp(rand(5)); samples=10, markersize=5)
+plot(gp(rand(5)); ribbon_scale=3)
 ```
-The given example plots 10 samples from the projection of the GP `gp`. The `markersize` is modified
-from default of 0.5 to 5.
+"""
+RecipesBase.plot(::AbstractVector, ::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(
+    ::AbstractVector, ::FiniteGP; kwargs...
+)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::FiniteGP)) RecipesBase.plot!(
+    ::RecipesBase.AbstractPlot, ::AbstractVector, ::FiniteGP; kwargs...
+)
+
+"""
+    plot(f::FiniteGP; kwargs...)
+    plot!([plot, ]f::FiniteGP; kwargs...)
+
+Plot the predictive mean and a ribbon around it for the projection `f` of a Gaussian
+process versus `f.x`.
+"""
+RecipesBase.plot(::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(::FiniteGP; kwargs...)
+@doc (@doc RecipesBase.plot(::FiniteGP)) RecipesBase.plot!(
+    ::RecipesBase.AbstractPlot, ::FiniteGP; kwargs...
+)
+
+"""
+    plot(x::AbstractVector, gp::AbstractGP; kwargs...)
+    plot!([plot, ]x::AbstractVector, gp::AbstractGP; kwargs...)
+
+Plot the predictive mean and a ribbon around it for the projection `gp(x)` of the Gaussian
+process `gp`.
+"""
+RecipesBase.plot(::AbstractVector, ::AbstractGP; kwargs...)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(
+    ::AbstractVector, ::AbstractGP; kwargs...
+)
+@doc (@doc RecipesBase.plot(::AbstractVector, ::AbstractGP)) RecipesBase.plot!(
+    ::RecipesBase.AbstractPlot, ::AbstractVector, ::AbstractGP; kwargs...
+)
+
+"""
+    sampleplot([x::AbstractVector=f.x, ]f::FiniteGP; samples=1, kwargs...)
+
+Plot samples from the projection `f` of a Gaussian process versus `x`.
+
+!!! note
+    Make sure to load [Plots.jl](https://github.com/JuliaPlots/Plots.jl) before you use
+    this function.
+
+When plotting multiple samples, these are treated as a _single_ series (i.e.,
+only a single entry will be added to the legend when providing a `label`).
+
+# Example
+
+```julia
+using Plots
+
+gp = GP(SqExponentialKernel())
+sampleplot(gp(rand(5)); samples=10, linealpha=1.0)
+```
+The given example plots 10 samples from the projection of the GP `gp`.
+The `linealpha` is modified from default of 0.35 to 1.
 
 ---
-    sampleplot(x::AbstractVector, gp::AbstractGP; samples=1)
+    sampleplot(x::AbstractVector, gp::AbstractGP; samples=1, kwargs...)
 
 Plot samples from the finite projection `gp(x, 1e-9)` versus `x`.
 """
@@ -53,18 +118,15 @@ SamplePlot((f,)::Tuple{<:FiniteGP}) = SamplePlot((f.x, f))
 SamplePlot((x, gp)::Tuple{<:AbstractVector,<:AbstractGP}) = SamplePlot((gp(x, 1e-9),))
 
 @recipe function f(sp::SamplePlot)
-    nsamples::Int = get(plotattributes, :samples, 1)
+    nsamples::Int = pop!(plotattributes, :samples, 1)
     samples = rand(sp.f, nsamples)
 
+    flat_x = repeat(vcat(sp.x, NaN), nsamples)
+    flat_f = vec(vcat(samples, fill(NaN, 1, nsamples)))
+
     # Set default attributes
-    seriestype --> :line
-    linealpha --> 0.2
-    markershape --> :circle
-    markerstrokewidth --> 0.0
-    markersize --> 0.5
-    markeralpha --> 0.3
-    seriescolor --> "red"
+    linealpha --> 0.35
     label --> ""
 
-    return sp.x, samples
+    return flat_x, flat_f
 end

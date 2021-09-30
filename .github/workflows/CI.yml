@@ -6,6 +6,12 @@ on:
       - master
   pull_request:
 
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
@@ -20,15 +26,15 @@ jobs:
           - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
         arch:
           - x64
         include:
           - version: 1
-            os: ubuntu-latest
+            os: macOS-latest
             arch: x64
-            coverage: true
+          - version: 1
+            os: windows-latest
+            arch: x64
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -48,13 +54,13 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         with:
-          coverage: ${{ matrix.coverage || false }}
+          coverage: ${{ matrix.version == '1' && matrix.os == 'ubuntu-latest' }}
         env:
           GROUP: AbstractGPs
       - uses: julia-actions/julia-processcoverage@v1
-        if: matrix.coverage
+        if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
       - name: Send coverage
-        if: matrix.coverage
+        if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v1
         with:
           file: lcov.info

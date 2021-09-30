@@ -1,12 +1,13 @@
 name = "AbstractGPs"
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
 authors = ["JuliaGaussianProcesses Team"]
-version = "0.3.8"
+version = "0.5.2"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
+IrrationalConstants = "92d709cd-6900-40b7-9082-c6be49f344b6"
 KernelFunctions = "ec8451be-7e33-11e9-00cf-bbf324bd1392"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
@@ -17,9 +18,10 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-ChainRulesCore = "0.10"
+ChainRulesCore = "1"
 Distributions = "0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25"
 FillArrays = "0.7, 0.8, 0.9, 0.10, 0.11, 0.12"
+IrrationalConstants = "0.1"
 KernelFunctions = "0.9, 0.10"
 RecipesBase = "1"
 Reexport = "0.2, 1"
