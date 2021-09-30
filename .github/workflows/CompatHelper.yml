@@ -21,7 +21,7 @@ jobs:
       - name: "Run CompatHelper"
         run: |
           import CompatHelper
-          subdirs = ["", "test", "docs"]
+          subdirs = ["", "test", "docs", "test/ppl"]
           for f in readdir("examples"; join=true)
               if isdir(f)
                   push!(subdirs, joinpath("examples", basename(f)))
