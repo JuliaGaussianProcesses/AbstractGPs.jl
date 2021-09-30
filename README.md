@@ -54,8 +54,8 @@ plot!(-0.5:0.001:1.5, p_fx; label="Posterior")
 ## Related Julia packages
 
 - [AbstractGPsMakie.jl](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl/) - Plotting GPs with [Makie.jl](https://github.com/JuliaPlots/Makie.jl/).
-- [BayesianLinearRegressors.jl](https://github.com/JuliaGaussianProcesses/BayesianLinearRegressors.jl) - Accelerated inference in GPs with a linear kernel. Built on types which implement this package's APIs.
 - [ApproximateGPs.jl](https://github.com/JuliaGaussianProcesses/ApproximateGPs.jl/) - Approximate inference for GPs, both for sparse approximations and non-Gaussian likelihoods. Built on types which implement this package's APIs.
+- [BayesianLinearRegressors.jl](https://github.com/JuliaGaussianProcesses/BayesianLinearRegressors.jl) - Accelerated inference in GPs with a linear kernel. Built on types which implement this package's APIs.
 - [GPLikelihoods.jl](https://github.com/JuliaGaussianProcesses/GPLikelihoods.jl/) - Non-Gaussian likelihood functions to use with GPs.
 - [KernelFunctions.jl](https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/) - Kernel functions for machine learning.
 - [Stheno.jl](https://github.com/JuliaGaussianProcesses/Stheno.jl) - Building probabilistic programmes involving GPs. Built on types which implement this package's APIs.
