@@ -11,6 +11,7 @@
     lfgp = lgp(x)
     @test lfgp isa AbstractGPs.LatentFiniteGP
     @test lfgp.fx isa AbstractGPs.FiniteGP
+    @test length(lfgp) == length(x)
 
     f = rand(10)
     @test logpdf(lfgp, (f=f, y=y)) isa Real
