@@ -46,8 +46,8 @@ include("test_util.jl")
 @testset "AbstractGPs" begin
     if GROUP == "All" || GROUP == "AbstractGPs"
         @testset "util" begin
-            include(joinpath("util", "common_covmat_ops.jl"))
-            include(joinpath("util", "plotting.jl"))
+            include("util/common_covmat_ops.jl")
+            include("util/plotting.jl")
         end
         println(" ")
         @info "Ran util tests"
@@ -103,6 +103,6 @@ include("test_util.jl")
         Pkg.activate("ppl")
         Pkg.develop(PackageSpec(; path=PKGDIR))
         Pkg.instantiate()
-        include(joinpath("ppl", "runtests.jl"))
+        include("ppl/runtests.jl")
     end
 end

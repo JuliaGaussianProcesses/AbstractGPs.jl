@@ -28,6 +28,8 @@ end
 
 (lgp::LatentGP)(x) = LatentFiniteGP(lgp.f(x, lgp.Σy), lgp.lik)
 
+Base.length(lgpx::LatentFiniteGP) = length(lgpx.fx)
+
 function Distributions.rand(rng::AbstractRNG, lfgp::LatentFiniteGP)
     f = rand(rng, lfgp.fx)
     y = rand(rng, lfgp.lik(f))

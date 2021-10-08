@@ -35,7 +35,7 @@ export GP,
     RowVecs
 
 # Various bits of utility functionality.
-include(joinpath("util", "common_covmat_ops.jl"))
+include("util/common_covmat_ops.jl")
 
 # AbstractGP interface.
 include("abstract_gp.jl")
@@ -57,10 +57,10 @@ include("sparse_approximations.jl")
 include("latent_gp.jl")
 
 # Plotting utilities.
-include(joinpath("util", "plotting.jl"))
+include("util/plotting.jl")
 
 # Testing utilities.
-include(joinpath("util", "test_util.jl"))
+include("util/test_util.jl")
 
 # Deprecations.
 include("deprecations.jl")
