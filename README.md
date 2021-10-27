@@ -1,6 +1,7 @@
 # AbstractGPs
 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaGaussianProcesses.github.io/AbstractGPs.jl/dev)
+[![Docs: stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaGaussianProcesses.github.io/AbstractGPs.jl/stable)
+[![Docs: dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaGaussianProcesses.github.io/AbstractGPs.jl/dev)
 [![CI](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/workflows/CI/badge.svg?branch=master)](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/actions/workflows/CI.yml?query=branch%3Amaster)
 [![Codecov](https://codecov.io/gh/JuliaGaussianProcesses/AbstractGPs.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaGaussianProcesses/AbstractGPs.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
@@ -9,7 +10,7 @@
 
 
 
-AbstractGPs.jl is a package that defines a low-level API for working with Gaussian processes (GPs), and basic functionality for working with them in the simplest cases. As such it is aimed more at developers and researchers who are interested in using it as a building block than end-users of GPs. You may want to go through the main [API design documentation](https://juliagaussianprocesses.github.io/AbstractGPs.jl/dev/api/).
+AbstractGPs.jl is a package that defines a low-level API for working with Gaussian processes (GPs), and basic functionality for working with them in the simplest cases. As such it is aimed more at developers and researchers who are interested in using it as a building block than end-users of GPs. You may want to go through the main [API design documentation](https://juliagaussianprocesses.github.io/AbstractGPs.jl/stable/api/).
 
 ![GP](gp.gif)
 
