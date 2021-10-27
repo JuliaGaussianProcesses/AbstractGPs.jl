@@ -9,7 +9,7 @@
 
 
 
-AbstractGPs.jl is a package that defines a low-level API for working with Gaussian processes (GPs), and basic functionality for working with them in the simplest cases. As such it is aimed more at developers and researchers who are interested in using it as a building block than end-users of GPs.
+AbstractGPs.jl is a package that defines a low-level API for working with Gaussian processes (GPs), and basic functionality for working with them in the simplest cases. As such it is aimed more at developers and researchers who are interested in using it as a building block than end-users of GPs. You may want to go through the main [API design documentation](https://juliagaussianprocesses.github.io/AbstractGPs.jl/dev/api/).
 
 ![GP](gp.gif)
 
