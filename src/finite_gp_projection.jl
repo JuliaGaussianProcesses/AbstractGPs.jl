@@ -26,6 +26,13 @@ function FiniteGP(
     return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
 end
 
+## conversions
+Base.convert(::Type{MvNormal}, f::FiniteGP) = MvNormal(mean_and_cov(f)...)
+function Base.convert(::Type{MvNormal{T}}, f::FiniteGP) where {T}
+    μ, Σ = mean_and_cov(f)
+    return MvNormal(convert(AbstractArray{T}, μ), convert(AbstractArray{T}, Σ))
+end
+
 Base.length(f::FiniteGP) = length(f.x)
 
 (f::AbstractGP)(x...) = FiniteGP(f, x...)
