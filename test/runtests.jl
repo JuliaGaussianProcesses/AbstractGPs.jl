@@ -31,6 +31,7 @@ using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
+using PDMats: ScalMat
 using Pkg
 using Plots
 using Random

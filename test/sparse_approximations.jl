@@ -115,3 +115,18 @@
         @test logpdf(p_fx, y) isa T
     end
 end
+
+@testset "tr_Cf_invΣy" begin
+    N = 3
+    x = rand(N)
+    σ² = 1.234
+    Σy_Diagonal = Diagonal(Fill(σ², N))
+    Σy_ScalMat = ScalMat(N, σ²)
+    f = GP(SqExponentialKernel())
+
+    for Σy in (Σy_Diagonal, Σy_ScalMat)
+        fx = f(x, Σy)
+        Cf = cov(f, x)
+        @test AbstractGPs.tr_Cf_invΣy(fx, Σy) ≈ tr(Cf / Matrix(Σy))
+    end
+end
