@@ -6,6 +6,22 @@ function generate_noise_matrix(rng::AbstractRNG, N::Int)
 end
 
 @testset "finite_gp" begin
+    @testset "convert" begin
+        f = GP(sin, SqExponentialKernel())
+        x = randn(10)
+        Σy = generate_noise_matrix(Random.GLOBAL_RNG, 10)
+        fx = FiniteGP(f, x, Σy)
+
+        dist = @inferred(convert(MvNormal, fx))
+        @test dist isa MvNormal{Float64}
+        @test mean(dist) ≈ mean(fx)
+        @test cov(dist) ≈ cov(fx)
+
+        dist = @inferred(convert(MvNormal{Float32}, fx))
+        @test dist isa MvNormal{Float32}
+        @test mean(dist) ≈ mean(fx)
+        @test cov(dist) ≈ cov(fx)
+    end
     @testset "statistics" begin
         rng, N, N′ = MersenneTwister(123456), 1, 9
         x, x′, Σy, Σy′ = randn(rng, N), randn(rng, N′), zeros(N, N), zeros(N′, N′)
