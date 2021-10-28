@@ -51,7 +51,7 @@ Intelligence and Statistics. 2009.
 function posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
     @assert vfe.fz.f === fx.f
 
-    U_y = _cholesky(_symmetric(fx.Σy)).U
+    U_y = _cholesky(fx.Σy).U
     U = cholesky(_symmetric(cov(vfe.fz))).U
 
     B_εf = U' \ (U_y' \ cov(fx, vfe.fz))'
@@ -85,7 +85,7 @@ function update_posterior(
     U = f_post_approx.data.U
     z = inducing_points(f_post_approx)
 
-    U_y₂ = _cholesky(_symmetric(fx.Σy)).U
+    U_y₂ = _cholesky(fx.Σy).U
 
     temp = zeros(size(f_post_approx.data.Σy, 1), size(fx.Σy, 2))
     Σy = [f_post_approx.data.Σy temp; temp' fx.Σy]
@@ -136,7 +136,7 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
     Cu1f = cov(f_post_approx.prior, z_old, f_post_approx.data.x)
     Cu2f = cov(f_post_approx.prior, z, f_post_approx.data.x)
 
-    U_y = _cholesky(_symmetric(f_post_approx.data.Σy)).U
+    U_y = _cholesky(f_post_approx.data.Σy).U
 
     B_εf₂ = U22' \ (Cu2f * inv(U_y) - U12' * B_εf₁)
     B_εf = vcat(B_εf₁, B_εf₂)
