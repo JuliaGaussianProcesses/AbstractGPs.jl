@@ -1,4 +1,4 @@
-# # Mauna Loa
+# # Mauna Loa time series example
 
 using CSV, DataFrames
 using AbstractGPs
