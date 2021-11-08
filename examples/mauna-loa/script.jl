@@ -8,17 +8,17 @@ using Plots
 
 # Let's load and visualize the dataset:
 
-begin
-    data = CSV.read("CO2_data.csv", Tables.matrix; header=0)
-    year = data[:, 1]
-    co2 = data[:, 2]
+data = CSV.read("CO2_data.csv", Tables.matrix; header=0)
+year = data[:, 1]
+co2 = data[:, 2]
+#md nothing #hide
 
-    #Split the data into training and testing data
-    xtrain = year[year .< 2004]
-    ytrain = co2[year .< 2004]
-    xtest = year[year .>= 2004]
-    ytest = co2[year .>= 2004]
-end;
+# Split the data into training and testing data
+xtrain = year[year .< 2004]
+ytrain = co2[year .< 2004]
+xtest = year[year .>= 2004]
+ytest = co2[year .>= 2004]
+#md nothing #hide
 
 function plotdata()
     plot(; xlabel="year", ylabel="CO2", legend=:bottomright)
@@ -60,16 +60,14 @@ plotdata()
 
 # We define a couple of helper functions to simplify the kernel construction:
 
-begin
-    SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
-    # PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
-    #Per(θ) = θ.σ^2 * with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
-    function Per(θ)
-        return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘
-               PeriodicTransform(1 / θ.p)
-    end
-    RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
+SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
+# PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
+#Per(θ) = θ.σ^2 * with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
+function Per(θ)
+    return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘
+           PeriodicTransform(1 / θ.p)
 end
+RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 
 function build_gp_prior(θ)
     # Kernel is represented as a sum of kernels
