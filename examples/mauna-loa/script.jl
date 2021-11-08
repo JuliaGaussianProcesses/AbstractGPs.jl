@@ -58,6 +58,7 @@ plotdata()
 # allows us to represent all required parameters as a nested NamedTuple:
 
 #! format: off
+## initial values to match http://stor-i.github.io/GaussianProcesses.jl/latest/mauna_loa/
 θ_init = (;
     se1 = (;
         σ = positive(exp(4.0)),
@@ -66,7 +67,7 @@ plotdata()
     per = (;
         σ = positive(exp(0.0)),
         ℓ = positive(exp(1.0)),
-        p = positive(exp(0.0)),
+        p = fixed(1.0),  # 1 year, do not optimise over
     ),
     se2 = (;
         σ = positive(exp(4.0)),
@@ -95,20 +96,24 @@ function Per(θ)
     return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘ PeriodicTransform(1 / θ.p)
 end
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
+#md nothing #hide
+
+# This allows us to write a function that, given the nested tuple of parameter values, constructs the GP prior:
 
 function build_gp_prior(θ)
-    smooth_trend = SE(θ.se1)
-    seasonality = Per(θ.per) * SE(θ.se2)
-    medium_term_irregularities = RQ(θ.rq)
-    noise_terms = SE(θ.se3) + θ.noise_scale^2 * WhiteKernel()
-    kernel = smooth_trend + seasonality + medium_term_irregularities + noise_terms
-    return GP(kernel)  # ZeroMean mean function by default
+    k_smooth_trend = SE(θ.se1)
+    k_seasonality = Per(θ.per) * SE(θ.se2)
+    k_medium_term_irregularities = RQ(θ.rq)
+    k_noise_terms = SE(θ.se3) + θ.noise_scale^2 * WhiteKernel()
+    kernel = k_smooth_trend + k_seasonality + k_medium_term_irregularities + k_noise_terms
+    return GP(kernel)  # `ZeroMean` mean function by default
 end
 #md nothing #hide
 
 # ## Posterior
 #
-# A `FiniteGP` represents the infinite-dimensional GP at a finite number of input features:
+# To construct the posterior, we need to first build a `FiniteGP`, which
+# represents the infinite-dimensional GP at a finite number of input features:
 
 function build_finite_gp(θ)
     f = build_gp_prior(θ)
@@ -121,7 +126,7 @@ end
 # Alternatively, we could have passed the noise variance as a second argument
 # to the GP call, `f(xtrain, θ.noise_scale^2)`.
 #
-# We construct the posterior by conditioning on the (finite) observations:
+# We obtain the posterior, conditioned on the (finite) observations, by calling `posterior`:
 
 function build_posterior_gp(θ)
     fx = build_finite_gp(θ)
@@ -129,12 +134,13 @@ function build_posterior_gp(θ)
 end
 #md nothing #hide
 
-# We can now construct the posterior GP.
-# The call to `ParameterHandling.value` is required to replace the constraints (such as `positive`) with concrete numbers:
+# Now we can put it all together to obtain a `PosteriorGP`.
+# The call to `ParameterHandling.value` is required to replace the constraints
+# (such as `positive` in our case) with concrete numbers:
 
 fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 
-# This is what the GP fitted to the data looks like for the initial choice of kernel hyperparameters:
+# Let's visualize what the GP fitted to the data looks like, for the initial choice of kernel hyperparameters.
 
 let
     ## The `let` block creates a new scope, so any utility variables we define in here won't leak outside.
@@ -142,6 +148,8 @@ let
     plotdata()
     plot!(fpost_init(1920:0.2:2030); ribbon_scale=2, label="posterior f(⋅)")  ## this returns the current plot object
 end  ## and so the plot object will be shown
+
+# A reasonable fit to the data, but awful extrapolation away from the observations!
 
 # ## Hyperparameter Optimization
 #
