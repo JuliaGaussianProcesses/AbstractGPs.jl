@@ -40,6 +40,10 @@ function preprocess(content)
     # remove VSCode `##` block delimiter lines
     content = replace(content, r"^##$."ms => "")
 
+    # remove JuliaFormatter commands
+    content = replace(content, r"^#! format: off$."ms => "")
+    content = replace(content, r"^#! format: on$."ms => "")
+
     # When run through Literate, the actual @__DIR__ macro points to the OUTDIR
     # Instead, replace it with the directory in which the script itself is located:
     content = replace(content, r"@__DIR__" => "\"$(escape_string(EXAMPLEPATH))\"")
