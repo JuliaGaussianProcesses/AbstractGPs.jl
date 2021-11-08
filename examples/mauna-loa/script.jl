@@ -92,21 +92,25 @@ fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 # This is what the GP fitted to the data looks like for the initial choice of kernel hyperparameters:
 
 let
+    ## The `let` block creates a new scope, so any utility variables we define in here won't leak outside.
+    ## The return value of this block is given by its last expression.
     plotdata()
-    plot!(fpost_init(1900:0.2:2050))
-end
+    plot!(fpost_init(1900:0.2:2050))  ## this returns the current plot object
+end  ## and so the plot object will be shown
 
 # To improve the fit, we want to maximize the (log) marginal likelihood with respect to the hyperparameters.
 # Optim.jl expects to minimize a loss, so we define it as the negative log marginal likelihood:
 
 function loss(θ)
     fx = build_finite_gp(θ)
-    lml = logpdf(fx, ytrain)
+    lml = logpdf(fx, ytrain)  # this computes the log marginal likelihood
     return -lml
 end
 
-# In the future, we are planning to provide the following utility function as
-# part of JuliaGaussianProcesses -- for now, we just define it inline.
+# !!! note
+#     In the future, we are planning to provide the following utility function
+#     as part of JuliaGaussianProcesses -- for now, we just define it inline.
+#
 # The L-BFGS parameters were chosen because they seem to work well empirically.
 # You could also try with the defaults.
 
