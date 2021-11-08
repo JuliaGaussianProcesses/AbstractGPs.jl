@@ -124,15 +124,15 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
 
     ## https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations
     function fg!(F, G, x)
-        if F != nothing && G != nothing
+        if F !== nothing && G !== nothing
             val, grad = Zygote.withgradient(loss_packed, x)
             G .= only(grad)
             return val
-        elseif G != nothing
+        elseif G !== nothing
             grad = Zygote.gradient(loss_packed, x)
             G .= only(grad)
             return nothing
-        elseif F != nothing
+        elseif F !== nothing
             return loss_packed(x)
         end
     end
