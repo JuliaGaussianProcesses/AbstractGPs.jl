@@ -19,7 +19,6 @@ ytrain = co2[idx_train]
 idx_test = .!idx_train
 xtest = year[idx_test]
 ytest = co2[idx_test]
-#md nothing #hide
 
 function plotdata()
     plot(; xlabel="year", ylabel="CO2", legend=:bottomright)

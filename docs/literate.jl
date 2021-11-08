@@ -3,7 +3,7 @@ if length(ARGS) != 2
     error("please specify the name of the example and the output directory")
 end
 const EXAMPLE = ARGS[1]
-const OUTDIR = ARGS[2]
+const OUTDIR = abspath(ARGS[2])
 
 # Activate environment
 # Note that each example's Project.toml must include Literate as a dependency
