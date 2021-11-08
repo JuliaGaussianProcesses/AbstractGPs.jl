@@ -8,7 +8,7 @@ using Plots
 
 # Let's load and visualize the dataset:
 
-data = CSV.read("CO2_data.csv", Tables.matrix; header=0)
+data = CSV.read(joinpath(@__DIR__, "CO2_data.csv"), Tables.matrix; header=0)
 year = data[:, 1]
 co2 = data[:, 2]
 
