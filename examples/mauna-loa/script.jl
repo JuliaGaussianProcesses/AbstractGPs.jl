@@ -64,8 +64,7 @@ SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
 # PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
 #Per(θ) = θ.σ^2 * with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
 function Per(θ)
-    return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘
-           PeriodicTransform(1 / θ.p)
+    return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘ PeriodicTransform(1 / θ.p)
 end
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 
@@ -102,7 +101,6 @@ end
 
 function loss(θ)
     fx = build_finite_gp(θ)
-    # TODO: define logpdf(::PosteriorGP) in AbstractGPs.jl?
     lml = logpdf(fx, ytrain)
     return -lml
 end
