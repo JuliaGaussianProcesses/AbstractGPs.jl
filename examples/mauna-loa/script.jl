@@ -11,13 +11,14 @@ using Plots
 data = CSV.read("CO2_data.csv", Tables.matrix; header=0)
 year = data[:, 1]
 co2 = data[:, 2]
-#md nothing #hide
 
-# Split the data into training and testing data
-xtrain = year[year .< 2004]
-ytrain = co2[year .< 2004]
-xtest = year[year .>= 2004]
-ytest = co2[year .>= 2004]
+## We split the data into training and testing set:
+idx_train = year .< 2004
+xtrain = year[idx_train]
+ytrain = co2[idx_train]
+idx_test = .!idx_train
+xtest = year[idx_test]
+ytest = co2[idx_test]
 #md nothing #hide
 
 function plotdata()
