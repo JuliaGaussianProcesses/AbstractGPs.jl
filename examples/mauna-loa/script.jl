@@ -61,15 +61,15 @@ plotdata()
 # We define a couple of helper functions to simplify the kernel construction:
 
 SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
-# PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
-#Per(θ) = θ.σ^2 * with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
+## PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
+##Per(θ) = θ.σ^2 * with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
 function Per(θ)
     return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘ PeriodicTransform(1 / θ.p)
 end
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 
 function build_gp_prior(θ)
-    # Kernel is represented as a sum of kernels
+    ## The kernel is represented as a sum of kernels:
     kernel = SE(θ.se1) + Per(θ.per) * SE(θ.se2) + RQ(θ.rq) + SE(θ.se3)
     return GP(kernel)
 end
@@ -121,7 +121,7 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
     θ_flat_init, unflatten = ParameterHandling.value_flatten(θ_init)
     loss_packed = loss ∘ unflatten
 
-    # https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations
+    ## https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations
     function fg!(F, G, x)
         if F != nothing && G != nothing
             val, grad = Zygote.withgradient(loss_packed, x)
