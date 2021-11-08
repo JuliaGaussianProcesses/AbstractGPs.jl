@@ -13,6 +13,8 @@ Pkg.activate(EXAMPLEPATH)
 Pkg.instantiate()
 using Literate: Literate
 
+cd(EXAMPLEPATH)
+
 function preprocess(content)
     # Add link to nbviewer below the first heading of level 1
     sub = SubstitutionString(
