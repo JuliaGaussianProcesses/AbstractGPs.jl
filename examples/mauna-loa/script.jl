@@ -22,8 +22,8 @@ ytest = co2[idx_test]
 
 function plotdata()
     plot(; xlabel="year", ylabel="CO2", legend=:bottomright)
-    scatter!(xtrain, ytrain; ms=2, label="train")
-    return scatter!(xtest, ytest; ms=2, label="test")
+    scatter!(xtrain, ytrain; ms=2, label="training data")
+    return scatter!(xtest, ytest; ms=2, label="test data", markerstrokewidth=0)
 end
 
 plotdata()
@@ -57,6 +57,7 @@ plotdata()
     noise_scale = positive(exp(-2.0)),
 )
 #! format: on
+#md nothing #hide
 
 # We define a couple of helper functions to simplify the kernel construction:
 
@@ -83,6 +84,7 @@ function build_posterior_gp(θ)
     fx = build_finite_gp(θ)
     return posterior(fx, ytrain)
 end
+#md nothing #hide
 
 # We can now construct the posterior GP.
 # The call to `ParameterHandling.value` is required to replace the constraints (such as `positive`) with concrete numbers:
@@ -95,7 +97,7 @@ let
     ## The `let` block creates a new scope, so any utility variables we define in here won't leak outside.
     ## The return value of this block is given by its last expression.
     plotdata()
-    plot!(fpost_init(1900:0.2:2050))  ## this returns the current plot object
+    plot!(fpost_init(1920:0.2:2030); ribbon_scale=2, label="posterior f(⋅)")  ## this returns the current plot object
 end  ## and so the plot object will be shown
 
 # To improve the fit, we want to maximize the (log) marginal likelihood with respect to the hyperparameters.
@@ -106,6 +108,7 @@ function loss(θ)
     lml = logpdf(fx, ytrain)  # this computes the log marginal likelihood
     return -lml
 end
+#md nothing #hide
 
 # !!! note
 #     In the future, we are planning to provide the following utility function
@@ -144,6 +147,7 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
 
     return unflatten(result.minimizer), result
 end
+#md nothing #hide
 
 # We now run the optimisation:
 
@@ -157,6 +161,7 @@ result
 # We now construct the posterior GP:
 
 fpost_opt = build_posterior_gp(ParameterHandling.value(θ_opt))
+#md nothing #hide
 
 # This is the kernel with the point-estimated hyperparameters:
 
@@ -166,5 +171,5 @@ fpost_opt.prior.kernel
 
 let
     plotdata()
-    plot!(fpost_opt(1900:0.2:2050))
+    plot!(fpost_opt(1920:0.2:2030); ribbon_scale=2, label="optimized posterior f(⋅)")
 end
