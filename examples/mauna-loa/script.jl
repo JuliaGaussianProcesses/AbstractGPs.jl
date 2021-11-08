@@ -1,10 +1,19 @@
 # # Mauna Loa time series example
+#
+# In this notebook, we apply Gaussian process regression to the Mauna Loa CO₂
+# dataset. This showcases a rich combination of kernels, and how to handle and
+# optimize all their parameters.
 
-using CSV, DataFrames
-using AbstractGPs
-using ParameterHandling
-using Optim, Zygote
-using Plots
+# ## Setup
+#
+# We make use of the following packages:
+
+using CSV, DataFrames  # data loading
+using AbstractGPs  # exact GP regression
+using ParameterHandling  # for nested and constrained parameters
+using Optim  # optimization
+using Zygote  # auto-diff gradient computation
+using Plots  # visualisation
 
 # Let's load and visualize the dataset:
 
@@ -21,14 +30,32 @@ xtest = year[idx_test]
 ytest = co2[idx_test]
 
 function plotdata()
-    plot(; xlabel="year", ylabel="CO2", legend=:bottomright)
-    scatter!(xtrain, ytrain; ms=2, label="training data")
-    return scatter!(xtest, ytest; ms=2, label="test data", markerstrokewidth=0)
+    plot(; xlabel="year", ylabel="CO₂", legend=:bottomright)
+    scatter!(xtrain, ytrain; label="training data", ms=2, markerstrokewidth=0)
+    return scatter!(xtest, ytest; label="test data", ms=2, markerstrokewidth=0)
 end
 
 plotdata()
 
-# We will use ParameterHandling.jl for handling the (hyper)parameters of our model. We represent all required parameters as a nested NamedTuple:
+# ## Prior
+#
+# We will model this dataset using a sum of several kernels which describe
+#
+# - smooth trend: squared exponential kernel with long lengthscale;
+# - seasonal component: periodic covariance function with period of one year,
+#   multiplied with a squared exponential kernel to allow decay away from exact
+#   periodicity;
+# - medium-term irregularities: rational quadratic kernel;
+# - noise terms: squared exponential kernel with short lengthscale
+#   and uncorrelated observation noise.
+#
+# For more details, see [Rasmussen & Williams (2005), chapter 5](http://www.gaussianprocess.org/gpml/chapters/RW5.pdf).
+
+# We will use
+# [ParameterHandling.jl](https://invenia.github.io/ParameterHandling.jl/) for
+# handling the (hyper)parameters of our model. It provides functions such as
+# `positive` with which we can put constraints on the hyperparameters, and
+# allows us to represent all required parameters as a nested NamedTuple:
 
 #! format: off
 θ_init = (;
@@ -70,15 +97,31 @@ end
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 
 function build_gp_prior(θ)
-    ## The kernel is represented as a sum of kernels:
-    kernel = SE(θ.se1) + Per(θ.per) * SE(θ.se2) + RQ(θ.rq) + SE(θ.se3)
-    return GP(kernel)
+    smooth_trend = SE(θ.se1)
+    seasonality = Per(θ.per) * SE(θ.se2)
+    medium_term_irregularities = RQ(θ.rq)
+    noise_terms = SE(θ.se3) + θ.noise_scale^2 * WhiteKernel()
+    kernel = smooth_trend + seasonality + medium_term_irregularities + noise_terms
+    return GP(kernel)  # ZeroMean mean function by default
 end
+#md nothing #hide
+
+# ## Posterior
+#
+# A `FiniteGP` represents the infinite-dimensional GP at a finite number of input features:
 
 function build_finite_gp(θ)
     f = build_gp_prior(θ)
-    return f(xtrain, θ.noise_scale^2)
+    return f(xtrain)
 end
+#md nothing #hide
+
+# In this notebook, we already included observation noise through the
+# `WhiteKernel` as part of the GP prior.
+# Alternatively, we could have passed the noise variance as a second argument
+# to the GP call, `f(xtrain, θ.noise_scale^2)`.
+#
+# We construct the posterior by conditioning on the (finite) observations:
 
 function build_posterior_gp(θ)
     fx = build_finite_gp(θ)
@@ -100,8 +143,12 @@ let
     plot!(fpost_init(1920:0.2:2030); ribbon_scale=2, label="posterior f(⋅)")  ## this returns the current plot object
 end  ## and so the plot object will be shown
 
-# To improve the fit, we want to maximize the (log) marginal likelihood with respect to the hyperparameters.
-# Optim.jl expects to minimize a loss, so we define it as the negative log marginal likelihood:
+# ## Hyperparameter Optimization
+#
+# To improve the fit, we want to maximize the (log) marginal likelihood with
+# respect to the hyperparameters.
+# [Optim.jl](https://julianlsolvers.github.io/Optim.jl/stable/) expects to
+# minimize a loss, so we define it as the negative log marginal likelihood:
 
 function loss(θ)
     fx = build_finite_gp(θ)
@@ -149,7 +196,7 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
 end
 #md nothing #hide
 
-# We now run the optimisation:
+# We now run the optimization:
 
 θ_opt, result = optimize_loss(loss, θ_init)
 result
@@ -158,7 +205,11 @@ result
 
 -result.minimum
 
-# We now construct the posterior GP:
+# To avoid bad local optima, we could have carried out several random restarts
+# with different initial values for the hyperparameters, and then picked the
+# result with the highest marginal likelihood. We omit this for simplicity.
+#
+# Let's construct the posterior GP with the optimized hyperparameters:
 
 fpost_opt = build_posterior_gp(ParameterHandling.value(θ_opt))
 #md nothing #hide
@@ -167,7 +218,7 @@ fpost_opt = build_posterior_gp(ParameterHandling.value(θ_opt))
 
 fpost_opt.prior.kernel
 
-# And, finally, this is the visualization of the posterior GP:
+# And, finally, we can visualize our optimized posterior GP:
 
 let
     plotdata()
