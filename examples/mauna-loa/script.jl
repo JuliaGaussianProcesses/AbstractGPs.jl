@@ -142,11 +142,13 @@ fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 
 # Let's visualize what the GP fitted to the data looks like, for the initial choice of kernel hyperparameters.
 
+plot_gp!(f; label) = plot!(f(1920:0.2:2030); ribbon_scale=2, linewidth=1, label)
+
 let
     ## The `let` block creates a new scope, so any utility variables we define in here won't leak outside.
     ## The return value of this block is given by its last expression.
     plotdata()
-    plot!(fpost_init(1920:0.2:2030); ribbon_scale=2, label="posterior f(⋅)")  ## this returns the current plot object
+    plot_gp!(fpost_init; label="posterior f(⋅)")  ## this returns the current plot object
 end  ## and so the plot object will be shown
 
 # A reasonable fit to the data, but awful extrapolation away from the observations!
@@ -232,5 +234,5 @@ fpost_opt.prior.kernel
 
 let
     plotdata()
-    plot!(fpost_opt(1920:0.2:2030); ribbon_scale=2, label="optimized posterior f(⋅)")
+    plot_gp!(fpost_opt; label="optimized posterior f(⋅)")
 end
