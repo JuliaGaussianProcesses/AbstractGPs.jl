@@ -170,8 +170,9 @@ end
 #md nothing #hide
 
 # !!! note
-#     In the future, we are planning to provide the following utility function
-#     as part of JuliaGaussianProcesses -- for now, we just define it inline.
+#     In the future, we are planning to provide the `optimize_loss` utility
+#     function as part of JuliaGaussianProcesses -- for now, we just define it
+#     inline.
 #
 # The L-BFGS parameters were chosen because they seem to work well empirically.
 # You could also try with the defaults.
@@ -217,11 +218,13 @@ result
 
 -result.minimum
 
-# To avoid bad local optima, we could have carried out several random restarts
-# with different initial values for the hyperparameters, and then picked the
-# result with the highest marginal likelihood. We omit this for simplicity.
-# For more details on how to fit GPs in practice, check out [A Practical Guide
-# to Gaussian Processes](https://tinyurl.com/guide2gp).
+# !!! note
+#     To avoid bad local optima, we could (and should) have carried out several
+#     random restarts with different initial values for the hyperparameters,
+#     and then picked the result with the highest marginal likelihood. We omit
+#     this for simplicity. For more details on how to fit GPs in practice,
+#     check out [A Practical Guide to Gaussian
+#     Processes](https://tinyurl.com/guide2gp).
 #
 # Let's construct the posterior GP with the optimized hyperparameters:
 
