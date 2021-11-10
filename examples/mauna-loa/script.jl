@@ -106,14 +106,15 @@ function build_gp_prior(θ)
     k_medium_term_irregularities = RQ(θ.rq)
     k_noise_terms = SE(θ.se3) + θ.noise_scale^2 * WhiteKernel()
     kernel = k_smooth_trend + k_seasonality + k_medium_term_irregularities + k_noise_terms
-    return GP(kernel)  # `ZeroMean` mean function by default
+    return GP(kernel)  # [`ZeroMean`](@ref) mean function by default
 end
 #md nothing #hide
 
 # ## Posterior
 #
-# To construct the posterior, we need to first build a `FiniteGP`, which
-# represents the infinite-dimensional GP at a finite number of input features:
+# To construct the posterior, we need to first build a [`FiniteGP`](@ref),
+# which represents the infinite-dimensional GP at a finite number of input
+# features:
 
 function build_finite_gp(θ)
     f = build_gp_prior(θ)
@@ -126,7 +127,8 @@ end
 # Alternatively, we could have passed the noise variance as a second argument
 # to the GP call, `f(xtrain, θ.noise_scale^2)`.
 #
-# We obtain the posterior, conditioned on the (finite) observations, by calling `posterior`:
+# We obtain the posterior, conditioned on the (finite) observations, by calling
+# [`posterior`](@ref):
 
 function build_posterior_gp(θ)
     fx = build_finite_gp(θ)
@@ -134,7 +136,7 @@ function build_posterior_gp(θ)
 end
 #md nothing #hide
 
-# Now we can put it all together to obtain a `PosteriorGP`.
+# Now we can put it all together to obtain a [`PosteriorGP`](@ref).
 # The call to `ParameterHandling.value` is required to replace the constraints
 # (such as `positive` in our case) with concrete numbers:
 
