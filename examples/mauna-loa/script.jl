@@ -243,7 +243,7 @@ function show_params(nt::NamedTuple, pre=0)
     res = ""
     for (s, v) in pairs(nt)
         if typeof(v) <: NamedTuple
-            res *= join(fill(" ", pre)) * "$(s):\n" * show_params(v, pre+4)
+            res *= join(fill(" ", pre)) * "$(s):\n" * show_params(v, pre + 4)
         else
             res *= join(fill(" ", pre)) * "$s = $(@sprintf("%.3f", v))\n"
         end
