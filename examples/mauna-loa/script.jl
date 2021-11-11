@@ -65,7 +65,7 @@ plotdata()
         ℓ = positive(exp(4.0)),
     ),
     seasonal = (;
-        # product kernels only need a single overall signal variance
+        ## product kernels only need a single overall signal variance
         per = (;
             ℓ = positive(exp(0.0)),  # relative to period!
             p = fixed(1.0),  # 1 year, do not optimize over
