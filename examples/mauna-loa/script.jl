@@ -235,9 +235,23 @@ fpost_opt = build_posterior_gp(ParameterHandling.value(θ_opt))
 
 fpost_opt.prior.kernel
 
-# which corresponds to the optimized parameters
+# Let's print the optimized values of the hyperparameters in a more helpful format:
 
-θ_opt
+using Printf
+
+function show_params(nt::NamedTuple, pre=0)
+    res = ""
+    for (s, v) in pairs(nt)
+        if typeof(v) <: NamedTuple
+            res *= join(fill(" ", pre)) * "$(s):\n" * show_params(v, pre+4)
+        else
+            res *= join(fill(" ", pre)) * "$s = $(@sprintf("%.3f", v))\n"
+        end
+    end
+    return res
+end
+
+print(show_params(ParameterHandling.value(θ_opt)))
 
 # And, finally, we can visualize our optimized posterior GP:
 
