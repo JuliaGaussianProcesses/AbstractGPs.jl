@@ -68,7 +68,7 @@ plotdata()
         # product kernels only need a single overall signal variance
         per = (;
             ℓ = positive(exp(0.0)),  # relative to period!
-            p = fixed(1.0),  # 1 year, do not optimise over
+            p = fixed(1.0),  # 1 year, do not optimize over
         ),
         se = (;
             σ = positive(exp(1.0)),
@@ -234,6 +234,10 @@ fpost_opt = build_posterior_gp(ParameterHandling.value(θ_opt))
 # This is the kernel with the point-estimated hyperparameters:
 
 fpost_opt.prior.kernel
+
+# which corresponds to the optimized parameters
+
+θ_opt
 
 # And, finally, we can visualize our optimized posterior GP:
 
