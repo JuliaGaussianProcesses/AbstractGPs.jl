@@ -122,11 +122,34 @@ function build_finite_gp(θ)
 end
 #md nothing #hide
 
-# In this notebook, we already included observation noise through the
-# `WhiteKernel` as part of the GP prior.
-# Alternatively, we could have passed the noise variance as a second argument
-# to the GP call, `f(xtrain, θ.noise_scale^2)`.
+# !!! info "`WhiteKernel` vs `FiniteGP` observation noise"
+#     In this notebook, we already included observation noise through the
+#     `WhiteKernel` as part of the GP prior covariance in `build_gp_prior`. We
+#     therefore call `f(xtrain)` which implies zero (additional) observation
+#     noise.
 #
+#     Alternatively, we could have omitted the `θ.noise_scale^2 *
+#     WhiteKernel()` term and instead passed the noise variance as a second
+#     argument to the GP call in `build_finite_gp`, `f(xtrain,
+#     θ.noise_scale^2)`.
+#
+#     These two approaches have slightly different semantics: In the first one,
+#     the `WhiteKernel` contributes non-zero variance to the `[i, j]` element
+#     of the covariance matrix of the `FiniteGP` if `xtrain[i] == xtrain[j]`
+#     (based on the values of the features). In the second one, the observation
+#     noise variance passed to `FiniteGP` only contributes to the diagonal
+#     elements of the covariance matrix, i.e. for `i == j`.
+#
+#     Moreover, the variance (uncertainty) of the posterior predictions
+#     includes the variance from the `WhiteKernel`, but does not include the
+#     variance of the observation noise passed to the `FiniteGP`. To include
+#     the observation noise in posterior predictions from the second approach,
+#     call `fpost_opt(xtest, noise_scale^2)`.
+#
+# !!! tip
+#     In practice, we recommend that you pass in observation noise to the
+#     `FiniteGP`, and omit the explicit `WhiteKernel`.
+
 # We obtain the posterior, conditioned on the (finite) observations, by calling
 # [`posterior`](@ref):
 
@@ -169,7 +192,7 @@ function loss(θ)
 end
 #md nothing #hide
 
-# !!! note
+# !!! note "Work-in-progress"
 #     In the future, we are planning to provide the `optimize_loss` utility
 #     function as part of JuliaGaussianProcesses -- for now, we just define it
 #     inline.
@@ -218,7 +241,7 @@ result
 
 -result.minimum
 
-# !!! note
+# !!! warning
 #     To avoid bad local optima, we could (and should) have carried out several
 #     random restarts with different initial values for the hyperparameters,
 #     and then picked the result with the highest marginal likelihood. We omit
@@ -236,6 +259,9 @@ fpost_opt = build_posterior_gp(ParameterHandling.value(θ_opt))
 fpost_opt.prior.kernel
 
 # Let's print the optimized values of the hyperparameters in a more helpful format:
+
+# !!! note "Work-in-progress"
+#     This is another utility function we would eventually like to move out of this notebook:
 
 using Printf
 
