@@ -30,7 +30,7 @@ xtest = year[idx_test]
 ytest = co2[idx_test]
 
 function plotdata()
-    plot(; xlabel="year", ylabel="CO₂", legend=:bottomright)
+    plot(; xlabel="year", ylabel="CO₂ [ppm]", legend=:bottomright)
     scatter!(xtrain, ytrain; label="training data", ms=2, markerstrokewidth=0)
     return scatter!(xtest, ytest; label="test data", ms=2, markerstrokewidth=0)
 end
@@ -60,25 +60,27 @@ plotdata()
 #! format: off
 ## initial values to match http://stor-i.github.io/GaussianProcesses.jl/latest/mauna_loa/
 θ_init = (;
-    se1 = (;
+    se_long = (;
         σ = positive(exp(4.0)),
         ℓ = positive(exp(4.0)),
     ),
-    per = (;
-        σ = positive(exp(0.0)),
-        ℓ = positive(exp(1.0)),
-        p = fixed(1.0),  # 1 year, do not optimise over
-    ),
-    se2 = (;
-        σ = positive(exp(4.0)),
-        ℓ = positive(exp(0.0)),
+    seasonal = (;
+        # product kernels only need a single overall signal variance
+        per = (;
+            ℓ = positive(exp(0.0)),  # relative to period!
+            p = fixed(1.0),  # 1 year, do not optimise over
+        ),
+        se = (;
+            σ = positive(exp(1.0)),
+            ℓ = positive(exp(4.0)),
+        ),
     ),
     rq = (;
         σ = positive(exp(0.0)),
         ℓ = positive(exp(0.0)),
         α = positive(exp(-1.0)),
     ),
-    se3 = (;
+    se_short = (;
         σ = positive(exp(-2.0)),
         ℓ = positive(exp(-2.0)),
     ),
@@ -91,20 +93,18 @@ plotdata()
 
 SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
 ## PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
-##Per(θ) = θ.σ^2 * with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
-function Per(θ)
-    return θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘ PeriodicTransform(1 / θ.p)
-end
+##Per(θ) = with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
+Per(θ) = with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘ PeriodicTransform(1 / θ.p)
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 #md nothing #hide
 
 # This allows us to write a function that, given the nested tuple of parameter values, constructs the GP prior:
 
 function build_gp_prior(θ)
-    k_smooth_trend = SE(θ.se1)
-    k_seasonality = Per(θ.per) * SE(θ.se2)
+    k_smooth_trend = SE(θ.se_long)
+    k_seasonality = Per(θ.seasonal.per) * SE(θ.seasonal.se)
     k_medium_term_irregularities = RQ(θ.rq)
-    k_noise_terms = SE(θ.se3) + θ.noise_scale^2 * WhiteKernel()
+    k_noise_terms = SE(θ.se_short) + θ.noise_scale^2 * WhiteKernel()
     kernel = k_smooth_trend + k_seasonality + k_medium_term_irregularities + k_noise_terms
     return GP(kernel)  # [`ZeroMean`](@ref) mean function by default
 end
