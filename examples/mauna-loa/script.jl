@@ -166,16 +166,30 @@ end
 fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 
 # Let's visualize what the GP fitted to the data looks like, for the initial choice of kernel hyperparameters.
+#
+# We use the following function to plot a GP `f` on a specific range, using the
+# AbstractGPs [plotting
+# recipes](https://juliagaussianprocesses.github.io/AbstractGPs.jl/dev/concrete_features/#Plotting).
+# By setting `ribbon_scale=2` we visualize the uncertainty band with :math:`\pm
+# 2` (instead of the default :math:`\pm 1`) standard deviations.
 
 plot_gp!(f; label) = plot!(f(1920:0.2:2030); ribbon_scale=2, linewidth=1, label)
+#md nothing #hide
+
+
+# !!! tip
+#     The `let` block [creates a new
+#     scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#scope-of-variables),
+#     so any utility variables we define in here won't leak outside. This is
+#     particularly helpful to keep notebooks tidy! The return value of this
+#     block is given by its last expression.
 
 let
-    ## The `let` block creates a new scope, so any utility variables we define in here won't leak outside.
-    ## The return value of this block is given by its last expression.
     plotdata()
     label = "posterior f(⋅)"
-    plot_gp!(fpost_init; label)  ## this returns the current plot object
-end  ## and so the plot object will be shown
+    plot_gp!(fpost_init; label)  # this returns the current plot object
+end  # and so the plot object will be shown
+## `label` is not available outside the `let` scope
 
 # A reasonable fit to the data, but awful extrapolation away from the observations!
 
