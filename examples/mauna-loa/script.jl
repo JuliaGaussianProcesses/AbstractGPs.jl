@@ -176,7 +176,6 @@ fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 plot_gp!(f; label) = plot!(f(1920:0.2:2030); ribbon_scale=2, linewidth=1, label)
 #md nothing #hide
 
-
 # !!! tip
 #     The `let` block [creates a new
 #     scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#scope-of-variables),
