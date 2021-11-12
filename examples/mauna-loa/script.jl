@@ -173,7 +173,8 @@ let
     ## The `let` block creates a new scope, so any utility variables we define in here won't leak outside.
     ## The return value of this block is given by its last expression.
     plotdata()
-    plot_gp!(fpost_init; label="posterior f(⋅)")  ## this returns the current plot object
+    label = "posterior f(⋅)"
+    plot_gp!(fpost_init; label)  ## this returns the current plot object
 end  ## and so the plot object will be shown
 
 # A reasonable fit to the data, but awful extrapolation away from the observations!
@@ -283,5 +284,6 @@ print(show_params(ParameterHandling.value(θ_opt)))
 
 let
     plotdata()
-    plot_gp!(fpost_opt; label="optimized posterior f(⋅)")
+    label = "optimized posterior f(⋅)"
+    plot_gp!(fpost_opt; label)
 end
