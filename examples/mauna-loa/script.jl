@@ -29,7 +29,7 @@ using Plots  # visualisation
     year = data[:, 1]
     co2 = data[:, 2]
 
-    # We split the data into training and testing set:
+    ## We split the data into training and testing set:
     idx_train = year .< 2004
     idx_test = .!idx_train
 
