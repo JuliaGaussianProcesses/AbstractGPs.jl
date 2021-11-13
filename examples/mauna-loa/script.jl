@@ -279,16 +279,17 @@ fpost_opt.prior.kernel
 
 using Printf
 
-function show_params(nt::NamedTuple, pre=0)
-    res = ""
+show_params(nt::Union{Dict,NamedTuple}) = String(take!(show_params(IOBuffer(), nt)))
+function show_params(io, nt::Union{Dict,NamedTuple}, indent::Int=0)
     for (s, v) in pairs(nt)
-        if typeof(v) <: NamedTuple
-            res *= join(fill(" ", pre)) * "$(s):\n" * show_params(v, pre + 4)
+        if v isa Union{Dict,NamedTuple}
+            println(io, " "^indent, s, ":")
+            show_params(io, v, indent + 4)
         else
-            res *= join(fill(" ", pre)) * "$s = $(@sprintf("%.3f", v))\n"
+            println(io, " "^indent, s, " = ", @sprintf("%.3f", v))
         end
     end
-    return res
+    return io
 end
 
 print(show_params(ParameterHandling.value(θ_opt)))
