@@ -15,19 +15,27 @@ using Optim  # optimization
 using Zygote  # auto-diff gradient computation
 using Plots  # visualisation
 
-# Let's load and visualize the dataset:
+# Let's load and visualize the dataset.
 
-data = CSV.read(joinpath(@__DIR__, "CO2_data.csv"), Tables.matrix; header=0)
-year = data[:, 1]
-co2 = data[:, 2]
+# !!! tip
+#     The `let` block [creates a new
+#     scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#scope-of-variables),
+#     so any utility variables we define in here won't leak outside. This is
+#     particularly helpful to keep notebooks tidy! The return value of the
+#     block is given by its last expression.
 
-## We split the data into training and testing set:
-idx_train = year .< 2004
-xtrain = year[idx_train]
-ytrain = co2[idx_train]
-idx_test = .!idx_train
-xtest = year[idx_test]
-ytest = co2[idx_test]
+(xtrain, ytrain), (xtest, ytest) = let
+    data = CSV.read(joinpath(@__DIR__, "CO2_data.csv"), Tables.matrix; header=0)
+    year = data[:, 1]
+    co2 = data[:, 2]
+
+    # We split the data into training and testing set:
+    idx_train = year .< 2004
+    idx_test = .!idx_train
+
+    (year[idx_train], co2[idx_train]), (year[idx_test], co2[idx_test])  # block's return value
+end
+## The utility variables such as `idx_train` and `idx_test` are not available outside the `let` scope
 
 function plotdata()
     plot(; xlabel="year", ylabel="CO₂ [ppm]", legend=:bottomright)
@@ -176,19 +184,8 @@ fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 plot_gp!(f; label) = plot!(f(1920:0.2:2030); ribbon_scale=2, linewidth=1, label)
 #md nothing #hide
 
-# !!! tip
-#     The `let` block [creates a new
-#     scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#scope-of-variables),
-#     so any utility variables we define in here won't leak outside. This is
-#     particularly helpful to keep notebooks tidy! The return value of this
-#     block is given by its last expression.
-
-let
-    plotdata()
-    label = "posterior f(⋅)"
-    plot_gp!(fpost_init; label)  # this returns the current plot object
-end  # and so the plot object will be shown
-## `label` is not available outside the `let` scope
+plotdata()
+plot_gp!(fpost_init; label="posterior f(⋅)")
 
 # A reasonable fit to the data, but awful extrapolation away from the observations!
 
@@ -296,8 +293,5 @@ print(show_params(ParameterHandling.value(θ_opt)))
 
 # And, finally, we can visualize our optimized posterior GP:
 
-let
-    plotdata()
-    label = "optimized posterior f(⋅)"
-    plot_gp!(fpost_opt; label)
-end
+plotdata()
+plot_gp!(fpost_opt; label= "optimized posterior f(⋅)")
