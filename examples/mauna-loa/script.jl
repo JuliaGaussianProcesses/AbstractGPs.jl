@@ -298,4 +298,4 @@ print(show_params(ParameterHandling.value(θ_opt)))
 # And, finally, we can visualize our optimized posterior GP:
 
 plotdata()
-plot_gp!(fpost_opt; label= "optimized posterior f(⋅)")
+plot_gp!(fpost_opt; label="optimized posterior f(⋅)")
