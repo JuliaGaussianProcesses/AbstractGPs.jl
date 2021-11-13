@@ -158,7 +158,7 @@ end
 #     For most use-cases and if in any doubt, we recommend that you pass in
 #     observation noise to the `FiniteGP`, and omit the explicit `WhiteKernel`.
 #     This is slightly faster (no need to check `xtrain[i] == xtrain[j]` for
-#     all pairs `i, j`), and `WhiteKernel` will not give stable gradients if
+#     all pairs `i`, `j`), and `WhiteKernel` will not give stable gradients if
 #     you wish to compute the gradient of the log marginal likelihood
 #     `logpdf(f(x), y)` w.r.t. `x`.
 
@@ -182,8 +182,8 @@ fpost_init = build_posterior_gp(ParameterHandling.value(θ_init))
 # We use the following function to plot a GP `f` on a specific range, using the
 # AbstractGPs [plotting
 # recipes](https://juliagaussianprocesses.github.io/AbstractGPs.jl/dev/concrete_features/#Plotting).
-# By setting `ribbon_scale=2` we visualize the uncertainty band with :math:`\pm
-# 2` (instead of the default :math:`\pm 1`) standard deviations.
+# By setting `ribbon_scale=2` we visualize the uncertainty band with ``\pm 2``
+# (instead of the default ``\pm 1``) standard deviations.
 
 plot_gp!(f; label) = plot!(f(1920:0.2:2030); ribbon_scale=2, linewidth=1, label)
 #md nothing #hide
