@@ -155,8 +155,12 @@ end
 #     call `fpost_opt(xtest, noise_scale^2)`.
 #
 # !!! tip
-#     In practice, we recommend that you pass in observation noise to the
-#     `FiniteGP`, and omit the explicit `WhiteKernel`.
+#     For most use-cases and if in any doubt, we recommend that you pass in
+#     observation noise to the `FiniteGP`, and omit the explicit `WhiteKernel`.
+#     This is slightly faster (no need to check `xtrain[i] == xtrain[j]` for
+#     all pairs `i, j`), and `WhiteKernel` will not give stable gradients if
+#     you wish to compute the gradient of the log marginal likelihood
+#     `logpdf(f(x), y)` w.r.t. `x`.
 
 # We obtain the posterior, conditioned on the (finite) observations, by calling
 # [`posterior`](@ref):
