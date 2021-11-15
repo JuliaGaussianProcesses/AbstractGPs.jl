@@ -3,7 +3,7 @@ if length(ARGS) != 2
     error("please specify the name of the example and the output directory")
 end
 const EXAMPLE = ARGS[1]
-const OUTDIR = ARGS[2]
+const OUTDIR = abspath(ARGS[2])
 
 # Activate environment
 # Note that each example's Project.toml must include Literate as a dependency
@@ -39,6 +39,14 @@ function preprocess(content)
 
     # remove VSCode `##` block delimiter lines
     content = replace(content, r"^##$."ms => "")
+
+    # remove JuliaFormatter commands
+    content = replace(content, r"^#! format: off$."ms => "")
+    content = replace(content, r"^#! format: on$."ms => "")
+
+    # When run through Literate, the actual @__DIR__ macro points to the OUTDIR
+    # Instead, replace it with the directory in which the script itself is located:
+    content = replace(content, r"@__DIR__" => "\"$(escape_string(EXAMPLEPATH))\"")
 
     return content
 end

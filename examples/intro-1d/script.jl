@@ -1,8 +1,8 @@
-# # One-dimensional regression
+# # Intro to AbstractGPs: one-dimensional regression
 #
 # ## Setup
 #
-# Loading the necessary packages and setting seed.
+# Loading the necessary packages.
 
 using AbstractGPs
 using Distributions
@@ -12,12 +12,12 @@ using Plots
 default(; legend=:outertopright, size=(700, 400))
 
 using Random
-Random.seed!(42)
+Random.seed!(42)  # setting the seed for reproducibility of this notebook
 #md nothing #hide
 
 # Load toy regression
-# [dataset](https://github.com/GPflow/docs/blob/master/doc/source/notebooks/basics/data/regression_1D.csv)
-# taken from GPFlow examples.
+# [dataset](https://github.com/GPflow/GPflow/blob/develop/doc/source/notebooks/basics/data/regression_1D.csv)
+# taken from GPflow examples.
 
 x = [
     0.8658165855998895,
