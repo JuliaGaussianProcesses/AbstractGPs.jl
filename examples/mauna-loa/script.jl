@@ -191,7 +191,7 @@ plot_gp!(f; label) = plot!(f(1920:0.2:2030); ribbon_scale=2, linewidth=1, label)
 plotdata()
 plot_gp!(fpost_init; label="posterior f(⋅)")
 
-# A reasonable fit to the data, but awful extrapolation away from the observations!
+# A reasonable fit to the data, but poor extrapolation away from the observations!
 
 # ## Hyperparameter Optimization
 #
@@ -249,12 +249,12 @@ end
 
 # We now run the optimization:
 
-θ_opt, result = optimize_loss(loss, θ_init)
-result
+θ_opt, opt_result = optimize_loss(loss, θ_init)
+opt_result
 
 # The final value of the log marginal likelihood is:
 
--result.minimum
+-opt_result.minimum
 
 # !!! warning
 #     To avoid bad local optima, we could (and should) have carried out several
