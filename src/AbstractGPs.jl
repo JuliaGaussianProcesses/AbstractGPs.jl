@@ -30,7 +30,6 @@ export GP,
     VFE,
     DTC,
     update_posterior,
-    LatentGP,
     ColVecs,
     RowVecs
 
@@ -52,9 +51,6 @@ include("exact_gpr_posterior.jl")
 
 # Approximate sparse GP inference for Gaussian likelihood.
 include("sparse_approximations.jl")
-
-# LatentGP and LatentFiniteGP objects to accommodate GPs with non-Gaussian likelihoods.
-include("latent_gp.jl")
 
 # Plotting utilities.
 include("util/plotting.jl")
