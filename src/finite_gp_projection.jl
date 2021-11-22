@@ -96,6 +96,8 @@ true
 """
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
 
+Distributions.invcov(f::FiniteGP) = inv(cov(f))
+
 """
     var(f::FiniteGP)
 
@@ -311,4 +313,22 @@ function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
     return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
+end
+
+function Distributions.logdetcov(f::FiniteGP)
+    return logdet(cov(f))
+end
+
+function Distributions.sqmahal(f::FiniteGP, x::AbstractArray)
+    m, C = mean_and_cov(f)
+    return sum(abs2, _symmetric(C) \ (x .- m), dims=1) # TODO verify this is correct/working
+end
+
+function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray)
+    return r .= sqmahal(f, x) # TODO write a more efficient implementation
+end
+
+function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray)
+    m, C = mean_and_cov(f)
+    return _symmetric(C) \ (x .- m) # TODO verify this is correct
 end
