@@ -312,23 +312,21 @@ function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
-    return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
+    return -((size(Y, 1) * T(log(2π)) + logdet(f, C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
 end
 
-function Distributions.logdetcov(f::FiniteGP)
-    return logdet(cov(f))
+function Distributions.logdetcov(f::FiniteGP, C::AbstractMatrix=cov(f))
+    return logdet(C)
 end
 
-function Distributions.sqmahal(f::FiniteGP, x::AbstractArray)
-    m, C = mean_and_cov(f)
+function Distributions.sqmahal(f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
     return sum(abs2, _symmetric(C) \ (x .- m), dims=1) # TODO verify this is correct/working
 end
 
-function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray)
-    return r .= sqmahal(f, x) # TODO write a more efficient implementation
+function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
+    return r .= sqmahal(f, x, (m, C)) # TODO write a more efficient implementation
 end
 
-function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray)
-    m, C = mean_and_cov(f)
+function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
     return _symmetric(C) \ (x .- m) # TODO verify this is correct
 end
