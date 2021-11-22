@@ -217,6 +217,14 @@ end
         @test y isa Vector{T}
         @test logpdf(fx, y) isa T
     end
+    @testset "AbstractMvNormal API" begin
+        rng = MersenneTwister(424242)
+        x = randn(rng, 123)
+        f = GP(SqExponentialKernel())
+        fx = f(x, 0.1)
+
+        Distributions.TestUtils.test_mvnormal(fx, 10^6, rng)
+    end
 end
 
 @testset "Docs" begin
