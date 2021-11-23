@@ -308,47 +308,29 @@ function Distributions._logpdf(f::FiniteGP, Y::AbstractVecOrMat{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
-    return -((size(Y, 1) * T(log2π) + logdet(C)) .+ sqmahal(f, Y, (m, C))) ./ 2
+    return -((size(Y, 1) * T(log2π) + logdet(C)) .+ _sqmahal(m, C, Y)) ./ 2
 end
 
-Distributions.logdetcov(f::FiniteGP, C=cov(f)) = logdet(C)
+Distributions.logdetcov(f::FiniteGP) = logdet(cov(f))
 
-function Distributions.sqmahal(
-    f::FiniteGP,
-    x::AbstractVecOrMat,
-    (m, C)::Tuple{<:AbstractVector,<:AbstractMatrix}=mean_and_cov(f),
-)
-    return sqmahal(f, x, (m, cholesky(_symmetric(C))))
+function Distributions.sqmahal(f::FiniteGP, x::AbstractVecOrMat)
+    m, C = mean_and_cov(f)
+    return _sqmahal(m, cholesky(_symmetric(C)), x)
 end
 
-# sqmahal should return a scalar if x is a vector
-function Distributions.sqmahal(
-    f::FiniteGP,
-    x::AbstractVector,
-    (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f),
-)
-    return tr_Xt_invA_X(C, x - m)
+_sqmahal(m::AbstractVector, C::Cholesky, x::AbstractVector) = tr_Xt_invA_X(C, x - m)
+_sqmahal(m::AbstractVector, C::Cholesky, x::AbstractMatrix) = diag_Xt_invA_X(C, x - m)
+
+function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray)
+    return r .= sqmahal(f, x) # TODO write a more efficient implementation
 end
 
-function Distributions.sqmahal(
-    f::FiniteGP,
-    x::AbstractMatrix,
-    (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f),
-)
-    return diag_Xt_invA_X(C, x .- m)
+function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray)
+    m, C = mean_and_cov(f)
+    return _gradlogpdf(m, C, x)
 end
 
-function Distributions.sqmahal!(
-    r::AbstractArray, f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f)
-)
-    return r .= sqmahal(f, x, (m, C)) # TODO write a more efficient implementation
-end
-
-function Distributions.gradlogpdf(
-    f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f)
-)
-    return _symmetric(C) \ (m .- x)
-end
+_gradlogpdf(m, C, x) = _symmetric(C) \ (m .- x)
 
 function Distributions.params(f::FiniteGP)
     return (f.f, f.x, f.Σy)
