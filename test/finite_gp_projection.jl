@@ -229,7 +229,7 @@ end
         Distributions.TestUtils.test_mvnormal(fx, 10^6, rng)
         @test Distributions.invcov(fx) ≈ inv(cov(fx))
         @test Distributions.gradlogpdf(fx, y) ≈
-            only(FiniteDifferences.grad(central_fdm(3, 1), Base.Fix1(logpdf, fx), y))
+            first(FiniteDifferences.grad(central_fdm(3, 1), Base.Fix1(logpdf, fx), y))
         @test Distributions.sqmahal!(r, fx, Y) ≈ Distributions.sqmahal(fx, Y)
     end
 end
