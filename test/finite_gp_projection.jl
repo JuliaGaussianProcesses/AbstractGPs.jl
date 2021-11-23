@@ -211,7 +211,6 @@ end
         f = GP(T(0), SqExponentialKernel())
 
         fx = f(x, T(0.1))
-        u = f(z, T(1e-4))
 
         y = rand(rng, fx)
         @test y isa Vector{T}
@@ -219,7 +218,7 @@ end
     end
     @testset "AbstractMvNormal API" begin
         rng = MersenneTwister(424242)
-        x = randn(rng, 123)
+        x = randn(rng, 5)
         f = GP(SqExponentialKernel())
         fx = f(x, 0.1)
 

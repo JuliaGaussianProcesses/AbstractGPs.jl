@@ -302,25 +302,30 @@ true
 """
 logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
-function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
-    return first(logpdf(f, reshape(y, :, 1)))
-end
+Distributions.loglikelihood(f::FiniteGP, Y::AbstractVecOrMat{<:Real}) = sum(logpdf(f, Y))
 
-Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
-
-function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
+function Distributions.logpdf(f::FiniteGP, Y::AbstractVecOrMat{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
-    return -((size(Y, 1) * T(log(2π)) + logdet(f, C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
+    return -((size(Y, 1) * T(log2π) + logdetcov(f, C)) .+ sqmahal(f, Y, (m, C))) ./ 2
 end
 
-function Distributions.logdetcov(f::FiniteGP, C::AbstractMatrix=cov(f))
+function Distributions.logdetcov(f::FiniteGP, C=cov(f))
     return logdet(C)
 end
 
-function Distributions.sqmahal(f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
-    return sum(abs2, _symmetric(C) \ (x .- m), dims=1) # TODO verify this is correct/working
+function Distributions.sqmahal(f::FiniteGP, x::AbstractVecOrMat, (m, C)::Tuple{<:AbstractVector,<:AbstractMatrix}=mean_and_cov(f))
+    return sqmahal(f, x, (m, cholesky(_symmetric(C))))
+end
+
+# sqmahal should return a scalar if x is a vector
+function Distributions.sqmahal(f::FiniteGP, x::AbstractVector, (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f))
+    return tr_Xt_invA_X(C, x - m)
+end
+
+function Distributions.sqmahal(f::FiniteGP, x::AbstractMatrix, (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f))
+    return diag_Xt_invA_X(C, x .- m)
 end
 
 function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
@@ -328,5 +333,9 @@ function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray,
 end
 
 function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
-    return _symmetric(C) \ (x .- m) # TODO verify this is correct
+    return _symmetric(C) \ (x .- m)
+end
+
+function Distributions.params(f::FiniteGP)
+    return (f.f, f.x, f.Σy)
 end
