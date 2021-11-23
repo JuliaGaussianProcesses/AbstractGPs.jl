@@ -1,4 +1,5 @@
-# If a matrix is `Diagonal` or if it is a `Cholesky` object, we generally don't need to wrap it in a `Symmetric`, because
+# If a matrix is `Diagonal` or if it is a `Cholesky` object,
+# we generally don't need to wrap it in a `Symmetric`, because
 # it's already symmetric. This is used in a couple of places to avoid precisely this and
 # having to add specialised methods of e.g. `_cholesky` for complicated wrapped types.
 _symmetric(X) = Symmetric(X)
