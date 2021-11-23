@@ -315,24 +315,40 @@ function Distributions.logdetcov(f::FiniteGP, C=cov(f))
     return logdet(C)
 end
 
-function Distributions.sqmahal(f::FiniteGP, x::AbstractVecOrMat, (m, C)::Tuple{<:AbstractVector,<:AbstractMatrix}=mean_and_cov(f))
+function Distributions.sqmahal(
+    f::FiniteGP,
+    x::AbstractVecOrMat,
+    (m, C)::Tuple{<:AbstractVector,<:AbstractMatrix}=mean_and_cov(f),
+)
     return sqmahal(f, x, (m, cholesky(_symmetric(C))))
 end
 
 # sqmahal should return a scalar if x is a vector
-function Distributions.sqmahal(f::FiniteGP, x::AbstractVector, (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f))
+function Distributions.sqmahal(
+    f::FiniteGP,
+    x::AbstractVector,
+    (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f),
+)
     return tr_Xt_invA_X(C, x - m)
 end
 
-function Distributions.sqmahal(f::FiniteGP, x::AbstractMatrix, (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f))
+function Distributions.sqmahal(
+    f::FiniteGP,
+    x::AbstractMatrix,
+    (m, C)::Tuple{<:AbstractVector,<:Cholesky}=mean_and_cov(f),
+)
     return diag_Xt_invA_X(C, x .- m)
 end
 
-function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
+function Distributions.sqmahal!(
+    r::AbstractArray, f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f)
+)
     return r .= sqmahal(f, x, (m, C)) # TODO write a more efficient implementation
 end
 
-function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f))
+function Distributions.gradlogpdf(
+    f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f)
+)
     return _symmetric(C) \ (x .- m)
 end
 

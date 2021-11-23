@@ -64,28 +64,44 @@ diag_At_A(A::AbstractVecOrMat) = vec(sum(abs2.(A); dims=1))
 tr_At_A(A::AbstractVecOrMat) = sum(abs2, A)
 
 function diag_At_B(A::AbstractVecOrMat, B::AbstractVecOrMat)
-    size(A) == size(B) || throw(DimensionMismatch("A ($(size(A))) and B ($(size(B))) do not have the same dimensions "))
+    size(A) == size(B) || throw(
+        DimensionMismatch(
+            "A ($(size(A))) and B ($(size(B))) do not have the same dimensions "
+        ),
+    )
     return vec(sum(A .* B; dims=1))
 end
 
 diag_Xt_A_X(A::Cholesky, X::AbstractVecOrMat) = diag_At_A(A.U * X)
 
 function diag_Xt_A_Y(X::AbstractVecOrMat, A::Cholesky, Y::AbstractVecOrMat)
-    size(X) == size(Y) || throw(DimensionMismatch("X ($(size(X))) and Y ($(size(Y))) do not have the same dimensions "))
+    size(X) == size(Y) || throw(
+        DimensionMismatch(
+            "X ($(size(X))) and Y ($(size(Y))) do not have the same dimensions "
+        ),
+    )
     return diag_At_B(A.U * X, A.U * Y)
 end
 
 diag_Xt_invA_X(A::Cholesky, X::AbstractVecOrMat) = diag_At_A(A.U' \ X)
 
 function diag_Xt_invA_Y(X::AbstractMatrix, A::Cholesky, Y::AbstractMatrix)
-    size(X) == size(Y) || throw(DimensionMismatch("X ($(size(X))) and Y ($(size(Y))) do not have the same dimensions "))
+    size(X) == size(Y) || throw(
+        DimensionMismatch(
+            "X ($(size(X))) and Y ($(size(Y))) do not have the same dimensions "
+        ),
+    )
     return diag_At_B(A.U' \ X, A.U' \ Y)
 end
 
 tr_Xt_invA_X(A::Cholesky, X::AbstractVecOrMat) = tr_At_A(A.U' \ X)
 
 function Xtinv_A_Xinv(A::Cholesky, X::Cholesky)
-    size(A) == size(X) || throw(DimensionMismatch("A ($(size(A))) and X ($(size(X))) do not have the same dimensions "))
+    size(A) == size(X) || throw(
+        DimensionMismatch(
+            "A ($(size(A))) and X ($(size(X))) do not have the same dimensions "
+        ),
+    )
     C = A.U \ (X.U' \ A.U')
     return Symmetric(C * C')
 end
