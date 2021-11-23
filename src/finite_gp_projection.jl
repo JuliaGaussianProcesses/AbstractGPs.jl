@@ -319,7 +319,7 @@ function Distributions.sqmahal(f::FiniteGP, x::AbstractVecOrMat)
 end
 
 _sqmahal(m::AbstractVector, C::Cholesky, x::AbstractVector) = tr_Xt_invA_X(C, x - m)
-_sqmahal(m::AbstractVector, C::Cholesky, x::AbstractMatrix) = diag_Xt_invA_X(C, x - m)
+_sqmahal(m::AbstractVector, C::Cholesky, x::AbstractMatrix) = diag_Xt_invA_X(C, x .- m)
 
 function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray)
     return r .= sqmahal(f, x) # TODO write a more efficient implementation
