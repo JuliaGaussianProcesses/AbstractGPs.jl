@@ -313,9 +313,14 @@ end
 
 Distributions.logdetcov(f::FiniteGP) = logdet(cov(f))
 
-function Distributions.sqmahal(f::FiniteGP, x::AbstractVecOrMat)
+function Distributions.sqmahal(f::FiniteGP, x::AbstractVector)
     m, C = mean_and_cov(f)
     return _sqmahal(m, cholesky(_symmetric(C)), x)
+end
+
+function Distributions.sqmahal(f::FiniteGP, X::AbstractMatrix)
+    m, C = mean_and_cov(f)
+    return _sqmahal(m, cholesky(_symmetric(C)), X)
 end
 
 _sqmahal(m::AbstractVector, C::Cholesky, x::AbstractVector) = tr_Xt_invA_X(C, x - m)
