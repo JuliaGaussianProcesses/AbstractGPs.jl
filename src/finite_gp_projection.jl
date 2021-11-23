@@ -332,6 +332,4 @@ end
 
 _gradlogpdf(m, C, x) = _symmetric(C) \ (m .- x)
 
-function Distributions.params(f::FiniteGP)
-    return (f.f, f.x, f.Σy)
-end
+Distributions.params(f::FiniteGP) = (f.f, f.x, f.Σy)
