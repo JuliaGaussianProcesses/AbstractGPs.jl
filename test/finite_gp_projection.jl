@@ -223,10 +223,13 @@ end
         f = GP(SqExponentialKernel())
         fx = f(x, 0.1)
         y = rand(rng, N)
+        Y = rand(rng, N, 10)
+        r = rand(rng, 10)
 
         Distributions.TestUtils.test_mvnormal(fx, 10^6, rng)
         @test invcov(fx) ≈ inv(cov(fx))
         @test Distributions.gradlogpdf(fx, y) ≈ only(FiniteDifferences.grad(central_fdm(3, 1), Base.Fix1(logpdf, fx), y))
+        @test Distributions.sqmahal!(r, fx, Y) ≈ Distributions.sqmahal(fx, Y)
     end
 end
 
