@@ -304,7 +304,7 @@ logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
 Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
 
-function Distributions._logpdf(f::FiniteGP, Y::AbstractVecOrMat{<:Real})
+function Distributions.logpdf(f::FiniteGP, Y::AbstractVecOrMat{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
