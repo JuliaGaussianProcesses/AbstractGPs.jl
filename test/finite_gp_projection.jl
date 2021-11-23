@@ -211,11 +211,26 @@ end
         f = GP(T(0), SqExponentialKernel())
 
         fx = f(x, T(0.1))
-        u = f(z, T(1e-4))
 
         y = rand(rng, fx)
         @test y isa Vector{T}
         @test logpdf(fx, y) isa T
+    end
+    @testset "AbstractMvNormal API" begin
+        rng = MersenneTwister(424242)
+        N = 5
+        x = randn(rng, N)
+        f = GP(SqExponentialKernel())
+        fx = f(x, 0.1)
+        y = rand(rng, N)
+        Y = rand(rng, N, 10)
+        r = rand(rng, 10)
+
+        Distributions.TestUtils.test_mvnormal(fx, 10^6, rng)
+        @test Distributions.invcov(fx) ≈ inv(cov(fx))
+        @test Distributions.gradlogpdf(fx, y) ≈
+            first(FiniteDifferences.grad(central_fdm(3, 1), Base.Fix1(logpdf, fx), y))
+        @test Distributions.sqmahal!(r, fx, Y) ≈ Distributions.sqmahal(fx, Y)
     end
 end
 
