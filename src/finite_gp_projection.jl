@@ -308,12 +308,10 @@ function Distributions._logpdf(f::FiniteGP, Y::AbstractVecOrMat{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
-    return -((size(Y, 1) * T(log2π) + logdetcov(f, C)) .+ sqmahal(f, Y, (m, C))) ./ 2
+    return -((size(Y, 1) * T(log2π) + logdet(C)) .+ sqmahal(f, Y, (m, C))) ./ 2
 end
 
-function Distributions.logdetcov(f::FiniteGP, C=cov(f))
-    return logdet(C)
-end
+Distributions.logdetcov(f::FiniteGP, C=cov(f)) = logdet(C)
 
 function Distributions.sqmahal(
     f::FiniteGP,
@@ -349,7 +347,7 @@ end
 function Distributions.gradlogpdf(
     f::FiniteGP, x::AbstractArray, (m, C)::Tuple=mean_and_cov(f)
 )
-    return _symmetric(C) \ (x .- m)
+    return _symmetric(C) \ (m .- x)
 end
 
 function Distributions.params(f::FiniteGP)
