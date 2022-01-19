@@ -23,6 +23,17 @@ end
 function FiniteGP(
     f::AbstractGP, X::AbstractMatrix, σ²=default_σ²; obsdim::Int=KernelFunctions.defaultobs
 )
+    nrows, ncols = size(X)
+
+    if obsdim == 1
+        ndata, dim, xvecs = nrows, ncols, "RowVecs"
+    elseif obsdim == 2
+        ndata, dim, xvecs = ncols, nrows, "ColVecs"
+    else
+        throw(ArgumentError("obsdim must be 1 or 2"))
+    end
+    @info "Evaluating the GP on a $nrows × $ncols matrix, interpreted as $ndata points of dimension $dim. To remove this message, wrap the matrix in $xvecs."
+
     return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
 end
 
