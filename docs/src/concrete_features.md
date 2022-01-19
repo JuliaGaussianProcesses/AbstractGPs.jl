@@ -74,11 +74,14 @@ f = GP(SqExponentialKernel())
 ```
 
 ### Exact Posterior
-```julia
-# Generate posterior with the first batch of data by conditioning the prior on them.
-p_fx = posterior(f(x[1:3], 0.1), y[1:3])
 
-# Generate posterior with the second batch of data, considering the previous posterior `p_fx` as the prior.
+Generate posterior with the first batch of data by conditioning the prior on them:
+```julia
+p_fx = posterior(f(x[1:3], 0.1), y[1:3])
+```
+
+Generate posterior with the second batch of data, considering the previous posterior `p_fx` as the prior:
+```julia
 p_p_fx = posterior(p_fx(x[4:10], 0.1), y[4:10])
 ```
 
