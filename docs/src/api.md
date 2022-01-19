@@ -48,6 +48,16 @@ fx = f(x, Σ)
 fx = AbstractGPs.FiniteGP(f, x, Σ)
 ```
 
+!!! note
+
+    When considering higher-dimensional input features, these are often
+    provided as a matrix `X`. Evaluating `f(X)` interprets these as a vector of
+    vectors, where by default each _column_ of `X` is seen to represent an
+    input point. The implementation is handled by KernelFunctions.jl; see its
+    [documentation on Input
+    Types](https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#Vector-Valued-Inputs)
+    for more details.
+
 The `FiniteGP` has two API levels.
 The [Primary Public API](@ref) should be supported by all `FiniteGP`s, while the [Secondary Public API](@ref) will only be supported by a subset.
 Use only the primary API when possible.
