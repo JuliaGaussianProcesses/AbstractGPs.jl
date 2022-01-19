@@ -1,8 +1,10 @@
-# If a matrix is `Diagonal`, we generally don't need to wrap it in a `Symmetric`, because
+# If a matrix is `Diagonal` or if it is a `Cholesky` object,
+# we generally don't need to wrap it in a `Symmetric`, because
 # it's already symmetric. This is used in a couple of places to avoid precisely this and
 # having to add specialised methods of e.g. `_cholesky` for complicated wrapped types.
 _symmetric(X) = Symmetric(X)
 _symmetric(X::Diagonal) = X
+_symmetric(X::Cholesky) = X
 
 # Small bit of indirection to work around a cholesky-related bug whereby the interaction
 # between `FillArrays` and `Diagonal` and `Cholesky` causes problems.
@@ -63,26 +65,44 @@ diag_At_A(A::AbstractVecOrMat) = vec(sum(abs2.(A); dims=1))
 tr_At_A(A::AbstractVecOrMat) = sum(abs2, A)
 
 function diag_At_B(A::AbstractVecOrMat, B::AbstractVecOrMat)
-    @assert size(A) == size(B)
+    size(A) == size(B) || throw(
+        DimensionMismatch(
+            "A ($(size(A))) and B ($(size(B))) do not have the same dimensions "
+        ),
+    )
     return vec(sum(A .* B; dims=1))
 end
 
 diag_Xt_A_X(A::Cholesky, X::AbstractVecOrMat) = diag_At_A(A.U * X)
 
 function diag_Xt_A_Y(X::AbstractVecOrMat, A::Cholesky, Y::AbstractVecOrMat)
-    @assert size(X) == size(Y)
+    size(X) == size(Y) || throw(
+        DimensionMismatch(
+            "X ($(size(X))) and Y ($(size(Y))) do not have the same dimensions "
+        ),
+    )
     return diag_At_B(A.U * X, A.U * Y)
 end
 
 diag_Xt_invA_X(A::Cholesky, X::AbstractVecOrMat) = diag_At_A(A.U' \ X)
 
 function diag_Xt_invA_Y(X::AbstractMatrix, A::Cholesky, Y::AbstractMatrix)
-    @assert size(X) == size(Y)
+    size(X) == size(Y) || throw(
+        DimensionMismatch(
+            "X ($(size(X))) and Y ($(size(Y))) do not have the same dimensions "
+        ),
+    )
     return diag_At_B(A.U' \ X, A.U' \ Y)
 end
 
+tr_Xt_invA_X(A::Cholesky, X::AbstractVecOrMat) = tr_At_A(A.U' \ X)
+
 function Xtinv_A_Xinv(A::Cholesky, X::Cholesky)
-    @assert size(A) == size(X)
+    size(A) == size(X) || throw(
+        DimensionMismatch(
+            "A ($(size(A))) and X ($(size(X))) do not have the same dimensions "
+        ),
+    )
     C = A.U \ (X.U' \ A.U')
     return Symmetric(C * C')
 end

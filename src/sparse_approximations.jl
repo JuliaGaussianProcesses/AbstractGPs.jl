@@ -281,7 +281,11 @@ function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::Fin
 end
 
 function consistency_check(fx, y)
-    length(fx) == length(y) || throw(DimensionMismatch("length(fx) = $(length(fx)) and length(y) = $(length(y)) do not match"))
+    return length(fx) == length(y) || throw(
+        DimensionMismatch(
+            "length(fx) = $(length(fx)) and length(y) = $(length(y)) do not match"
+        ),
+    )
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
