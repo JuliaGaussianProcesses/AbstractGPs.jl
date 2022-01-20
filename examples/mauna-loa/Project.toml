@@ -9,7 +9,7 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
-AbstractGPs = "0.5"
+AbstractGPs = "0.5, 0.6"
 CSV = "0.9"
 DataFrames = "1"
 Literate = "2"
