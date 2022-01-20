@@ -30,10 +30,6 @@ end
         f = GP(sin, SqExponentialKernel())
         fx, fx′ = FiniteGP(f, x, Σy), FiniteGP(f, x′, Σy′)
 
-        @test FiniteGP(f, Xmat; obsdim=1) == FiniteGP(f, RowVecs(Xmat))
-        @test FiniteGP(f, Xmat; obsdim=2) == FiniteGP(f, ColVecs(Xmat))
-        @test FiniteGP(f, Xmat, σ²; obsdim=1) == FiniteGP(f, RowVecs(Xmat), σ²)
-        @test FiniteGP(f, Xmat, σ²; obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²)
         @test mean(fx) == mean(f, x)
         @test cov(fx) == cov(f, x)
         @test var(fx) == diag(cov(fx))
