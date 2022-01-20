@@ -29,7 +29,7 @@ function FiniteGP(f::AbstractGP, X::AbstractMatrix, σ²=default_σ²)
   wrap it in ColVecs (e.g. `f(ColVecs(X), σ²)`).
 - If this is supposed to represent $nrows data points of dimension $ncols,
   wrap it in RowVecs (e.g. `f(RowVecs(X), σ²)`).
-For more details, see https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#Input-Types
+These are lightweight wrappers around the matrix, which allows the fastest performance. For more details, see https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#Input-Types
 """,
         ),
     )

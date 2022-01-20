@@ -43,13 +43,13 @@ logpdf(f_posterior(x), y)
 ```
 
 ## Compute the VFE approximation to the log marginal probability of `y`.
-Here, z is a set of pseudo-points. 
+Here, z is a set of pseudo-points.
 ```julia
 z = randn(rng, 4)
 ```
 
 ### Evidence Lower BOund (ELBO)
-We provide a ready implentation of elbo w.r.t to the pseudo points. We can perform Variational Inference on pseudo-points by maximizing the ELBO term w.r.t pseudo-points `z` and any kernel parameters. For more information, see [examples](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/tree/master/examples). 
+We provide a ready implentation of elbo w.r.t to the pseudo points. We can perform Variational Inference on pseudo-points by maximizing the ELBO term w.r.t pseudo-points `z` and any kernel parameters. For more information, see [examples](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/tree/master/examples).
 ```julia
 elbo(VFE(f(z)), fx, y)
 ```
@@ -65,7 +65,7 @@ f_approx_posterior = posterior(VFE(f(z)), fx, y)
 marginals(f_approx_posterior(x))
 ```
 
-## Sequential Conditioning 
+## Sequential Conditioning
 Sequential conditioning allows you to compute your posterior in an online fashion. We do this in an efficient manner by updating the cholesky factorisation of the covariance matrix and avoiding recomputing it from original covariance matrix.
 
 ```julia
