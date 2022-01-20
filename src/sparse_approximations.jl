@@ -283,7 +283,7 @@ end
 function consistency_check(fx, y)
     return length(fx) == length(y) || throw(
         DimensionMismatch(
-            "length(fx) = $(length(fx)) and length(y) = $(length(y)) do not match"
+            "length(fx) = $(length(fx)) and length(y) = $(length(y)) must match"
         ),
     )
 end
