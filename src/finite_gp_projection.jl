@@ -20,21 +20,14 @@ function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
     return FiniteGP(f, x, Fill(σ², length(x)))
 end
 
-function FiniteGP(
-    f::AbstractGP, X::AbstractMatrix, σ²=default_σ²; obsdim::Int=KernelFunctions.defaultobs
-)
+function FiniteGP(f::AbstractGP, X::AbstractMatrix, σ²=default_σ²)
     nrows, ncols = size(X)
-
-    if obsdim == 1
-        ndata, dim, xvecs = nrows, ncols, "RowVecs"
-    elseif obsdim == 2
-        ndata, dim, xvecs = ncols, nrows, "ColVecs"
-    else
-        throw(ArgumentError("obsdim must be 1 or 2"))
-    end
-    @info "Evaluating the GP on a $nrows × $ncols matrix, interpreted as $ndata points of dimension $dim. To remove this message, wrap the matrix in $xvecs."
-
-    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
+    throw(ArgumentError("""projecting a GP on a finite number of points only accepts vectors (e.g. a vector of vectors for multi-dimensional features), but was called with a $nrows × $ncols matrix.
+- If this is supposed to represent $ncols data points of dimension $nrows,
+  wrap it in ColVecs (e.g. `f(ColVecs(X), σ²)`).
+- If this is supposed to represent $nrows data points of dimension $ncols,
+  wrap it in RowVecs (e.g. `f(RowVecs(X), σ²)`).
+  """))
 end
 
 ## conversions
