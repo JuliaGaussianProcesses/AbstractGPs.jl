@@ -22,13 +22,17 @@ end
 
 function FiniteGP(f::AbstractGP, X::AbstractMatrix, σ²=default_σ²)
     nrows, ncols = size(X)
-    throw(ArgumentError("""projecting a GP on a finite number of points only accepts vectors (e.g. a vector of vectors for multi-dimensional features), but was called with a $nrows × $ncols matrix.
+    throw(
+        ArgumentError(
+            """projecting a GP on a finite number of points only accepts vectors (e.g. a vector of vectors for multi-dimensional features), but was called with a $nrows × $ncols matrix.
 - If this is supposed to represent $ncols data points of dimension $nrows,
   wrap it in ColVecs (e.g. `f(ColVecs(X), σ²)`).
 - If this is supposed to represent $nrows data points of dimension $ncols,
   wrap it in RowVecs (e.g. `f(RowVecs(X), σ²)`).
 For more details, see https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#Input-Types
-"""))
+""",
+        ),
+    )
 end
 
 ## conversions
