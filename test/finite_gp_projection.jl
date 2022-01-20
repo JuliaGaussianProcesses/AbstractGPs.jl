@@ -232,6 +232,11 @@ end
             first(FiniteDifferences.grad(central_fdm(3, 1), Base.Fix1(logpdf, fx), y))
         @test Distributions.sqmahal!(r, fx, Y) ≈ Distributions.sqmahal(fx, Y)
     end
+    @testset "matrix inputs" begin
+        f = GP(SqExponentialKernel())
+        X = randn(5, 3)
+        @test_throws ArgumentError f(X)
+    end
 end
 
 @testset "Docs" begin
