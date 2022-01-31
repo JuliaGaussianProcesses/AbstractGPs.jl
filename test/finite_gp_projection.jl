@@ -37,7 +37,7 @@ end
             @test f(x) isa AbstractGPs.FiniteGP
             @test f(x, σ²) isa AbstractGPs.FiniteGP
             @test f(Xmat; obsdim=obsdim) == f(x)
-            @test f(Xmat, σ², obsdim=obsdim) == f(x, σ²)
+            @test f(Xmat, σ²; obsdim=obsdim) == f(x, σ²)
         end
         @test @test_deprecated(f(Xmat)) == f(ColVecs(Xmat))
 
@@ -247,7 +247,9 @@ end
 
 @testset "Docs" begin
     docstring = string(Docs.doc(logpdf, Tuple{AbstractGPs.FiniteGP,Vector{Float64}}))
-    @test occursin("logpdf(f::AbstractGPs.FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
+    @test occursin(
+        "logpdf(f::AbstractGPs.FiniteGP, y::AbstractVecOrMat{<:Real})", docstring
+    )
 end
 
 # """
