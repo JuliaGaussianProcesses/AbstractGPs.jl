@@ -31,7 +31,7 @@ Base.length(f::FiniteGP) = length(f.x)
 
 (f::AbstractGP)(x...) = FiniteGP(f, x...)
 function (f::AbstractGP)(
-    X::AbstractMatrix, args...; obsdim::Union{Int,Nothing}=KernelFunctions.default_obs
+    X::AbstractMatrix, args...; obsdim::Union{Int,Nothing}=KernelFunctions.defaultobs
 )
     return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), args...)
 end
