@@ -20,12 +20,6 @@ function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
     return FiniteGP(f, x, Fill(σ², length(x)))
 end
 
-function FiniteGP(
-    f::AbstractGP, X::AbstractMatrix, σ²=default_σ²; obsdim::Int=KernelFunctions.defaultobs
-)
-    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
-end
-
 ## conversions
 Base.convert(::Type{MvNormal}, f::FiniteGP) = MvNormal(mean_and_cov(f)...)
 function Base.convert(::Type{MvNormal{T}}, f::FiniteGP) where {T}
@@ -36,6 +30,13 @@ end
 Base.length(f::FiniteGP) = length(f.x)
 
 (f::AbstractGP)(x...) = FiniteGP(f, x...)
+function (f::AbstractGP)(
+    X::AbstractMatrix,
+    args...;
+    obsdim::Union{Int,Nothing}=KernelFunctions.default_obs,
+)
+    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), args...; kwargs...)
+end
 
 """
     mean(fx::FiniteGP)
