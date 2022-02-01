@@ -131,7 +131,7 @@ function test_internal_abstractgps_interface(
     z::AbstractVector;
     atol=1e-12,
     σ²::Real=1e-1,
-    jitter::Real=1e-15,
+    jitter::Real=AbstractGPs.default_σ²,
 )
     if length(x) == length(z)
         throw(error("x and y should be of different lengths."))
