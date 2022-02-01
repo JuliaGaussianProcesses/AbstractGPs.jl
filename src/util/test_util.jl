@@ -131,6 +131,7 @@ function test_internal_abstractgps_interface(
     z::AbstractVector;
     atol=1e-12,
     σ²::Real=1e-1,
+    jitter::Real=1e-15,
 )
     if length(x) == length(z)
         throw(error("x and y should be of different lengths."))
@@ -203,9 +204,9 @@ function test_internal_abstractgps_interface(
     y = rand(fx)
     @test length(y) == length(x)
     @test logpdf(fx, y) isa Real
-    @test elbo(VFE(f(x)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
-    @test elbo(VFE(f(z)), fx, y) <= logpdf(fx, y)
-    @test dtc(VFE(f(x)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
+    @test elbo(VFE(f(x, jitter)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
+    @test elbo(VFE(f(z, jitter)), fx, y) <= logpdf(fx, y)
+    @test dtc(VFE(f(x, jitter)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
 end
 
 end
