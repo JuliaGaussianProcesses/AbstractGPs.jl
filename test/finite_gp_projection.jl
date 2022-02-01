@@ -10,7 +10,8 @@ end
         f = GP(sin, SqExponentialKernel())
         x = randn(10)
         Σy = generate_noise_matrix(Random.GLOBAL_RNG, 10)
-        fx = FiniteGP(f, x, Σy)
+        fx = f(x, Σy)
+        @test fx isa AbstractGPs.FiniteGP
 
         dist = @inferred(convert(MvNormal, fx))
         @test dist isa MvNormal{Float64}
@@ -28,12 +29,18 @@ end
         σ² = 1e-3
         Xmat = randn(rng, N, N′)
         f = GP(sin, SqExponentialKernel())
-        fx, fx′ = FiniteGP(f, x, Σy), FiniteGP(f, x′, Σy′)
+        fx, fx′ = f(x, Σy), f(x′, Σy′)
+        @test fx isa AbstractGPs.FiniteGP
+        @test fx′ isa AbstractGPs.FiniteGP
 
-        @test FiniteGP(f, Xmat; obsdim=1) == FiniteGP(f, RowVecs(Xmat))
-        @test FiniteGP(f, Xmat; obsdim=2) == FiniteGP(f, ColVecs(Xmat))
-        @test FiniteGP(f, Xmat, σ²; obsdim=1) == FiniteGP(f, RowVecs(Xmat), σ²)
-        @test FiniteGP(f, Xmat, σ²; obsdim=2) == FiniteGP(f, ColVecs(Xmat), σ²)
+        for (x, obsdim) in ((RowVecs(Xmat), 1), (ColVecs(Xmat), 2))
+            @test f(x) isa AbstractGPs.FiniteGP
+            @test f(x, σ²) isa AbstractGPs.FiniteGP
+            @test f(Xmat; obsdim=obsdim) == f(x)
+            @test f(Xmat, σ²; obsdim=obsdim) == f(x, σ²)
+        end
+        @test @test_deprecated(f(Xmat)) == f(ColVecs(Xmat))
+
         @test mean(fx) == mean(f, x)
         @test cov(fx) == cov(f, x)
         @test var(fx) == diag(cov(fx))
@@ -57,7 +64,8 @@ end
         N = 10
         x = randn(rng, N)
         Σy = generate_noise_matrix(rng, N)
-        fx = FiniteGP(GP(1, SqExponentialKernel()), x, Σy)
+        fx = GP(1, SqExponentialKernel())(x, Σy)
+        @test fx isa AbstractGPs.FiniteGP
 
         # Check that samples are the correct size.
         @test length(rand(rng, fx)) == length(x)
@@ -79,7 +87,8 @@ end
         m0 = 1
         S = 100_000
         x = range(-3.0, 3.0; length=N)
-        f = FiniteGP(GP(m0, SqExponentialKernel()), x, 1e-12)
+        f = GP(m0, SqExponentialKernel())(x, 1e-12)
+        @test f isa AbstractGPs.FiniteGP
 
         # Check mean + covariance estimates approximately converge for single-GP sampling.
         f̂1 = rand(rng, f, S)
@@ -100,7 +109,7 @@ end
 
     #     # Check that the gradient w.r.t. the samples is correct (single-sample).
     #     adjoint_test(
-    #         x->rand(MersenneTwister(123456), FiniteGP(GP(sin, EQ(), GPC()), x, Σy)),
+    #         x->rand(MersenneTwister(123456), GP(sin, EQ(), GPC())(x, Σy)),
     #         randn(rng, N),
     #         x;
     #         atol=1e-9, rtol=1e-9,
@@ -108,7 +117,7 @@ end
 
     #     # Check that the gradient w.r.t. the samples is correct (multisample).
     #     adjoint_test(
-    #         x->rand(MersenneTwister(123456), FiniteGP(GP(sin, EQ(), GPC()), x, Σy), S),
+    #         x->rand(MersenneTwister(123456), GP(sin, EQ(), GPC())(x, Σy), S),
     #         randn(rng, N, S),
     #         x;
     #         atol=1e-9, rtol=1e-9,
@@ -125,7 +134,7 @@ end
     #                 f = GP(sin, EQ(), GPC())
     #                 Σy = _to_psd(A)
     #                 C = cholesky(Σy)
-    #                 return tr_Cf_invΣy(FiniteGP(f, x, Σy), Σy, C)
+    #                 return tr_Cf_invΣy(f(x, Σy), Σy, C)
     #             end,
     #             randn(rng), x, A,
     #         )
@@ -138,7 +147,7 @@ end
     #                 f = GP(sin, EQ(), GPC())
     #                 Σy = Diagonal(exp.(a .+ 1))
     #                 C = cholesky(Σy)
-    #                 return tr_Cf_invΣy(FiniteGP(f, x, Σy), Σy, C)
+    #                 return tr_Cf_invΣy(f(x, Σy), Σy, C)
     #             end,
     #             randn(rng), x, a,
     #         )
@@ -151,8 +160,10 @@ end
         σ = 1e-1
         x = collect(range(-3.0; stop=3.0, length=N))
         f = GP(1, SqExponentialKernel())
-        fx = FiniteGP(f, x, 0)
-        y = FiniteGP(f, x, σ^2)
+        fx = f(x, 0)
+        @test fx isa AbstractGPs.FiniteGP
+        y = f(x, σ^2)
+        @test y isa AbstractGPs.FiniteGP
         ŷ = rand(rng, y)
 
         # Check that logpdf returns the correct type and roughly agrees with Distributions.
@@ -179,28 +190,28 @@ end
         # # Check that gradient w.r.t. inputs is approximately correct for `f`.
         # x, l̄ = randn(rng, N), randn(rng)
         # adjoint_test(
-        #     x->logpdf(FiniteGP(f, x, 1e-3), ones(size(x))),
+        #     x->logpdf(f(x, 1e-3), ones(size(x))),
         #     l̄, collect(x);
         #     atol=1e-8, rtol=1e-8,
         # )
         # adjoint_test(
-        #     x->sum(logpdf(FiniteGP(f, x, 1e-3), ones(size(Ŷ)))),
+        #     x->sum(logpdf(f(x, 1e-3), ones(size(Ŷ)))),
         #     l̄, collect(x);
         #     atol=1e-8, rtol=1e-8,
         # )
 
         # # Check that the gradient w.r.t. the noise is approximately correct for `f`.
         # σ_ = randn(rng)
-        # adjoint_test((σ_, ŷ)->logpdf(FiniteGP(f, x, exp(σ_)), ŷ), l̄, σ_, ŷ)
-        # adjoint_test((σ_, Ŷ)->sum(logpdf(FiniteGP(f, x, exp(σ_)), Ŷ)), l̄, σ_, Ŷ)
+        # adjoint_test((σ_, ŷ)->logpdf(f(x, exp(σ_)), ŷ), l̄, σ_, ŷ)
+        # adjoint_test((σ_, Ŷ)->sum(logpdf(f(x, exp(σ_)), Ŷ)), l̄, σ_, Ŷ)
 
         # # Check that the gradient w.r.t. a scaling of the GP works.
         # adjoint_test(
-        #     α->logpdf(FiniteGP(α * f, x, 1e-1), ŷ), l̄, randn(rng);
+        #     α->logpdf((α * f)(x, 1e-1), ŷ), l̄, randn(rng);
         #     atol=1e-8, rtol=1e-8,
         # )
         # adjoint_test(
-        #     α->sum(logpdf(FiniteGP(α * f, x, 1e-1), Ŷ)), l̄, randn(rng);
+        #     α->sum(logpdf((α * f)(x, 1e-1), Ŷ)), l̄, randn(rng);
         #     atol=1e-8, rtol=1e-8,
         # )
     end
@@ -235,7 +246,7 @@ end
 end
 
 @testset "Docs" begin
-    docstring = string(Docs.doc(logpdf, Tuple{FiniteGP,Vector{Float64}}))
+    docstring = string(Docs.doc(logpdf, Tuple{AbstractGPs.FiniteGP,Vector{Float64}}))
     @test occursin("logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
 end
 
@@ -257,14 +268,14 @@ end
 #         # Test gradient w.r.t. random sampling.
 #         N = length(x)
 #         adjoint_test(
-#             (x, isp_σ)->rand(_rng(), FiniteGP(f, x, exp(isp_σ)^2)),
+#             (x, isp_σ)->rand(_rng(), f(x, exp(isp_σ)^2)),
 #             randn(rng, N),
 #             x,
 #             isp_σ,;
 #             atol=atol, rtol=rtol,
 #         )
 #         adjoint_test(
-#             (x, isp_σ)->rand(_rng(), FiniteGP(f, x, exp(isp_σ)^2), 11),
+#             (x, isp_σ)->rand(_rng(), f(x, exp(isp_σ)^2), 11),
 #             randn(rng, N, 11),
 #             x,
 #             isp_σ,;
@@ -272,20 +283,20 @@ end
 #         )
 
 #         # Check that gradient w.r.t. logpdf is correct.
-#         y, l̄ = rand(rng, FiniteGP(f, x, exp(isp_σ))), randn(rng)
+#         y, l̄ = rand(rng, f(x, exp(isp_σ))), randn(rng)
 #         adjoint_test(
-#             (x, isp_σ, y)->logpdf(FiniteGP(f, x, exp(isp_σ)), y),
+#             (x, isp_σ, y)->logpdf(f(x, exp(isp_σ)), y),
 #             l̄, x, isp_σ, y;
 #             atol=atol, rtol=rtol,
 #         )
 
 #         # Check that elbo is tight-ish when it's meant to be.
-#         fx, yx = FiniteGP(f, x, 1e-9), FiniteGP(f, x, exp(isp_σ))
+#         fx, yx = f(x, 1e-9), f(x, exp(isp_σ))
 #         @test isapprox(elbo(yx, y, fx), logpdf(yx, y); atol=1e-6, rtol=1e-6)
 
 #         # Check that gradient w.r.t. elbo is correct.
 #         adjoint_test(
-#             (x, ŷ, isp_σ)->elbo(FiniteGP(f, x, exp(isp_σ)), ŷ, FiniteGP(f, x, 1e-9)),
+#             (x, ŷ, isp_σ)->elbo(f(x, exp(isp_σ)), ŷ, f(x, 1e-9)),
 #             randn(rng), x, y, isp_σ;
 #             atol=1e-6, rtol=1e-6,
 #         )
@@ -333,31 +344,31 @@ end
 #     Smat = Matrix(S)
 
 #     f = GP(cos, EQ(), GPC())
-#     y = rand(FiniteGP(f, x, S))
+#     y = rand(f(x, S))
 
-#     @test logpdf(FiniteGP(f, x, S), y) ≈ logpdf(FiniteGP(f, x, Smat), y)
+#     @test logpdf(f(x, S), y) ≈ logpdf(f(x, Smat), y)
 #     adjoint_test(
-#         (x, S, y)->logpdf(FiniteGP(f, x, S), y), randn(rng), x, Smat, y;
+#         (x, S, y)->logpdf(f(x, S), y), randn(rng), x, Smat, y;
 #         atol=1e-6, rtol=1e-6,
 #     )
 #     adjoint_test(
-#         (x, A1, A2, y)->logpdf(FiniteGP(f, x, block_diagonal([A1 * A1' + I, A2 * A2' + I])), y),
+#         (x, A1, A2, y)->logpdf(f(x, block_diagonal([A1 * A1' + I, A2 * A2' + I])), y),
 #         randn(rng), x, As[1], As[2], y;
 #         atol=1e-6, rtol=1e-6
 #     )
 
-#     @test elbo(FiniteGP(f, x, Smat), y, FiniteGP(f, x)) ≈ logpdf(FiniteGP(f, x, Smat), y)
-#     @test elbo(FiniteGP(f, x, S), y, FiniteGP(f, x)) ≈
-#         elbo(FiniteGP(f, x, Smat), y, FiniteGP(f, x))
+#     @test elbo(f(x, Smat), y, f(x)) ≈ logpdf(f(x, Smat), y)
+#     @test elbo(f(x, S), y, f(x)) ≈
+#         elbo(f(x, Smat), y, f(x))
 #     adjoint_test(
-#         (x, A, y)->elbo(FiniteGP(f, x, _to_psd(A)), y, FiniteGP(f, x)),
+#         (x, A, y)->elbo(f(x, _to_psd(A)), y, f(x)),
 #         randn(rng), x, randn(rng, sum(Ns), sum(Ns)), y;
 #         atol=1e-6, rtol=1e-6,
 #     )
 #     adjoint_test(
 #         (x, A1, A2, y) -> begin
 #             S = block_diagonal([A1 * A1' + I, A2 * A2' + I])
-#             return elbo(FiniteGP(f, x, S), y, FiniteGP(f, x))
+#             return elbo(f(x, S), y, f(x))
 #         end,
 #         randn(rng), x, As[1], As[2], y;
 #         atol=1e-6, rtol=1e-6,

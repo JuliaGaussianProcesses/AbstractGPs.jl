@@ -2,7 +2,6 @@ using AbstractGPs
 using AbstractGPs:
     AbstractGP,
     MeanFunction,
-    FiniteGP,
     ConstMean,
     GP,
     ZeroMean,
