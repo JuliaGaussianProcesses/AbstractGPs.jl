@@ -20,12 +20,6 @@ function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
     return FiniteGP(f, x, Fill(σ², length(x)))
 end
 
-function FiniteGP(
-    f::AbstractGP, X::AbstractMatrix, σ²=default_σ²; obsdim::Int=KernelFunctions.defaultobs
-)
-    return FiniteGP(f, KernelFunctions.vec_of_vecs(X; obsdim=obsdim), σ²)
-end
-
 ## conversions
 Base.convert(::Type{MvNormal}, f::FiniteGP) = MvNormal(mean_and_cov(f)...)
 function Base.convert(::Type{MvNormal{T}}, f::FiniteGP) where {T}
@@ -36,6 +30,11 @@ end
 Base.length(f::FiniteGP) = length(f.x)
 
 (f::AbstractGP)(x...) = FiniteGP(f, x...)
+function (f::AbstractGP)(
+    X::AbstractMatrix, args...; obsdim::Union{Int,Nothing}=KernelFunctions.defaultobs
+)
+    return f(KernelFunctions.vec_of_vecs(X; obsdim=obsdim), args...)
+end
 
 """
     mean(fx::FiniteGP)
@@ -95,6 +94,8 @@ true
 ```
 """
 Statistics.cov(f::FiniteGP) = cov(f.f, f.x) + f.Σy
+
+Distributions.invcov(f::FiniteGP) = inv(cov(f))
 
 """
     var(f::FiniteGP)
@@ -300,15 +301,39 @@ true
 """
 logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})
 
-function Distributions._logpdf(f::FiniteGP, y::AbstractVector{<:Real})
-    return first(logpdf(f, reshape(y, :, 1)))
-end
-
 Distributions.loglikelihood(f::FiniteGP, Y::AbstractMatrix{<:Real}) = sum(logpdf(f, Y))
 
-function Distributions.logpdf(f::FiniteGP, Y::AbstractMatrix{<:Real})
+function Distributions.logpdf(f::FiniteGP, Y::AbstractVecOrMat{<:Real})
     m, C_mat = mean_and_cov(f)
     C = cholesky(_symmetric(C_mat))
     T = promote_type(eltype(m), eltype(C), eltype(Y))
-    return -((size(Y, 1) * T(log(2π)) + logdet(C)) .+ diag_Xt_invA_X(C, Y .- m)) ./ 2
+    return -((size(Y, 1) * T(log2π) + logdet(C)) .+ _sqmahal(m, C, Y)) ./ 2
 end
+
+Distributions.logdetcov(f::FiniteGP) = logdet(cov(f))
+
+function Distributions.sqmahal(f::FiniteGP, x::AbstractVector)
+    m, C = mean_and_cov(f)
+    return _sqmahal(m, cholesky(_symmetric(C)), x)
+end
+
+function Distributions.sqmahal(f::FiniteGP, X::AbstractMatrix)
+    m, C = mean_and_cov(f)
+    return _sqmahal(m, cholesky(_symmetric(C)), X)
+end
+
+_sqmahal(m::AbstractVector, C::Cholesky, x::AbstractVector) = tr_Xt_invA_X(C, x - m)
+_sqmahal(m::AbstractVector, C::Cholesky, x::AbstractMatrix) = diag_Xt_invA_X(C, x .- m)
+
+function Distributions.sqmahal!(r::AbstractArray, f::FiniteGP, x::AbstractArray)
+    return r .= sqmahal(f, x) # TODO write a more efficient implementation
+end
+
+function Distributions.gradlogpdf(f::FiniteGP, x::AbstractArray)
+    m, C = mean_and_cov(f)
+    return _gradlogpdf(m, C, x)
+end
+
+_gradlogpdf(m, C, x) = _symmetric(C) \ (m .- x)
+
+Distributions.params(f::FiniteGP) = (f.f, f.x, f.Σy)
