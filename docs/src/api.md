@@ -2,8 +2,8 @@
 
 ## Intended Audience
 
-This page is intended for developers.
-If you are a user, please refer to our other examples.
+This page is best read once you have a sense of what this package is trying to achieve.
+Therefore, we recommend reading (or at least skimming) some of the examples before reading these docs.
 
 
 
