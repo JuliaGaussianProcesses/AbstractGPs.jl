@@ -22,10 +22,10 @@ struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
 end
 
 """
-    posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
 Compute the optimal approximate posterior [1] over the process `f = fx.f`, given observations `y`
-of `f` at `x`, and inducing points `v.z`.
+of `f` at `x`, and inducing points `vfe.fz.x`.
 
 ```jldoctest
 julia> f = GP(Matern52Kernel());
@@ -34,11 +34,11 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=13);
 
-julia> v = VFE(f(z));
+julia> vfe = VFE(f(z));
 
 julia> y = rand(f(x, 0.1));
 
-julia> post = posterior(v, f(x, 0.1), y);
+julia> post = posterior(vfe, f(x, 0.1), y);
 
 julia> post(z) isa AbstractGPs.FiniteGP
 true
