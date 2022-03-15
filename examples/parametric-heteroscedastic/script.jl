@@ -41,12 +41,12 @@ function objective(θ)
     return -logpdf(f(x, Σ), y)
 end;
 
-# Optimise the hyperparameters. They've been initialised to the correct values, so
+# Optimise the hyperparameters. They've been initialised near the correct values, so
 # they ought not to deviate too far.
 result = optimize(
     objective ∘ unflatten,
     θ -> only(Zygote.gradient(objective ∘ unflatten, θ)),
-    flat_init_params,
+    flat_init_params + 0.1 * randn(Xoshiro(123456), length(flat_init_params)),
     LBFGS(;
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
         linesearch=Optim.LineSearches.BackTracking(),
@@ -75,9 +75,10 @@ set_theme!(
 let
     fig = Figure()
     ax = Axis(fig[1, 1])
-    plot!(ax, x, f_post(x, Σ_obs_final); bandscale=3)
-    plot!(ax, x, f_post(x, 1e-9); bandscale=3)
+    plot!(ax, x, f_post(x, Σ_obs_final); bandscale=3, label="posterior + noise", color=(:orange, 0.1))
+    plot!(ax, x, f_post(x, 1e-9); bandscale=3, label="posterior")
     gpsample!(ax, x, f_post(x, 1e-9); samples=10, color=Set1_4[3])
-    scatter!(ax, x, y)
-    fig
+    scatter!(ax, x, y; label="y")
+    axislegend(ax)
+    save("foo.pdf", fig)
 end
