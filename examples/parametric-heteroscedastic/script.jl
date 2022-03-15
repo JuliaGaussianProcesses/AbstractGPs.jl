@@ -21,13 +21,11 @@ using Zygote
 build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l))
 
 # Observation variance is some scaling of x^2.
-observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x.^2)
+observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2)
 
 # Specify hyperparameters.
 flat_init_params, unflatten = ParameterHandling.value_flatten((
-    s=positive(1.0),
-    l=positive(3.0),
-    σ²=positive(0.1),
+    s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
 ));
 θ_init = unflatten(flat_init_params);
 
