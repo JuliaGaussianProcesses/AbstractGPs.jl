@@ -75,7 +75,7 @@ set_theme!(
 let
     fig = Figure()
     ax = Axis(fig[1, 1])
-    plot!(ax, x, f_post(x, Σ_obs_final); bandscale=3, label="posterior + noise", color=(:orange, 0.1))
+    plot!(ax, x, f_post(x, Σ_obs_final); bandscale=3, label="posterior + noise", color=(:orange, 0.3))
     plot!(ax, x, f_post(x, 1e-9); bandscale=3, label="posterior")
     gpsample!(ax, x, f_post(x, 1e-9); samples=10, color=Set1_4[3])
     scatter!(ax, x, y; label="y")
