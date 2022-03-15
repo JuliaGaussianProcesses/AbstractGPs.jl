@@ -39,7 +39,7 @@ function objective(θ)
     f = build_gp(θ)
     Σ = observation_variance(θ, x)
     return -logpdf(f(x, Σ), y)
-end
+end;
 
 # Optimise the hyperparameters. They've been initialised to the correct values, so
 # they ought not to deviate too far.
