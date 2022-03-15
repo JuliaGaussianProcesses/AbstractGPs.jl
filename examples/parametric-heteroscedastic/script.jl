@@ -11,6 +11,7 @@ using AbstractGPsMakie
 using CairoMakie
 using KernelFunctions
 using LinearAlgebra
+using Literate
 using Optim
 using ParameterHandling
 using Random
