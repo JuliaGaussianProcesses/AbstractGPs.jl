@@ -28,26 +28,28 @@ AbstractGPs is an officially registered Julia package, so the following will ins
 using AbstractGPs, Plots
 
 # Generate toy synthetic data.
-X = rand(10)
-Y = sin.(rand(10))
+x = rand(10)
+y = sin.(rand(10))
 
-# Define GP prior with Matern32 kernel
+# Define GP prior with Matern-3/2 kernel
 f = GP(Matern32Kernel())
 
-# Finite projection at the inputs `X`
-fx = f(X, 0.001)
+# Finite projection of `f` at inputs `x`.
+# Added Gaussian noise with variance 0.001.
+fx = f(x, 0.001)
 
-# Data's log-likelihood w.r.t prior GP `f`. 
-logpdf(fx, Y)
+# Log marginal probability of `y` under `f` at `x`.
+# Quantity typically maximised to train hyperparameters.
+logpdf(fx, y)
 
-# Exact posterior given `Y`.
-p_fx = posterior(fx, Y)
+# Exact posterior given `y`. This is another GP.
+p_fx = posterior(fx, y)
 
-# Data's log-likelihood w.r.t posterior GP `p_fx`. 
-logpdf(p_fx(X), Y)
+# Log marginal posterior predictive probability.
+logpdf(p_fx(x), y)
 
 # Plot posterior.
-scatter(X, Y; label="Data")
+scatter(x, y; label="Data")
 plot!(-0.5:0.001:1.5, p_fx; label="Posterior")
 ```
 
