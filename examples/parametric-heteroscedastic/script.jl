@@ -63,11 +63,13 @@ f_post = posterior(fx_final, y);
 # Plot the results, making use of AbstractGPsMakie.
 using CairoMakie.Makie.ColorSchemes: Set1_4
 
+#! format: off
 set_theme!(
     palette=(color=Set1_4,),
     patchcolor=(Set1_4[2], 0.2),
     Axis=(limits=((0, 10), nothing),),
 )
+#! format: on
 
 let
     fig = Figure()
