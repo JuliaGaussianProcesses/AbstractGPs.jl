@@ -1,4 +1,10 @@
-# Parameteric Heteroscedsatic
+# # Parameteric Heteroscedsatic example.
+# This is a simple example in which the observation noise variance is a function of
+# the input. It is assumed to be a simple quadratic form, with a single unknown
+# scaling parameter, in addition to the usual lengthscale and variance parameters
+# of the GP.
+# A point estimate of the parameters are obtained using type-II maximum likelihood
+# as per usual.
 
 using AbstractGPs
 using AbstractGPsMakie
@@ -12,6 +18,8 @@ using Zygote
 
 # Specify simple GP.
 build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l))
+
+# Observation variance is some scaling of x^2.
 observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x.^2)
 
 # Specify hyperparameters.
@@ -26,6 +34,7 @@ flat_init_params, unflatten = ParameterHandling.value_flatten((
 const x = range(0.0, 10.0; length=100)
 const y = rand(Xoshiro(123456), build_gp(θ_init)(x, observation_variance(θ_init, x)))
 
+# Specify objective function.
 function objective(θ)
     f = build_gp(θ)
     Σ = observation_variance(θ, x)
