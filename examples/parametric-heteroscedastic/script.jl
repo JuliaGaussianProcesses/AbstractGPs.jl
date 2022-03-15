@@ -46,7 +46,7 @@ end;
 result = optimize(
     objective ∘ unflatten,
     θ -> only(Zygote.gradient(objective ∘ unflatten, θ)),
-    flat_init_params + 0.1 * randn(Xoshiro(123456), length(flat_init_params)),
+    flat_init_params + 0.01 * randn(Xoshiro(123456), length(flat_init_params)),
     LBFGS(;
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
         linesearch=Optim.LineSearches.BackTracking(),
