@@ -80,5 +80,5 @@ let
     gpsample!(ax, x, f_post(x, 1e-9); samples=10, color=Set1_4[3])
     scatter!(ax, x, y; label="y")
     axislegend(ax)
-    save("foo.pdf", fig)
+    fig
 end
