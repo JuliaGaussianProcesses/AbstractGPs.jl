@@ -60,7 +60,7 @@ include("latent_gp.jl")
 include("util/plotting.jl")
 
 # Testing utilities.
-include("util/test_util.jl")
+include("util/TestUtils.jl")
 
 # Deprecations.
 include("deprecations.jl")
