@@ -1,10 +1,11 @@
-# # Parameteric Heteroscedsatic Model
+# # Parametric Heteroscedastic Model
+#
 # This example is a small extension of the standard GP regression problem, in which the
 # observation noise variance is a function of the input.
 # It is assumed to be a simple quadratic form, with a single unknown
 # scaling parameter, in addition to the usual lengthscale and variance parameters
 # of the GP.
-# A point estimate of the parameters are obtained using type-II maximum likelihood,
+# A point estimate of all parameters is obtained using type-II maximum likelihood,
 # as per usual.
 
 using AbstractGPs
@@ -18,13 +19,13 @@ using ParameterHandling
 using Random
 using Zygote
 
-# Specify simple GP.
+# Specify simple GP:
 build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
 
-# Observation variance is some scaling of x^2.
+# Observation variance is some scaling of $x^2$:
 observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2);
 
-# Specify hyperparameters.
+# Specify hyperparameters:
 flat_init_params, unflatten = ParameterHandling.value_flatten((
     s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
 ));
@@ -70,7 +71,7 @@ set_theme!(
     patchcolor=(Set1_4[2], 0.2),
     Axis=(limits=((0, 10), nothing),),
 )
-#! format: onn
+#! format: on
 
 let
     fig = Figure()
