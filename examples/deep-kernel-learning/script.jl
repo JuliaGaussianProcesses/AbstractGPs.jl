@@ -21,7 +21,7 @@ target_f(x) = sinc(abs(x)^abs(x)) # We use sinc with a highly varying value
 target_f(x::AbstractArray) = target_f(first(x))
 y_train = target_f.(x_train) + randn(N) * noise
 x_test = collect(eachrow(range(xmin, xmax; length=200))) # Testing dataset
-spectral_mixture_kernel()
+
 # ## Model definition
 # We create a neural net with 2 layers and 10 units each
 # The data is passed through the NN before being used in the kernel
