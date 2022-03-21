@@ -60,8 +60,8 @@ Xt_invA_Y(X::AbstractVecOrMat, A::Cholesky, Y::AbstractVecOrMat) = (A.U' \ X)' *
 
 At_A(A::AbstractVecOrMat) = A'A
 
-diag_At_A(A::AbstractMatrix) = vec(sum(abs2.(A); dims=1))
-diag_At_A(x::AbstractVector) = [dot(x, x)]
+diag_At_A(A::AbstractMatrix) = vec(sum(abs2, A; dims=1))
+diag_At_A(A::AbstractVector) = [sum(abs2, A)]
 
 tr_At_A(A::AbstractVecOrMat) = sum(abs2, A)
 
