@@ -283,7 +283,7 @@ end
 function consistency_check(fx, y)
     length(fx) == length(y) || throw(
         DimensionMismatch(
-            "the dimension of the projected GP (here: $(length(fx))) must equal the number of targets (here: $(length(y)))"
+            "the dimension of the projected GP (here: $(length(fx))) must equal the number of targets (here: $(length(y)))",
         ),
     )
     return nothing
