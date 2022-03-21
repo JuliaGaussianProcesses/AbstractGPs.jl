@@ -65,7 +65,7 @@ diag_At_A(A::AbstractVector) = [sum(abs2, A)]
 
 tr_At_A(A::AbstractVecOrMat) = sum(abs2, A)
 
-function diag_At_B(A::AbstractVecOrMat, B::AbstractVecOrMat)
+function diag_At_B(A::AbstractMatrix, B::AbstractMatrix)
     size(A) == size(B) || throw(
         DimensionMismatch(
             "A ($(size(A))) and B ($(size(B))) do not have the same dimensions "
