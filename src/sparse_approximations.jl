@@ -268,7 +268,12 @@ end
 
 # Factor out computations common to the `elbo` and `dtc`.
 function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
-    consistency_check(fx, y)
+    length(fx) == length(y) || throw(
+        DimensionMismatch(
+            "the dimension of the projected GP (here: $(length(fx))) must equal the number of targets (here: $(length(y)))",
+        ),
+    )
+
     chol_Σy = _cholesky(fx.Σy)
 
     A = cholesky(_symmetric(cov(fz))).U' \ (chol_Σy.U' \ cov(fx, fz))'
@@ -278,10 +283,6 @@ function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::Fin
     tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
     _dtc = -(length(y) * typeof(tmp)(log2π) + tmp) / 2
     return _dtc, A
-end
-
-function consistency_check(fx, y)
-    @assert length(fx) == length(y)
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
