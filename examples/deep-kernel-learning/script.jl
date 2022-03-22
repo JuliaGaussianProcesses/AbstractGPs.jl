@@ -61,9 +61,8 @@ opt = Flux.ADAM(0.1)
     end
     Flux.Optimise.update!(opt, ps, grads)
     if i % 100 == 0
-        @info "$i/$nmax"
         L = loss(y_train)
-        # @info "Loss = $L"
+        @info "$i/$nmax; loss = $L"
         p = Plots.plot(
             vcat(x_test...), target_f; lab="true f", title="Loss = $(loss(y_train))"
         )
