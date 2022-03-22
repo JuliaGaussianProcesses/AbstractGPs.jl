@@ -28,7 +28,7 @@ x_test = collect(eachrow(range(xmin, xmax; length=200))) # Testing dataset
 neuralnet = Chain(Dense(1, 20), Dense(20, 30), Dense(30, 5))
 # We use two cases :
 # - The Squared Exponential Kernel
-k = transform(SqExponentialKernel(), FunctionTransform(neuralnet))
+k = SqExponentialKernel() ∘ FunctionTransform(neuralnet)
 
 # We use AbstractGPs.jl to define our model
 gpprior = GP(k) # GP Prior
