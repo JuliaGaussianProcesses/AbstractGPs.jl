@@ -12,34 +12,36 @@ default(; legendfontsize=15.0, linewidth=3.0);
 
 # ## Data creation
 # We create a simple 1D Problem with very different variations
-xmin = -3;
-xmax = 3; # Limits
+
+xmin, xmax = (-3, 3)  # Limits
 N = 150
-noise = 0.01
+noise_std = 0.01
 x_train = collect(eachrow(rand(Uniform(xmin, xmax), N))) # Training dataset
 target_f(x) = sinc(abs(x)^abs(x)) # We use sinc with a highly varying value
-target_f(x::AbstractArray) = target_f(first(x))
-y_train = target_f.(x_train) + randn(N) * noise
+target_f(x::AbstractArray) = target_f(only(x))
+y_train = target_f.(x_train) + randn(N) * noise_std
 x_test = collect(eachrow(range(xmin, xmax; length=200))) # Testing dataset
 
+plot(xmin:0.01:xmax, target_f; label="ground truth")
+scatter!(map(only, x_train), y_train; label="training data")
+
 # ## Model definition
-# We create a neural net with 2 layers and 10 units each
-# The data is passed through the NN before being used in the kernel
+# We create a neural net with 2 layers and 10 units each.
+# The data is passed through the NN before being used in the kernel.
 neuralnet = Chain(Dense(1, 20), Dense(20, 30), Dense(30, 5))
-# We use two cases :
-# - The Squared Exponential Kernel
+
+# We use the Squared Exponential Kernel:
 k = SqExponentialKernel() ∘ FunctionTransform(neuralnet)
 
-# We use AbstractGPs.jl to define our model
-gpprior = GP(k) # GP Prior
-fx = AbstractGPs.FiniteGP(gpprior, x_train, noise) # Prior on f
-fp = posterior(fx, y_train) # Posterior of f
+# We now define our model:
+gpprior = GP(k)  # GP Prior
+fx = AbstractGPs.FiniteGP(gpprior, x_train, noise_std^2)  # Prior at the observations
+fp = posterior(fx, y_train)  # Posterior of f given the observations
 
-# This compute the log evidence of `y`,
-# which is going to be used as the objective
+# This computes the log evidence of `y`, which is going to be used as the objective:
 loss(y) = -logpdf(fx, y)
 
-@info "Init Loss = $(loss(y_train))"
+@info "Initial loss = $(loss(y_train))"
 
 # Flux will automatically extract all the parameters of the kernel
 ps = Flux.params(k)
@@ -48,9 +50,10 @@ ps = Flux.params(k)
 p_init = Plots.plot(
     vcat(x_test...), target_f; lab="true f", title="Loss = $(loss(y_train))"
 )
-Plots.scatter!(vcat(x_train...), y_train; lab="data")
+Plots.scatter!(vcat(x_train...), y_train; label="data")
 pred = marginals(fp(x_test))
-Plots.plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), lab="Prediction")
+Plots.plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), label="Prediction")
+
 # ## Training
 anim = Animation()
 nmax = 1000
