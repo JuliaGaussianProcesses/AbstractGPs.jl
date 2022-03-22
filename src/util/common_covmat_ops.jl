@@ -60,11 +60,12 @@ Xt_invA_Y(X::AbstractVecOrMat, A::Cholesky, Y::AbstractVecOrMat) = (A.U' \ X)' *
 
 At_A(A::AbstractVecOrMat) = A'A
 
-diag_At_A(A::AbstractVecOrMat) = vec(sum(abs2.(A); dims=1))
+diag_At_A(A::AbstractMatrix) = vec(sum(abs2, A; dims=1))
+diag_At_A(A::AbstractVector) = [sum(abs2, A)]
 
 tr_At_A(A::AbstractVecOrMat) = sum(abs2, A)
 
-function diag_At_B(A::AbstractVecOrMat, B::AbstractVecOrMat)
+function diag_At_B(A::AbstractMatrix, B::AbstractMatrix)
     size(A) == size(B) || throw(
         DimensionMismatch(
             "A ($(size(A))) and B ($(size(B))) do not have the same dimensions "
@@ -72,6 +73,7 @@ function diag_At_B(A::AbstractVecOrMat, B::AbstractVecOrMat)
     )
     return vec(sum(A .* B; dims=1))
 end
+diag_At_B(x::AbstractVector, y::AbstractVector) = [dot(x, y)]
 
 diag_Xt_A_X(A::Cholesky, X::AbstractVecOrMat) = diag_At_A(A.U * X)
 
