@@ -76,4 +76,7 @@ opt = Flux.ADAM(0.1)
         display(p)
     end
 end
-gif(anim; fps=5)
+gif(anim, "train-dkl.gif"; fps=5)
+nothing #hide
+
+# ![](train-dkl.gif)
