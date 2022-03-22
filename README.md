@@ -29,7 +29,7 @@ using AbstractGPs, Plots
 
 # Generate toy synthetic data.
 x = rand(10)
-y = sin.(rand(10))
+y = sin.(x)
 
 # Define GP prior with Matern-3/2 kernel
 f = GP(Matern32Kernel())
