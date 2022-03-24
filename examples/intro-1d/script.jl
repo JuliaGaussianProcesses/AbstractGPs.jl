@@ -16,7 +16,7 @@ Random.seed!(42)  # setting the seed for reproducibility of this notebook
 #md nothing #hide
 
 # Load toy regression
-# [dataset](https://github.com/GPflow/GPflow/blob/develop/doc/source/notebooks/basics/data/regression_1D.csv)
+# [dataset](https://github.com/GPflow/GPflow/blob/develop/doc/sphinx/notebooks/basics/data/regression_1D.csv)
 # taken from GPflow examples.
 
 x = [
