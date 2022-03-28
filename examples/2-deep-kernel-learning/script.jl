@@ -46,12 +46,11 @@ loss(y) = -logpdf(fx, y)
 ps = Flux.params(k)
 
 # We show the initial prediction with the untrained model
-p_init = Plots.plot(
-    vcat(x_test...), target_f; lab="true f", title="Loss = $(loss(y_train))"
-)
-Plots.scatter!(vcat(x_train...), y_train; label="data")
+p_init = plot(; title="Loss = $(round(loss(y_train); sigdigits=6))")
+plot!(vcat(x_test...), target_f; label="true f")
+scatter!(vcat(x_train...), y_train; label="data")
 pred = marginals(fp(x_test))
-Plots.plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), label="Prediction")
+plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), label="Prediction")
 
 # ## Training
 anim = Animation()
@@ -62,15 +61,14 @@ for i in 1:nmax
         loss(y_train)
     end
     Flux.Optimise.update!(opt, ps, grads)
-    if i % 100 == 0
+    if i % 10 == 0
         L = loss(y_train)
         @info "$i/$nmax; loss = $L"
-        p = Plots.plot(
-            vcat(x_test...), target_f; lab="true f", title="Loss = $(loss(y_train))"
-        )
-        p = Plots.scatter!(vcat(x_train...), y_train; lab="data")
+        p = plot(; title="iteration $i/$nmax: loss = $(round(L; sigdigits=6))")
+        plot!(vcat(x_test...), target_f; label="true f")
+        scatter!(vcat(x_train...), y_train; label="data")
         pred = marginals(posterior(fx, y_train)(x_test))
-        Plots.plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), lab="Prediction")
+        plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), label="Prediction")
         frame(anim)
         display(p)
     end
