@@ -77,12 +77,12 @@ for i in 1:nmax
         loss(y_train)
     end
     Flux.Optimise.update!(opt, ps, grads)
-    if i % 10 == 0
+
+    if i % 100 == 0
         L = loss(y_train)
-        if i < 100 || i % 100 == 0
-            @info "iteration $i/$nmax: loss = $L"
-        end
-        p = plot(; title="iteration $i/$nmax: loss = $(round(L; sigdigits=6))")
+        @info "iteration $i/$nmax: loss = $L"
+
+        p = plot(; title="Loss[$i/$nmax] = $(round(L; sigdigits=6))")
         plot!(vcat(x_test...), target_f; label="true f")
         scatter!(vcat(x_train...), y_train; label="data")
         pred = marginals(posterior(fx, y_train)(x_test))
@@ -91,7 +91,7 @@ for i in 1:nmax
         display(p)
     end
 end
-gif(anim, "train-dkl.gif"; fps=5)
+gif(anim, "train-dkl.gif"; fps=3)
 nothing #hide
 
 # ![](train-dkl.gif)
