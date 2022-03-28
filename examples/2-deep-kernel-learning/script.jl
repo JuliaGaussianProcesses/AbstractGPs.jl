@@ -6,7 +6,6 @@ using KernelFunctions
 using Flux
 using Distributions, LinearAlgebra
 using Plots
-using ProgressMeter
 using AbstractGPs
 default(; legendfontsize=15.0, linewidth=3.0);
 
@@ -58,7 +57,7 @@ Plots.plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), label="Prediction")
 anim = Animation()
 nmax = 1000
 opt = Flux.ADAM(0.1)
-@showprogress for i in 1:nmax
+for i in 1:nmax
     global grads = gradient(ps) do
         loss(y_train)
     end
