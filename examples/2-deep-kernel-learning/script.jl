@@ -65,22 +65,22 @@ ps = Flux.params(k)
 p_init = plot(; title="Loss = $(round(loss(y_train); sigdigits=6))")
 plot!(vcat(x_test...), target_f; label="true f")
 scatter!(vcat(x_train...), y_train; label="data")
-pred = marginals(fp(x_test))
-plot!(vcat(x_test...), mean.(pred); ribbon=std.(pred), label="Prediction")
+pred_init = marginals(fp(x_test))
+plot!(vcat(x_test...), mean.(pred_init); ribbon=std.(pred_init), label="Prediction")
 
 # ## Training
 anim = Animation()
 nmax = 1000
 opt = Flux.ADAM(0.1)
 for i in 1:nmax
-    global grads = gradient(ps) do
+    grads = gradient(ps) do
         loss(y_train)
     end
     Flux.Optimise.update!(opt, ps, grads)
     if i % 10 == 0
         L = loss(y_train)
-        if i % 100 == 0
-            @info "$i/$nmax; loss = $L"
+        if i < 100 || i % 100 == 0
+            @info "iteration $i/$nmax: loss = $L"
         end
         p = plot(; title="iteration $i/$nmax: loss = $(round(L; sigdigits=6))")
         plot!(vcat(x_test...), target_f; label="true f")
