@@ -1,12 +1,26 @@
 # # Deep Kernel Learning with Flux
-# ## Package loading
+
+## Background
+
+# This example trains a GP whose inputs are passed through a neural network.
+# This kind of model has been considered previously [^Calandra] [^Wilson], although it has been shown that some care is needed to avoid substantial overfitting [^Ober].
+# In this example we make use of the `FunctionTransform` from [KernelFunctions.jl](github.com/JuliaGaussianProcesses/KernelFunctions.jl/) to put a simple Multi-Layer Perceptron built using Flux.jl inside a standard kernel.
+
+# [^Calandra]: Calandra, R., Peters, J., Rasmussen, C. E., & Deisenroth, M. P. (2016, July). [Manifold Gaussian processes for regression.](https://ieeexplore.ieee.org/abstract/document/7727626) In 2016 International Joint Conference on Neural Networks (IJCNN) (pp. 3338-3345). IEEE.
+
+# [^Wilson]: Wilson, A. G., Hu, Z., Salakhutdinov, R. R., & Xing, E. P. (2016). [Stochastic variational deep kernel learning.](https://proceedings.neurips.cc/paper/2016/hash/bcc0d400288793e8bdcd7c19a8ac0c2b-Abstract.html) Advances in Neural Information Processing Systems, 29.
+
+# [^Ober]: Ober, S. W., Rasmussen, C. E., & van der Wilk, M. (2021, December). [The promises and pitfalls of deep kernel learning.](https://proceedings.mlr.press/v161/ober21a.html) In Uncertainty in Artificial Intelligence (pp. 1206-1216). PMLR.
+
+# ### Package loading
 # We use a couple of useful packages to plot and optimize
 # the different hyper-parameters
-using KernelFunctions
-using Flux
-using Distributions, LinearAlgebra
-using Plots
 using AbstractGPs
+using Distributions
+using Flux
+using KernelFunctions
+using LinearAlgebra
+using Plots
 default(; legendfontsize=15.0, linewidth=3.0);
 
 # ## Data creation
@@ -15,14 +29,15 @@ default(; legendfontsize=15.0, linewidth=3.0);
 xmin, xmax = (-3, 3)  # Limits
 N = 150
 noise_std = 0.01
-x_train = collect(eachrow(rand(Uniform(xmin, xmax), N))) # Training dataset
+x_train_vec = rand(Uniform(xmin, xmax), N) # Training dataset
+x_train = collect(eachrow(x_train_vec)) # vector-of-vectors for Flux compatibility
 target_f(x) = sinc(abs(x)^abs(x)) # We use sinc with a highly varying value
-target_f(x::AbstractArray) = target_f(only(x))
-y_train = target_f.(x_train) + randn(N) * noise_std
-x_test = collect(eachrow(range(xmin, xmax; length=200))) # Testing dataset
+y_train = target_f.(x_train_vec) + randn(N) * noise_std
+x_test_vec = range(xmin, xmax; length=200) # Testing dataset
+x_test = collect(eachrow(x_test_vec)) # vector-of-vectors for Flux compatibility
 
 plot(xmin:0.01:xmax, target_f; label="ground truth")
-scatter!(map(only, x_train), y_train; label="training data")
+scatter!(x_train_vec, y_train; label="training data")
 
 # ## Model definition
 # We create a neural net with 2 layers and 10 units each.
@@ -63,7 +78,9 @@ for i in 1:nmax
     Flux.Optimise.update!(opt, ps, grads)
     if i % 10 == 0
         L = loss(y_train)
-        @info "$i/$nmax; loss = $L"
+        if i % 100 == 0
+            @info "$i/$nmax; loss = $L"
+        end
         p = plot(; title="iteration $i/$nmax: loss = $(round(L; sigdigits=6))")
         plot!(vcat(x_test...), target_f; label="true f")
         scatter!(vcat(x_train...), y_train; label="data")
