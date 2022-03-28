@@ -69,16 +69,17 @@ pred_init = marginals(fp(x_test))
 plot!(vcat(x_test...), mean.(pred_init); ribbon=std.(pred_init), label="Prediction")
 
 # ## Training
-anim = Animation()
-nmax = 1000
+nmax = 200
 opt = Flux.ADAM(0.1)
+
+anim = Animation()
 for i in 1:nmax
     grads = gradient(ps) do
         loss(y_train)
     end
     Flux.Optimise.update!(opt, ps, grads)
 
-    if i % 100 == 0
+    if i % 10 == 0
         L = loss(y_train)
         @info "iteration $i/$nmax: loss = $L"
 
