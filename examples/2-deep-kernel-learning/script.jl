@@ -52,7 +52,8 @@ gpprior = GP(k)  # GP Prior
 fx = AbstractGPs.FiniteGP(gpprior, x_train, noise_std^2)  # Prior at the observations
 fp = posterior(fx, y_train)  # Posterior of f given the observations
 
-# This computes the log evidence of `y`, which is going to be used as the objective:
+# This computes the negative log evidence of `y` (the negative log marginal likelihood of
+# the neural network parameters), which is going to be used as the objective:
 loss(y) = -logpdf(fx, y)
 
 @info "Initial loss = $(loss(y_train))"
