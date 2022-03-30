@@ -76,9 +76,11 @@
     @test Xt_invA_Y(X, A, Y) ≈ X' * (A \ Y)
 
     @test diag_At_A(x) ≈ [x'x]
+    @test (@allocated diag_At_A(x)) <= 96
     @test diag_At_A(X) ≈ diag(X'X)
 
     @test diag_At_B(x, z) ≈ [x'z]
+    @test (@allocated diag_At_B(x, z)) <= 96
     @test diag_At_B(X, Z) ≈ diag(X'Z)
 
     @test diag_Xt_A_X(A, x) ≈ [Xt_A_X(A, x)]

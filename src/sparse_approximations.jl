@@ -22,10 +22,10 @@ struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
 end
 
 """
-    posterior(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
 Compute the optimal approximate posterior [1] over the process `f = fx.f`, given observations `y`
-of `f` at `x`, and inducing points `v.z`.
+of `f` at `x`, and inducing points `vfe.fz.x`.
 
 ```jldoctest
 julia> f = GP(Matern52Kernel());
@@ -34,11 +34,11 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=13);
 
-julia> v = VFE(f(z));
+julia> vfe = VFE(f(z));
 
 julia> y = rand(f(x, 0.1));
 
-julia> post = posterior(v, f(x, 0.1), y);
+julia> post = posterior(vfe, f(x, 0.1), y);
 
 julia> post(z) isa AbstractGPs.FiniteGP
 true
@@ -268,7 +268,12 @@ end
 
 # Factor out computations common to the `elbo` and `dtc`.
 function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
-    consistency_check(fx, y)
+    length(fx) == length(y) || throw(
+        DimensionMismatch(
+            "the dimension of the projected GP (here: $(length(fx))) must equal the number of targets (here: $(length(y)))",
+        ),
+    )
+
     chol_Σy = _cholesky(fx.Σy)
 
     A = cholesky(_symmetric(cov(fz))).U' \ (chol_Σy.U' \ cov(fx, fz))'
@@ -278,10 +283,6 @@ function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::Fin
     tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
     _dtc = -(length(y) * typeof(tmp)(log2π) + tmp) / 2
     return _dtc, A
-end
-
-function consistency_check(fx, y)
-    @assert length(fx) == length(y)
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
