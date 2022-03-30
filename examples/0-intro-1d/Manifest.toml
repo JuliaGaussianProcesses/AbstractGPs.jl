@@ -4,10 +4,10 @@ julia_version = "1.7.1"
 manifest_format = "2.0"
 
 [[deps.AbstractGPs]]
-deps = ["ChainRulesCore", "Distributions", "FillArrays", "IrrationalConstants", "KernelFunctions", "LinearAlgebra", "Random", "RecipesBase", "Reexport", "Statistics", "StatsBase", "Test"]
-git-tree-sha1 = "9a86aff5babfe1e4dbd79be47d7a9dfd141e11af"
+deps = ["ChainRulesCore", "Distributions", "FillArrays", "IrrationalConstants", "KernelFunctions", "LinearAlgebra", "PDMats", "Random", "RecipesBase", "Reexport", "Statistics", "StatsBase", "Test"]
+path = "../.."
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
-version = "0.5.9"
+version = "0.5.10"
 
 [[deps.AbstractMCMC]]
 deps = ["BangBang", "ConsoleProgressMonitor", "Distributed", "Logging", "LoggingExtras", "ProgressLogging", "Random", "StatsBase", "TerminalLoggers", "Transducers"]
