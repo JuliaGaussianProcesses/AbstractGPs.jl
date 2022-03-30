@@ -5,6 +5,7 @@
 _symmetric(X) = Symmetric(X)
 _symmetric(X::Diagonal) = X
 _symmetric(X::Cholesky) = X
+_symmetric(X::AbstractPDMat) = X
 
 # Small bit of indirection to work around a cholesky-related bug whereby the interaction
 # between `FillArrays` and `Diagonal` and `Cholesky` causes problems.
