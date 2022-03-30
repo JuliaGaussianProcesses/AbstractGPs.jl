@@ -4,7 +4,7 @@ using ChainRulesCore
 using Distributions
 using FillArrays
 using LinearAlgebra
-using PDMats: ScalMat
+using PDMats: AbstractPDMat, ScalMat
 using Reexport
 @reexport using KernelFunctions
 using Random
