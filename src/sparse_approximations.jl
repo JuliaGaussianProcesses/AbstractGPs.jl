@@ -290,5 +290,5 @@ function tr_Cf_invΣy(f::FiniteGP, Σy::Diagonal)
 end
 
 function tr_Cf_invΣy(f::FiniteGP, Σy::ScalMat)
-    return sum(var(f.f, f.x) / Σy)
+    return sum(var(f.f, f.x)) / Σy.value
 end
