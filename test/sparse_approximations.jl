@@ -5,7 +5,8 @@
     N_b = 6
 
     # Specify prior.
-    f = GP(sin, Matern32Kernel())
+    k = Matern32Kernel()
+    f = GP(sin, k)
 
     # Sample from prior.
     x = collect(range(-1.0, 1.0; length=N_cond))
@@ -19,7 +20,7 @@
     f_approx_post = posterior(VFE(f(x, 1e-12)), fx, y)
 
     # Verify that approximate posterior ≈ posterior at various inputs.
-    x_test = randn(rng, 100)
+    x_test = randn(rng, 5)
     @test mean(f_post, x_test) ≈ mean(f_approx_post, x_test)
     @test cov(f_post, x_test) ≈ cov(f_approx_post, x_test)
 
@@ -27,6 +28,18 @@
     a = collect(range(-1.0, 1.0; length=N_a))
     b = randn(rng, N_b)
     TestUtils.test_internal_abstractgps_interface(rng, f_approx_post, a, b)
+
+    u = randn(rng, 10)
+    f_approx_post = posterior(VFE(f(u, 1e-12)), fx, y)
+    
+    q(a, b) = kernelmatrix(k, a, u) * inv(kernelmatrix(k, u, u)) * kernelmatrix(k, u, b)    
+    Σ(x, u) = inv(inv(f_approx_post.approx.fz.Σy) * kernelmatrix(k, u, x) * kernelmatrix(k, x, u) + kernelmatrix(k, u, u))
+    
+    @test inv(LinearAlgebra.Diagonal(1e-12*ones(5))) * kernelmatrix(k, x_test, u) * Σ(x, u) * kernelmatrix(k, u, x) * y ≈
+        mean(f_approx_post, x_test)
+
+    @test kernelmatrix(k, x_test, x_test) - q(x_test, x_test) + kernelmatrix(k, x_test, u) * Σ(x, u) * transpose(kernelmatrix(k, x_test, u)) ≈
+        cov(f_approx_post, x_test)
 
     @testset "update_posterior (new observation)" begin
         rng = MersenneTwister(1)
