@@ -17,7 +17,7 @@ end
 const default_σ² = 1e-18
 
 function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
-    return FiniteGP(f, x, Fill(σ², length(x)))
+    return FiniteGP(f, x, ScalMat(length(x), σ²))
 end
 
 ## conversions
