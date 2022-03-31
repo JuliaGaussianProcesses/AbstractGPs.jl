@@ -21,6 +21,10 @@ function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
     return FiniteGP(f, x, Fill(σ², length(x)))
 end
 
+function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::UniformScaling)
+    return FiniteGP(f, x, σ²[1, 1])
+end
+
 ## conversions
 Base.convert(::Type{MvNormal}, f::FiniteGP) = MvNormal(mean_and_cov(f)...)
 function Base.convert(::Type{MvNormal{T}}, f::FiniteGP) where {T}
