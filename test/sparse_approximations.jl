@@ -31,14 +31,24 @@
 
     u = randn(rng, 10)
     f_approx_post = posterior(VFE(f(u, 1e-12)), fx, y)
-    
-    q(a, b) = kernelmatrix(k, a, u) * inv(kernelmatrix(k, u, u)) * kernelmatrix(k, u, b)    
-    Σ(x, u) = inv(inv(f_approx_post.approx.fz.Σy) * kernelmatrix(k, u, x) * kernelmatrix(k, x, u) + kernelmatrix(k, u, u))
-    
-    @test inv(LinearAlgebra.Diagonal(1e-12*ones(5))) * kernelmatrix(k, x_test, u) * Σ(x, u) * kernelmatrix(k, u, x) * y ≈
-        mean(f_approx_post, x_test)
 
-    @test kernelmatrix(k, x_test, x_test) - q(x_test, x_test) + kernelmatrix(k, x_test, u) * Σ(x, u) * transpose(kernelmatrix(k, x_test, u)) ≈
+    q(a, b) = kernelmatrix(k, a, u) * inv(kernelmatrix(k, u, u)) * kernelmatrix(k, u, b)
+    function Σ(x, u)
+        return inv(
+            inv(f_approx_post.approx.fz.Σy) *
+            kernelmatrix(k, u, x) *
+            kernelmatrix(k, x, u) + kernelmatrix(k, u, u),
+        )
+    end
+
+    @test inv(LinearAlgebra.Diagonal(1e-12 * ones(5))) *
+          kernelmatrix(k, x_test, u) *
+          Σ(x, u) *
+          kernelmatrix(k, u, x) *
+          y ≈ mean(f_approx_post, x_test)
+
+    @test kernelmatrix(k, x_test, x_test) - q(x_test, x_test) +
+          kernelmatrix(k, x_test, u) * Σ(x, u) * transpose(kernelmatrix(k, x_test, u)) ≈
         cov(f_approx_post, x_test)
 
     @testset "update_posterior (new observation)" begin
