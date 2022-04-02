@@ -50,4 +50,4 @@ julia> # add any other example-specific dependencies
 ```
 to generate the project files.
 
-Make sure to commit both the `Project.toml` and the `Manifest.toml` file when you want to contribute your example in a pull request.
+Make sure to commit the `Project.toml` (but not the `Manifest.toml` file) when you want to contribute your example in a pull request.
