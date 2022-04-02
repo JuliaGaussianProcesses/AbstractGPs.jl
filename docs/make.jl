@@ -33,14 +33,13 @@ makedocs(;
         "Home" => "index.md",
         "The Main APIs" => "api.md",
         "Concrete Features" => "concrete_features.md",
-        "Examples" =>
-            map(
-                basename.(
-                    filter!(isdir, readdir(joinpath(@__DIR__, "src", "examples"); join=true)),
-                ),
-            ) do x
-                joinpath("examples", x, "index.md")
-            end,
+        "Examples" => map(
+            basename.(
+                filter!(isdir, readdir(joinpath(@__DIR__, "src", "examples"); join=true)),
+            ),
+        ) do x
+            joinpath("examples", x, "index.md")
+        end,
     ],
     #strict=true,
     checkdocs=:exports,
