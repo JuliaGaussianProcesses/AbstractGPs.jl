@@ -88,11 +88,7 @@ end
 Ensure that the gradient w.r.t. the inputs of `MeanFunction` `m` are approximately correct.
 """
 function differentiable_mean_function_tests(
-    m::MeanFunction,
-    ȳ::AbstractVector,
-    x::AbstractVector;
-    rtol=_rtol,
-    atol=_atol,
+    m::MeanFunction, ȳ::AbstractVector, x::AbstractVector; rtol=_rtol, atol=_atol
 )
     # Run forward tests.
     mean_function_tests(m, x)
