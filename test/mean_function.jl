@@ -14,8 +14,8 @@
             # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
             # currently ChainRulesTestUtils isn't up to handling this, so this will have to do
             # for now.
-            y, pb = rrule(AbstractGPs._map_meanfunction, f, x)
-            @test y == AbstractGPs._map_meanfunction(f, x)
+            y, pb = rrule(AbstractGPs._map_meanfunction, m, x)
+            @test y == AbstractGPs._map_meanfunction(m, x)
             Δmap, Δf, Δx = pb(randn(rng, N))
             @test iszero(Δmap)
             @test iszero(Δf)
