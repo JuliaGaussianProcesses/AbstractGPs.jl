@@ -1,16 +1,14 @@
 @testset "mean_functions" begin
     @testset "ZeroMean" begin
-        P = 3
-        Q = 2
-        D = 4
-        # X = ColVecs(randn(rng, D, P))
-        x = randn(P)
-        x̄ = randn(P)
+        rng, D, N = MersenneTwister(123456), 5, 3
+        # X = ColVecs(randn(rng, D, N))
+        x = randn(rng, N)
+        x̄ = randn(rng, N)
         f = ZeroMean{Float64}()
 
         for x in [x]
             @test AbstractGPs._map_meanfunction(f, x) == zeros(size(x))
-            differentiable_mean_function_tests(f, randn(rng, P), x)
+            differentiable_mean_function_tests(f, randn(rng, N), x)
         end
 
         # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
@@ -18,7 +16,7 @@
         # for now.
         y, pb = rrule(AbstractGPs._map_meanfunction, f, x)
         @test y == AbstractGPs._map_meanfunction(f, x)
-        Δmap, Δf, Δx = pb(randn(P))
+        Δmap, Δf, Δx = pb(randn(rng, N))
         @test iszero(Δmap)
         @test iszero(Δf)
         @test iszero(Δx)
