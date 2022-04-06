@@ -22,24 +22,31 @@
         @test iszero(Δx)
     end
     @testset "ConstMean" begin
-        rng, D, N = MersenneTwister(123456), 5, 3
-        # X = ColVecs(randn(rng, D, N))
-        x = randn(rng, N)
+        rng, N, D = MersenneTwister(123456), 5, 3
+        x1 = randn(rng, N)
+        xD = ColVecs(randn(rng, D, N))
+        xD′ = RowVecs(randn(rng, N, D))
+
         c = randn(rng)
         m = ConstMean(c)
 
-        for x in [x]
+        for x in [x1, xD, xD′]
             @test AbstractGPs._map_meanfunction(m, x) == fill(c, N)
             differentiable_mean_function_tests(m, randn(rng, N), x)
         end
     end
     @testset "CustomMean" begin
-        rng, N, D = MersenneTwister(123456), 11, 2
-        x = randn(rng, N)
-        foo_mean = x -> sum(abs2, x)
-        f = CustomMean(foo_mean)
+        rng, N, D = MersenneTwister(123456), 5, 3
+        x1 = randn(rng, N)
+        xD = ColVecs(randn(rng, D, N))
+        xD′ = RowVecs(randn(rng, N, D))
 
-        @test AbstractGPs._map_meanfunction(f, x) == map(foo_mean, x)
-        differentiable_mean_function_tests(f, randn(rng, N), x)
+        foo_mean = x -> sum(abs2, x)
+        m = CustomMean(foo_mean)
+
+        for x in [x1, xD, xD′]
+            @test AbstractGPs._map_meanfunction(m, x) == map(foo_mean, x)
+            differentiable_mean_function_tests(m, randn(rng, N), x)
+        end
     end
 end
