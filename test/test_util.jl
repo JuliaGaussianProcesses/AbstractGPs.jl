@@ -73,8 +73,9 @@ end
 Test _very_ basic consistency properties of the mean function `m`.
 """
 function mean_function_tests(m::MeanFunction, x::AbstractVector)
-    @test AbstractGPs._map_meanfunction(m, x) isa AbstractVector
-    @test length(ew(m, x)) == length(x)
+    mean = AbstractGPs._map_meanfunction(m, x)
+    @test mean isa AbstractVector
+    @test length(mean) == length(x)
 end
 
 """
@@ -88,8 +89,8 @@ Ensure that the gradient w.r.t. the inputs of `MeanFunction` `m` are approximate
 """
 function differentiable_mean_function_tests(
     m::MeanFunction,
-    ȳ::AbstractVector{<:Real},
-    x::AbstractVector{<:Real};
+    ȳ::AbstractVector,
+    x::AbstractVector;
     rtol=_rtol,
     atol=_atol,
 )
@@ -98,22 +99,9 @@ function differentiable_mean_function_tests(
 
     # Check adjoint.
     @assert length(ȳ) == length(x)
-    return adjoint_test(x -> ew(m, x), ȳ, x; rtol=rtol, atol=atol)
+    adjoint_test(x -> AbstractGPs._map_meanfunction(m, x), ȳ, x; rtol=rtol, atol=atol)
+    return nothing
 end
-
-# function differentiable_mean_function_tests(
-#     m::MeanFunction,
-#     ȳ::AbstractVector{<:Real},
-#     x::ColVecs{<:Real};
-#     rtol=_rtol,
-#     atol=_atol,
-# )
-#     # Run forward tests.
-#     mean_function_tests(m, x)
-
-#     @assert length(ȳ) == length(x)
-#     adjoint_test(X->ew(m, ColVecs(X)), ȳ, x.X; rtol=rtol, atol=atol)  
-# end
 
 function differentiable_mean_function_tests(
     rng::AbstractRNG, m::MeanFunction, x::AbstractVector; rtol=_rtol, atol=_atol

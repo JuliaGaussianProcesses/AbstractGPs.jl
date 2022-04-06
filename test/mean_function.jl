@@ -10,7 +10,7 @@
 
         for x in [x]
             @test AbstractGPs._map_meanfunction(f, x) == zeros(size(x))
-            # differentiable_mean_function_tests(f, randn(rng, P), x)
+            differentiable_mean_function_tests(f, randn(rng, P), x)
         end
 
         # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
@@ -32,7 +32,7 @@
 
         for x in [x]
             @test AbstractGPs._map_meanfunction(m, x) == fill(c, N)
-            # differentiable_mean_function_tests(m, randn(rng, N), x)
+            differentiable_mean_function_tests(m, randn(rng, N), x)
         end
     end
     @testset "CustomMean" begin
@@ -42,6 +42,6 @@
         f = CustomMean(foo_mean)
 
         @test AbstractGPs._map_meanfunction(f, x) == map(foo_mean, x)
-        # differentiable_mean_function_tests(f, randn(rng, N), x)
+        differentiable_mean_function_tests(f, randn(rng, N), x)
     end
 end
