@@ -125,34 +125,6 @@ end
             rtol=1e-9,
         )
     end
-    @testset "tr_Cf_invΣy" begin
-        N = 11
-        x = collect(range(-3.0, 3.0; length=N))
-        @testset "dense" begin
-            rng = MersenneTwister(123456)
-            A = randn(rng, N, N - 2)
-            adjoint_test(
-                (x, A) -> begin
-                    f = GP(sin, SqExponentialKernel())
-                    Σy = _to_psd(A)
-                    C = cholesky(Σy)
-                    return tr_Cf_invΣy(f(x, Σy), Σy, C)
-                end, randn(rng), x, A
-            )
-        end
-        @testset "Diagonal" begin
-            rng = MersenneTwister(123456)
-            a = 0.01 .* randn(rng, N)
-            adjoint_test(
-                (x, a) -> begin
-                    f = GP(sin, SqExponentialKernel())
-                    Σy = Diagonal(exp.(a .+ 1))
-                    C = cholesky(Σy)
-                    return tr_Cf_invΣy(f(x, Σy), Σy, C)
-                end, randn(rng), x, a
-            )
-        end
-    end
     @testset "logpdf / loglikelihood" begin
         rng = MersenneTwister(123456)
         N = 10
