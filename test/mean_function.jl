@@ -1,14 +1,15 @@
 @testset "mean_functions" begin
-    @testset "ZeroMean" begin
-        rng, N, D = MersenneTwister(123456), 5, 3
-        x1 = randn(rng, N)
-        xD = ColVecs(randn(rng, D, N))
-        xD′ = RowVecs(randn(rng, N, D))
+    rng = MersenneTwister(123456)
+    N, D = 5, 3
+    x1 = randn(rng, N)
+    xD = ColVecs(randn(rng, D, N))
+    xD′ = RowVecs(randn(rng, N, D))
 
+    @testset "ZeroMean" begin
         m = ZeroMean{Float64}()
 
         for x in [x1, xD, xD′]
-            @test AbstractGPs._map_meanfunction(m, x) == zeros(size(x))
+            @test AbstractGPs._map_meanfunction(m, x) == zeros(N)
             differentiable_mean_function_tests(m, randn(rng, N), x)
 
             # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
@@ -22,12 +23,8 @@
             @test iszero(Δx)
         end
     end
-    @testset "ConstMean" begin
-        rng, N, D = MersenneTwister(123456), 5, 3
-        x1 = randn(rng, N)
-        xD = ColVecs(randn(rng, D, N))
-        xD′ = RowVecs(randn(rng, N, D))
 
+    @testset "ConstMean" begin
         c = randn(rng)
         m = ConstMean(c)
 
@@ -36,12 +33,8 @@
             differentiable_mean_function_tests(m, randn(rng, N), x)
         end
     end
-    @testset "CustomMean" begin
-        rng, N, D = MersenneTwister(123456), 5, 3
-        x1 = randn(rng, N)
-        xD = ColVecs(randn(rng, D, N))
-        xD′ = RowVecs(randn(rng, N, D))
 
+    @testset "CustomMean" begin
         foo_mean = x -> sum(abs2, x)
         m = CustomMean(foo_mean)
 
