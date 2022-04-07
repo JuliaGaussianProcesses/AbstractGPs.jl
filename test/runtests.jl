@@ -45,19 +45,19 @@ include("test_util.jl")
 
 @testset "AbstractGPs" begin
     if GROUP == "All" || GROUP == "AbstractGPs"
-        #@testset "util" begin
-        #    include("util/common_covmat_ops.jl")
-        #    include("util/plotting.jl")
-        #end
-        #println(" ")
-        #@info "Ran util tests"
+        @testset "util" begin
+            include("util/common_covmat_ops.jl")
+            include("util/plotting.jl")
+        end
+        println(" ")
+        @info "Ran util tests"
 
-        #@testset "abstract_gp" begin
-        #    include("abstract_gp.jl")
-        #    include("finite_gp_projection.jl")
-        #end
-        #println(" ")
-        #@info "Ran abstract_gp tests"
+        @testset "abstract_gp" begin
+            include("abstract_gp.jl")
+            include("finite_gp_projection.jl")
+        end
+        println(" ")
+        @info "Ran abstract_gp tests"
 
         @testset "gp" begin
             include("mean_function.jl")
@@ -66,37 +66,37 @@ include("test_util.jl")
         println(" ")
         @info "Ran gp tests"
 
-        #@testset "posterior_gp" begin
-        #    include("exact_gpr_posterior.jl")
-        #    include("sparse_approximations.jl")
-        #end
-        #println(" ")
-        #@info "Ran posterior_gp tests"
+        @testset "posterior_gp" begin
+            include("exact_gpr_posterior.jl")
+            include("sparse_approximations.jl")
+        end
+        println(" ")
+        @info "Ran posterior_gp tests"
 
-        #include("latent_gp.jl")
-        #println(" ")
-        #@info "Ran latent_gp tests"
+        include("latent_gp.jl")
+        println(" ")
+        @info "Ran latent_gp tests"
 
-        #include("deprecations.jl")
-        #println(" ")
-        #@info "Ran deprecation tests"
+        include("deprecations.jl")
+        println(" ")
+        @info "Ran deprecation tests"
 
-        #@testset "doctests" begin
-        #    DocMeta.setdocmeta!(
-        #        AbstractGPs,
-        #        :DocTestSetup,
-        #        :(using AbstractGPs, Random, Documenter, LinearAlgebra);
-        #        recursive=true,
-        #    )
-        #    doctest(
-        #        AbstractGPs;
-        #        doctestfilters=[
-        #            r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
-        #            r"(Array{[a-zA-Z0-9]+,\s?1}|\s?Vector{[a-zA-Z0-9]+})",
-        #            r"(Array{[a-zA-Z0-9]+,\s?2}|\s?Matrix{[a-zA-Z0-9]+})",
-        #        ],
-        #    )
-        #end
+        @testset "doctests" begin
+            DocMeta.setdocmeta!(
+                AbstractGPs,
+                :DocTestSetup,
+                :(using AbstractGPs, Random, Documenter, LinearAlgebra);
+                recursive=true,
+            )
+            doctest(
+                AbstractGPs;
+                doctestfilters=[
+                    r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
+                    r"(Array{[a-zA-Z0-9]+,\s?1}|\s?Vector{[a-zA-Z0-9]+})",
+                    r"(Array{[a-zA-Z0-9]+,\s?2}|\s?Matrix{[a-zA-Z0-9]+})",
+                ],
+            )
+        end
     end
 
     if (GROUP == "All" || GROUP == "PPL") && VERSION >= v"1.5"
