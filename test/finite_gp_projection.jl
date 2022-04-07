@@ -176,14 +176,6 @@ end
         σ_ = randn(rng)
         adjoint_test((σ_, ŷ) -> logpdf(f(x, exp(σ_)), ŷ), l̄, σ_, ŷ)
         adjoint_test((σ_, Ŷ) -> sum(logpdf(f(x, exp(σ_)), Ŷ)), l̄, σ_, Ŷ)
-
-        # Check that the gradient w.r.t. a scaling of the GP works.
-        # adjoint_test(
-        #     α -> logpdf((α * f)(x, 1e-1), ŷ), l̄, randn(rng); atol=1e-8, rtol=1e-8
-        # )
-        # adjoint_test(
-        #     α -> sum(logpdf((α * f)(x, 1e-1), Ŷ)), l̄, randn(rng); atol=1e-8, rtol=1e-8
-        # )
     end
     @testset "Type Stability - $T" for T in [Float64, Float32]
         rng = MersenneTwister(123456)
