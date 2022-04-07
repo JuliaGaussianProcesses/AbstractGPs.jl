@@ -27,10 +27,6 @@ end
 Base.zero(d::Dict) = Dict([(key, zero(val)) for (key, val) in d])
 Base.zero(x::Array) = zero.(x)
 
-# TODO should move into KernelFunctions.jl
-Base.zero(x::ColVecs) = ColVecs(zero(x.X))
-Base.zero(x::RowVecs) = RowVecs(zero(x.X))
-
 # My version of isapprox
 function fd_isapprox(x_ad::Nothing, x_fd, rtol, atol)
     return fd_isapprox(x_fd, zero(x_fd), rtol, atol)
