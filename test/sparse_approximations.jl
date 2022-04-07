@@ -143,7 +143,10 @@ end
                     Σy = _to_psd(A)
                     C = cholesky(Σy)
                     return AbstractGPs.tr_Cf_invΣy(f(x, Σy), Σy, C)
-                end, randn(rng), x, A
+                end,
+                randn(rng),
+                x,
+                A,
             )
         end
         @testset "Diagonal" begin
