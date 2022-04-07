@@ -122,6 +122,7 @@ end
     σ² = 1.234
     Σy_Diagonal = Diagonal(Fill(σ², N))
     Σy_ScalMat = ScalMat(N, σ²)
+    # Σy_dense = _to_psd(randn(N, N - 2))  # dense observation covariance not currently implemented for sparse approximation, and might be slower than exact inference anyways
     f = GP(SqExponentialKernel())
 
     for Σy in (Σy_Diagonal, Σy_ScalMat)
