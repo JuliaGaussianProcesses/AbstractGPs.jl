@@ -122,9 +122,10 @@ end
     σ² = 1.234
     Σy_Diagonal = Diagonal(Fill(σ², N))
     Σy_ScalMat = ScalMat(N, σ²)
+    Σy_dense = _to_psd(randn(N, N - 2))
     f = GP(SqExponentialKernel())
 
-    for Σy in (Σy_Diagonal, Σy_ScalMat)
+    for Σy in (Σy_Diagonal, Σy_ScalMat, Σy_dense)
         fx = f(x, Σy)
         Cf = cov(f, x)
         @test AbstractGPs.tr_Cf_invΣy(fx, Σy) ≈ tr(Cf / Matrix(Σy))
