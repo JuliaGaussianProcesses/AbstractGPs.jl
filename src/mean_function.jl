@@ -1,7 +1,5 @@
 abstract type MeanFunction end
 
-# (m::MeanFunction)(x::AbstractVector) = _map_meanfunction(m, x)
-
 """
     ZeroMean{T<:Real} <: MeanFunction
 
