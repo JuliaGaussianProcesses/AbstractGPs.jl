@@ -33,21 +33,11 @@ makedocs(;
         "Home" => "index.md",
         "The Main APIs" => "api.md",
         "Concrete Features" => "concrete_features.md",
-        "Examples" => map(
-            basename.(
-                filter!(isdir, readdir(joinpath(@__DIR__, "src", "examples"); join=true)),
-            ),
-        ) do x
-            joinpath("examples", x, "index.md")
-        end,
+        "Examples" => JuliaGPsDocs.find_generated_examples(AbstractGPs),
     ],
     #strict=true,
     checkdocs=:exports,
-    doctestfilters=[
-        r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
-        r"(Array{[a-zA-Z0-9]+,\s?1}|Vector{[a-zA-Z0-9]+})",
-        r"(Array{[a-zA-Z0-9]+,\s?2}|Matrix{[a-zA-Z0-9]+})",
-    ],
+    doctestfilters=JuliaGPsDocs.DOCTEST_FILTERS,
 )
 
 deploydocs(; repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git", push_preview=true)
