@@ -11,16 +11,6 @@
         for x in [x1, xD_colvecs, xD_rowvecs]
             @test AbstractGPs._map_meanfunction(m, x) == zeros(N)
             differentiable_mean_function_tests(m, randn(rng, N), x)
-
-            # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
-            # currently ChainRulesTestUtils isn't up to handling this, so this will have to do
-            # for now.
-            y, pb = rrule(AbstractGPs._map_meanfunction, m, x)
-            @test y == AbstractGPs._map_meanfunction(m, x)
-            Δmap, Δf, Δx = pb(randn(rng, N))
-            @test iszero(Δmap)
-            @test iszero(Δf)
-            @test iszero(Δx)
         end
     end
 
