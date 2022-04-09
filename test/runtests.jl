@@ -23,7 +23,6 @@ using AbstractGPs:
     TestUtils
 
 using Documenter
-using ChainRulesCore
 using Distributions: MvNormal, PDMat, loglikelihood, Distributions
 using FillArrays
 using FiniteDifferences
