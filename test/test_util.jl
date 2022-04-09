@@ -95,7 +95,7 @@ function differentiable_mean_function_tests(
 
     # Check adjoint.
     @assert length(ȳ) == length(x)
-    adjoint_test(x -> AbstractGPs._map_meanfunction(m, x), ȳ, x; rtol=rtol, atol=atol)
+    adjoint_test(x -> collect(AbstractGPs._map_meanfunction(m, x)), ȳ, x; rtol=rtol, atol=atol)
     return nothing
 end
 

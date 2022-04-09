@@ -10,7 +10,7 @@ struct ZeroMean{T<:Real} <: MeanFunction end
 """
 This is an AbstractGPs-internal workaround for AD issues; ideally we would just extend Base.map
 """
-_map_meanfunction(::ZeroMean{T}, x::AbstractVector) where {T} = zeros(T, length(x))
+ _map_meanfunction(::ZeroMean{T}, x::AbstractVector) where {T} = Zeros{T}(length(x))
 
 function ChainRulesCore.rrule(::typeof(_map_meanfunction), m::ZeroMean, x::AbstractVector)
     map_ZeroMean_pullback(Δ) = (NoTangent(), ZeroTangent(), ZeroTangent())
@@ -28,7 +28,7 @@ struct ConstMean{T<:Real} <: MeanFunction
     c::T
 end
 
-_map_meanfunction(m::ConstMean, x::AbstractVector) = fill(m.c, length(x))
+_map_meanfunction(m::ConstMean, x::AbstractVector) = Fill(m.c, length(x))
 
 function ChainRulesCore.rrule(::typeof(_map_meanfunction), m::ConstMean, x::AbstractVector)
     map_ConstMean_pullback(Δ) = (NoTangent(), Tangent{ConstMean}(; c=sum(Δ)), ZeroTangent())
