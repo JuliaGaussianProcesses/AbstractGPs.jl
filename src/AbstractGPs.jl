@@ -1,6 +1,5 @@
 module AbstractGPs
 
-using ChainRulesCore
 using Distributions
 using FillArrays
 using LinearAlgebra
