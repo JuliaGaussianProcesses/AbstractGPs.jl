@@ -14,6 +14,8 @@ using IrrationalConstants: log2π
 
 using KernelFunctions: ColVecs, RowVecs
 
+using ChainRulesCore: ChainRulesCore
+
 export GP,
     rand!,
     mean,
