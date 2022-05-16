@@ -18,6 +18,9 @@ Compute the mean vector of the multivariate Normal `f(x)`.
 """
 Statistics.mean(::AbstractGP, ::AbstractVector)
 
+# https://github.com/JuliaDiff/ChainRules.jl/pull/615 introduced a `rrule` that causes errors
+ChainRulesCore.@opt_out ChainRulesCore.rrule(::ChainRulesCore.RuleConfig{>:ChainRulesCore.HasReverseMode}, ::typeof(mean), ::AbstractGP, ::AbstractVector)
+
 """
     cov(f::AbstractGP, x::AbstractVector)
 
