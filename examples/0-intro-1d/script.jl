@@ -64,7 +64,7 @@ f = GP(Matern52Kernel())
 #md nothing #hide
 
 # We create a finite dimensional projection at the inputs of the training dataset
-# observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
+# observed under Gaussian noise with variance $\sigma^2 = 0.1$, and compute the
 # log-likelihood of the outputs of the training dataset.
 
 fx = f(x_train, 0.1)
