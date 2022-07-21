@@ -131,3 +131,9 @@ end
         @test AbstractGPs.tr_Cf_invΣy(fx, Σy) ≈ tr(Cf / Matrix(Σy))
     end
 end
+
+@testset "logdet" begin
+    l = LowerTriangular(rand(3,3))
+    C = Cholesky(l)
+    @test logdet(C) ≈ AbstractGPs.logdet_(C)
+end
