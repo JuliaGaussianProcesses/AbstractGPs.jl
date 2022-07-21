@@ -266,6 +266,7 @@ function dtc(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
     return _dtc
 end
 
+logdet_(C::Cholesky) = sum(diag(C.factors))
 # Factor out computations common to the `elbo` and `dtc`.
 function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
     length(fx) == length(y) || throw(
@@ -280,7 +281,7 @@ function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::Fin
     Λ_ε = cholesky(Symmetric(A * A' + I))
     δ = chol_Σy.U' \ (y - mean(fx))
 
-    tmp = logdet(chol_Σy) + logdet(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
+    tmp = logdet_(chol_Σy) + logdet_(Λ_ε) + sum(abs2, δ) - sum(abs2, Λ_ε.U' \ (A * δ))
     _dtc = -(length(y) * typeof(tmp)(log2π) + tmp) / 2
     return _dtc, A
 end
