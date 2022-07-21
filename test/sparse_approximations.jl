@@ -133,7 +133,7 @@ end
 end
 
 @testset "logdet" begin
-    l = LowerTriangular(rand(3,3))
+    l = LowerTriangular(rand(3, 3))
     C = Cholesky(l)
     @test logdet(C) ≈ AbstractGPs.logdet_(C)
 end
