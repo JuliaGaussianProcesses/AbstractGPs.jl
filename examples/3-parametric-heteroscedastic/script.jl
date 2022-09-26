@@ -79,7 +79,7 @@ with_theme(
         label="posterior + noise",
         color=(:orange, 0.3),
     )
-    plot!(ax, x, f_post; bandscale=3, label="posterior")
+    plot!(x, f_post; bandscale=3, label="posterior")
     gpsample!(x, f_post; samples=10, color=Set1_4[3])
     scatter!(x, y; label="y")
     axislegend()
