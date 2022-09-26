@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   ppl:
-    name: PPL tests (Turing and Soss)
+    name: PPL tests (Turing)
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
