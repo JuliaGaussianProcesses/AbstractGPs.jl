@@ -6,6 +6,7 @@
 
 using AbstractGPs
 using Distributions
+using FillArrays
 using StatsFuns
 
 using Plots
@@ -122,7 +123,7 @@ const loglik_train = gp_loglikelihood(x_train, y_train)
 # We define a Gaussian prior for the joint distribution of the two transformed kernel
 # parameters. We assume that both parameters are independent with mean 0 and variance 1.
 
-logprior(params) = logpdf(MvNormal(2, 1), params)
+logprior(params) = logpdf(MvNormal(Eye(2)), params)
 #md nothing #hide
 
 # ### Hamiltonian Monte Carlo
@@ -259,20 +260,20 @@ samples =
         ADgradient(:ForwardDiff, loglik_train),
         n_samples;
         reporter=NoProgressReport(),
-    ).chain
+    ).posterior_matrix
 #md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
-samples_constrained = [map(softplus, p) for p in samples]
-mean_samples = mean(samples_constrained)
+samples_constrained = map(softplus, samples)
+mean_samples = vec(mean(samples_constrained; dims=2))
 
 # We plot a histogram of the samples for the two parameters.
 # The vertical line in each graph indicates the mean of the samples.
 
 histogram(
-    reduce(hcat, samples_constrained)';
+    samples_constrained';
     xlabel="sample",
     ylabel="counts",
     layout=2,
@@ -285,7 +286,7 @@ vline!(mean_samples'; linewidth=2)
 # of the test data with respect to the posterior Gaussian process with default kernel
 # parameters.
 
-mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in eachcol(samples))
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
@@ -293,7 +294,8 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (DynamicHMC)")
 scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
-for p in samples[(end - 100):end]
+for i in (n_samples - 100):n_samples
+    p = @view samples[:, i]
     sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
@@ -310,7 +312,7 @@ using EllipticalSliceSampling
 # We draw 2000 samples from the posterior distribution of kernel parameters.
 
 samples = sample(ESSModel(
-    MvNormal(2, 1), # Gaussian prior
+    MvNormal(Eye(2)), # Gaussian prior
     loglik_train,
 ), ESS(), n_samples; progress=false)
 #md nothing #hide
