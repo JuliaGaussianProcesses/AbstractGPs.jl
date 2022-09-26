@@ -65,21 +65,23 @@ f_post = posterior(fx_final, y);
 # Plot the results, making use of [AbstractGPsMakie](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl):
 using CairoMakie.Makie.ColorSchemes: Set1_4
 
-#! format: off
-set_theme!(
-    palette=(color=Set1_4,),
-    patchcolor=(Set1_4[2], 0.2),
-    Axis=(limits=((0, 10), nothing),),
-)
-#! format: on
-
-let
-    fig = Figure()
-    ax = Axis(fig[1, 1])
-    plot!(ax, x, f_post(x, Σ_obs_final); bandscale=3, label="posterior + noise", color=(:orange, 0.3))
-    plot!(ax, x, f_post(x, 1e-9); bandscale=3, label="posterior")
-    gpsample!(ax, x, f_post(x, 1e-9); samples=10, color=Set1_4[3])
-    scatter!(ax, x, y; label="y")
-    axislegend(ax)
-    fig
+with_theme(
+    Theme(;
+        palette=(color=Set1_4,),
+        patchcolor=(Set1_4[2], 0.2),
+        Axis=(limits=((0, 10), nothing),),
+    ),
+) do
+    plot(
+        x,
+        f_post(x, Σ_obs_final);
+        bandscale=3,
+        label="posterior + noise",
+        color=(:orange, 0.3),
+    )
+    plot!(x, f_post; bandscale=3, label="posterior")
+    gpsample!(x, f_post; samples=10, color=Set1_4[3])
+    scatter!(x, y; label="y")
+    axislegend()
+    current_figure()
 end
