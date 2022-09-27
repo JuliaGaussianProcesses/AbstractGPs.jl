@@ -18,7 +18,7 @@ using Zygote
 
 using LinearAlgebra
 using Random
-Random.seed!(42)  # setting the seed for reproducibility of this notebook
+Random.seed!(12)  # setting the seed for reproducibility of this notebook
 #md nothing #hide
 
 # Specify simple GP:
