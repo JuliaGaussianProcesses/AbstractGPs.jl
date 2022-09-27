@@ -74,9 +74,8 @@ result = optimize(
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
         linesearch=Optim.LineSearches.BackTracking(),
     ),
-    Optim.Options(; iterations=4_000);
-    inplace=false,
-);
+    Optim.Options(; iterations=4_000),
+)
 θ_final = unflatten(result.minimizer);
 
 # Construct the posterior GP with the optimal model parameters:
