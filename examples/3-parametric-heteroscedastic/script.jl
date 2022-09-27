@@ -25,7 +25,7 @@ Random.seed!(1234)  # setting the seed for reproducibility of this notebook
 build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
 
 # Observation variance is some scaling of $x^2$:
-observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2);
+observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(0.01 .+ θ.σ² .* x .^ 2);
 
 # Specify hyperparameters:
 const flat_θ, unflatten = ParameterHandling.value_flatten((
@@ -34,7 +34,7 @@ const flat_θ, unflatten = ParameterHandling.value_flatten((
 θ = unflatten(flat_θ);
 
 # Build inputs:
-const x = range(0.0, 10.0; length=100)
+const x = 0.0:0.1:10.0
 const y = rand(build_gp(θ)(x, observation_variance(θ, x)));
 
 # We specify the objective function:
@@ -93,10 +93,6 @@ with_theme(
         Axis=(limits=((0, 10), nothing),),
     ),
 ) do
-    ## Fix numerical issues when computing the Cholesky decomposition of the covariance matrix
-    ## of the finite projection of the posterior GP by introducing artifical noise
-    f_post_jitter = f_post(x, 1e-8)
-
     plot(
         x,
         f_post(x, Σ_obs_final);
@@ -104,8 +100,8 @@ with_theme(
         label="posterior + noise",
         color=(:orange, 0.3),
     )
-    plot!(x, f_post_jitter; bandscale=3, label="posterior")
-    gpsample!(x, f_post_jitter; samples=10, color=Set1_4[3])
+    plot!(x, f_post; bandscale=3, label="posterior")
+    gpsample!(x, f_post; samples=10, color=Set1_4[3])
     scatter!(x, y; label="y")
     axislegend()
     current_figure()
