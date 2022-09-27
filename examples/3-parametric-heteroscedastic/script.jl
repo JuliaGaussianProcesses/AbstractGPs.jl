@@ -93,8 +93,8 @@ with_theme(
         Axis=(limits=((0, 10), nothing),),
     ),
 ) do
-    # Fix numerical issues when computing the Cholesky decomposition of the covariance matrix
-    # of the finite projection of the posterior GP by introducing artifical noise
+    ## Fix numerical issues when computing the Cholesky decomposition of the covariance matrix
+    ## of the finite projection of the posterior GP by introducing artifical noise
     f_post_jitter = f_post(x, 1e-8)
 
     plot(
