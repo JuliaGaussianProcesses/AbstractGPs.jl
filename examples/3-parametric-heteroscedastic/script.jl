@@ -74,7 +74,7 @@ result = optimize(
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
         linesearch=Optim.LineSearches.BackTracking(),
     ),
-    Optim.Options(; iterations=4_000),
+    Optim.Options(; show_every=100),
 )
 θ_final = unflatten(result.minimizer);
 
