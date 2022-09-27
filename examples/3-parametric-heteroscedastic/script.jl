@@ -28,7 +28,7 @@ build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
 observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2);
 
 # Specify hyperparameters:
-flat_θ, unflatten = ParameterHandling.value_flatten((
+const flat_θ, unflatten = ParameterHandling.value_flatten((
     s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
 ));
 θ = unflatten(flat_θ);
@@ -37,19 +37,38 @@ flat_θ, unflatten = ParameterHandling.value_flatten((
 const x = range(0.0, 10.0; length=100)
 const y = rand(build_gp(θ)(x, observation_variance(θ, x)));
 
-# Specify objective function:
-function objective(θ)
+# We specify the objective function:
+function objective(flat_θ)
+    θ = unflatten(flat_θ)
     f = build_gp(θ)
     Σ = observation_variance(θ, x)
     return -logpdf(f(x, Σ), y)
+end;
+
+# We use L-BFGS for optimising the objective function.
+# It is a first-order method and hence requires computing the gradient of the objective function.
+# We do not derive and implement the gradient function manually here but instead use reverse-mode automatic differentiation with Zygote.
+# When computing gradients with Zygote, the objective function is evaluated as well.
+# We can exploit this and [avoid re-evaluating the objective function](https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations) in such cases.
+function objective_and_gradient(F, G, flat_θ)
+    if G !== nothing
+        val_grad = Zygote.withgradient(objective, flat_θ)
+        copyto!(G, only(val_grad.grad))
+        if F !== nothing
+            return val_grad.val
+        end
+    end
+    if F !== nothing
+        return objective(flat_θ)
+    end
+    return nothing
 end;
 
 # Optimise the hyperparameters. They've been initialised near the correct values, so
 # they ought not to deviate too far.
 flat_θ_init = flat_θ + 0.01 * randn(length(flat_θ))
 result = optimize(
-    objective ∘ unflatten,
-    flat_θ -> only(Zygote.gradient(objective ∘ unflatten, flat_θ)),
+    Optim.only_fg!(objective_and_gradient),
     flat_θ_init,
     LBFGS(;
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
