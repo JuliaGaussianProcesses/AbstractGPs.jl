@@ -12,12 +12,14 @@ using AbstractGPs
 using AbstractGPsMakie
 using CairoMakie
 using KernelFunctions
-using LinearAlgebra
-using Literate
 using Optim
 using ParameterHandling
-using Random
 using Zygote
+
+using LinearAlgebra
+using Random
+Random.seed!(42)  # setting the seed for reproducibility of this notebook
+#md nothing #hide
 
 # Specify simple GP:
 build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
@@ -26,14 +28,14 @@ build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
 observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2);
 
 # Specify hyperparameters:
-flat_init_params, unflatten = ParameterHandling.value_flatten((
+flat_θ, unflatten = ParameterHandling.value_flatten((
     s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
 ));
-θ_init = unflatten(flat_init_params);
+θ = unflatten(flat_θ);
 
 # Build inputs:
-const x = range(0.0, 10.0; length=100);
-const y = rand(Xoshiro(123456), build_gp(θ_init)(x, observation_variance(θ_init, x)));
+const x = range(0.0, 10.0; length=100)
+const y = rand(build_gp(θ)(x, observation_variance(θ, x)));
 
 # Specify objective function:
 function objective(θ)
@@ -44,10 +46,11 @@ end;
 
 # Optimise the hyperparameters. They've been initialised near the correct values, so
 # they ought not to deviate too far.
+flat_θ_init = flat_θ + 0.01 * randn(length(flat_θ))
 result = optimize(
     objective ∘ unflatten,
-    θ -> only(Zygote.gradient(objective ∘ unflatten, θ)),
-    flat_init_params + 0.01 * randn(Xoshiro(123456), length(flat_init_params)),
+    flat_θ -> only(Zygote.gradient(objective ∘ unflatten, flat_θ)),
+    flat_θ_init,
     LBFGS(;
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
         linesearch=Optim.LineSearches.BackTracking(),
@@ -58,8 +61,8 @@ result = optimize(
 θ_final = unflatten(result.minimizer);
 
 # Construct the posterior GP with the optimal model parameters:
-Σ_obs_final = observation_variance(θ_final, x);
-fx_final = build_gp(θ_final)(x, Σ_obs_final);
+Σ_obs_final = observation_variance(θ_final, x)
+fx_final = build_gp(θ_final)(x, Σ_obs_final)
 f_post = posterior(fx_final, y);
 
 # Plot the results, making use of [AbstractGPsMakie](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl):
