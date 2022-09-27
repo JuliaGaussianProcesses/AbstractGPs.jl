@@ -76,7 +76,7 @@ result = optimize(
     ),
     Optim.Options(; show_every=100),
 )
-θ_final = unflatten(result.minimizer);
+θ_final = unflatten(result.minimizer)
 
 # Construct the posterior GP with the optimal model parameters:
 Σ_obs_final = observation_variance(θ_final, x)
@@ -93,6 +93,10 @@ with_theme(
         Axis=(limits=((0, 10), nothing),),
     ),
 ) do
+    # Fix numerical issues when computing the Cholesky decomposition of the covariance matrix
+    # of the finite projection of the posterior GP by introducing artifical noise
+    f_post_jitter = f_post(x, 1e-8)
+
     plot(
         x,
         f_post(x, Σ_obs_final);
@@ -100,8 +104,8 @@ with_theme(
         label="posterior + noise",
         color=(:orange, 0.3),
     )
-    plot!(x, f_post; bandscale=3, label="posterior")
-    gpsample!(x, f_post; samples=10, color=Set1_4[3])
+    plot!(x, f_post_jitter; bandscale=3, label="posterior")
+    gpsample!(x, f_post_jitter; samples=10, color=Set1_4[3])
     scatter!(x, y; label="y")
     axislegend()
     current_figure()
