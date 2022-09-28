@@ -18,31 +18,30 @@ using Zygote
 
 using LinearAlgebra
 using Random
-Random.seed!(1234)  # setting the seed for reproducibility of this notebook
+Random.seed!(42)  # setting the seed for reproducibility of this notebook
 #md nothing #hide
 
-# Specify simple GP:
-build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
+# In this example we work with a simple GP with a Gaussian kernel and heteroscedastic observation variance.
+function build_gpx(θ, x::AbstractVector{<:Real}
+    Σ = Diagonal(0.01 .+ θ.σ² .* x .^ 2)
+    return GP(0, θ.s * with_lengthscale(SEKernel(), θ.l))(x, Σ)
+end
 
-# Observation variance is some scaling of $x^2$:
-observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(0.01 .+ θ.σ² .* x .^ 2);
-
-# Specify hyperparameters:
+# We specify the following hyperparameters:
 const flat_θ, unflatten = ParameterHandling.value_flatten((
     s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
 ));
 θ = unflatten(flat_θ);
 
-# Build inputs:
+# We generate some observations:
 const x = 0.0:0.1:10.0
-const y = rand(build_gp(θ)(x, observation_variance(θ, x)));
+const y = rand(build_gpx(θ, x));
 
 # We specify the objective function:
 function objective(flat_θ)
     θ = unflatten(flat_θ)
-    f = build_gp(θ)
-    Σ = observation_variance(θ, x)
-    return -logpdf(f(x, Σ), y)
+    fx = build_gpx(θ, x)
+    return -logpdf(fx, y)
 end;
 
 # We use L-BFGS for optimising the objective function.
@@ -64,8 +63,7 @@ function objective_and_gradient(F, G, flat_θ)
     return nothing
 end;
 
-# Optimise the hyperparameters. They've been initialised near the correct values, so
-# they ought not to deviate too far.
+# We optimise the hyperparameters using initializations close to the values that the observations were generated with.
 flat_θ_init = flat_θ + 0.01 * randn(length(flat_θ))
 result = optimize(
     Optim.only_fg!(objective_and_gradient),
@@ -76,14 +74,15 @@ result = optimize(
     ),
     Optim.Options(; show_every=100),
 )
+
+# The optimal model parameters are:
 θ_final = unflatten(result.minimizer)
 
-# Construct the posterior GP with the optimal model parameters:
-Σ_obs_final = observation_variance(θ_final, x)
-fx_final = build_gp(θ_final)(x, Σ_obs_final)
+# We compute the posterior GP with these optimal model parameters:
+fx_final = build_gpx(θ_final, x)
 f_post = posterior(fx_final, y);
 
-# Plot the results, making use of [AbstractGPsMakie](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl):
+# We visualize the results with [AbstractGPsMakie](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl):
 using CairoMakie.Makie.ColorSchemes: Set1_4
 
 with_theme(
