@@ -22,7 +22,7 @@ Random.seed!(42)  # setting the seed for reproducibility of this notebook
 #md nothing #hide
 
 # In this example we work with a simple GP with a Gaussian kernel and heteroscedastic observation variance.
-function build_gpx(θ, x::AbstractVector{<:Real}
+function build_gpx(θ, x::AbstractVector{<:Real})
     Σ = Diagonal(0.01 .+ θ.σ² .* x .^ 2)
     return GP(0, θ.s * with_lengthscale(SEKernel(), θ.l))(x, Σ)
 end
