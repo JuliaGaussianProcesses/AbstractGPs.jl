@@ -22,10 +22,11 @@ Random.seed!(42)  # setting the seed for reproducibility of this notebook
 #md nothing #hide
 
 # In this example we work with a simple GP with a Gaussian kernel and heteroscedastic observation variance.
+observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2)
 function build_gpx(θ, x::AbstractVector{<:Real})
-    Σ = Diagonal(0.01 .+ θ.σ² .* x .^ 2)
+    Σ = observation_variance(θ, x)
     return GP(0, θ.s * with_lengthscale(SEKernel(), θ.l))(x, Σ)
-end
+end;
 
 # We specify the following hyperparameters:
 const flat_θ, unflatten = ParameterHandling.value_flatten((
@@ -94,7 +95,7 @@ with_theme(
 ) do
     plot(
         x,
-        f_post(x, Σ_obs_final);
+        f_post(x, observation_variance(θ_final, x));
         bandscale=3,
         label="posterior + noise",
         color=(:orange, 0.3),
