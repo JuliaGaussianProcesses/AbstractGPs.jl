@@ -140,6 +140,7 @@ logprior(params) = logpdf(MvNormal(Eye(2)), params)
 
 using AdvancedHMC
 using ForwardDiff
+using LogDensityProblems
 
 # Set the number of samples to draw and warmup iterations.
 
@@ -149,9 +150,13 @@ n_adapts = 1_000
 
 # Define a Hamiltonian system of the log joint probability.
 
-logjoint_train(params) = loglik_train(params) + logprior(params)
+struct LogJointTrain end
+
+LogDensityProblems.logdensity(p::LogJointTrain, θ) = loglik_train(θ) + logprior(θ)
+LogDensityProblems.dimension(p::LogJointTrain) = 2
+
 metric = DiagEuclideanMetric(2)
-hamiltonian = Hamiltonian(metric, logjoint_train, ForwardDiff)
+hamiltonian = Hamiltonian(metric, LogJointTrain(), ForwardDiff)
 #md nothing #hide
 
 # Define a leapfrog solver, with initial step size chosen heuristically.
@@ -234,7 +239,7 @@ plt
 # implement the LogDensityProblems interface for `loglik_train`.
 
 using DynamicHMC
-using LogDensityProblems
+using LogDensityProblemsAD
 
 ## Log joint density
 function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
