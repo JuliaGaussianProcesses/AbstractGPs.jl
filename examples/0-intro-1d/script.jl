@@ -140,8 +140,6 @@ logprior(params) = logpdf(MvNormal(Eye(2)), params)
 
 using AdvancedHMC
 using ForwardDiff
-using LogDensityProblems
-using LogDensityProblemsAD
 
 # Set the number of samples to draw and warmup iterations.
 
@@ -162,7 +160,9 @@ LogDensityProblems.logdensity(::LogJointTrain, θ) = loglik_train(θ) + logprior
 LogDensityProblems.dimension(::LogJointTrain) = 2
 
 ## `LogJointTrain` does not allow to evaluate derivatives of the log density function
-LogDensityProblems.capabilities(::Type{LogJointTrain}) = LogDensityProblems.LogDensityOrder{0}()
+function LogDensityProblems.capabilities(::Type{LogJointTrain})
+    return LogDensityProblems.LogDensityOrder{0}()
+end
 #md nothing #hide
 
 # We use [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) to compute the derivatives of the log joint density with automatic differentiation.
