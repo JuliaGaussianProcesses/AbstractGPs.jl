@@ -141,6 +141,7 @@ logprior(params) = logpdf(MvNormal(Eye(2)), params)
 using AdvancedHMC
 using ForwardDiff
 using LogDensityProblems
+using LogDensityProblemsAD
 
 # Set the number of samples to draw and warmup iterations.
 
@@ -148,15 +149,33 @@ n_samples = 2_000
 n_adapts = 1_000
 #md nothing #hide
 
-# Define a Hamiltonian system of the log joint probability.
+# AdvancedHMC and DynamicHMC below require us to implement the LogDensityProblems interface for the log joint probability.
+
+using LogDensityProblems
 
 struct LogJointTrain end
 
-LogDensityProblems.logdensity(p::LogJointTrain, θ) = loglik_train(θ) + logprior(θ)
-LogDensityProblems.dimension(p::LogJointTrain) = 2
+## Log joint density
+LogDensityProblems.logdensity(::LogJointTrain, θ) = loglik_train(θ) + logprior(θ)
+
+## The parameter space is two-dimensional
+LogDensityProblems.dimension(::LogJointTrain) = 2
+
+## `LogJointTrain` does not allow to evaluate derivatives of the log density function
+LogDensityProblems.capabilities(::Type{LogJointTrain}) = LogDensityProblems.LogDensityOrder{0}()
+#md nothing #hide
+
+# We use [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) to compute the derivatives of the log joint density with automatic differentiation.
+
+using LogDensityProblemsAD
+
+const logjoint_train = ADgradient(Val(:ForwardDiff), LogJointTrain())
+#md nothing #hide
+
+# We define an Hamiltonian system of the log joint probability.
 
 metric = DiagEuclideanMetric(2)
-hamiltonian = Hamiltonian(metric, LogJointTrain(), ForwardDiff)
+hamiltonian = Hamiltonian(metric, logjoint_train)
 #md nothing #hide
 
 # Define a leapfrog solver, with initial step size chosen heuristically.
@@ -235,34 +254,14 @@ plt
 
 # #### DynamicHMC
 #
-# We repeat the inference with DynamicHMC. DynamicHMC requires us to
-# implement the LogDensityProblems interface for `loglik_train`.
+# We repeat the inference with DynamicHMC.
 
 using DynamicHMC
-using LogDensityProblemsAD
-
-## Log joint density
-function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
-    return ℓ(params) + logprior(params)
-end
-
-## The parameter space is two-dimensional
-LogDensityProblems.dimension(::typeof(loglik_train)) = 2
-
-## `loglik_train` does not allow to evaluate derivatives of
-## the log-likelihood function
-function LogDensityProblems.capabilities(::Type{<:typeof(loglik_train)})
-    return LogDensityProblems.LogDensityOrder{0}()
-end
-
-# Now we can draw samples from the posterior distribution of kernel parameters with
-# DynamicHMC. Again we use [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl)
-# to compute the derivatives of the log joint density with automatic differentiation.
 
 samples =
     mcmc_with_warmup(
         Random.GLOBAL_RNG,
-        ADgradient(:ForwardDiff, loglik_train),
+        logjoint_train,
         n_samples;
         reporter=NoProgressReport(),
     ).posterior_matrix
