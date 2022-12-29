@@ -260,10 +260,7 @@ using DynamicHMC
 
 samples =
     mcmc_with_warmup(
-        Random.GLOBAL_RNG,
-        logjoint_train,
-        n_samples;
-        reporter=NoProgressReport(),
+        Random.GLOBAL_RNG, logjoint_train, n_samples; reporter=NoProgressReport()
     ).posterior_matrix
 #md nothing #hide
 
