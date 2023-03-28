@@ -5,9 +5,6 @@
 This page is best read once you have a sense of what this package is trying to achieve.
 Therefore, we recommend reading (or at least skimming) some of the examples before reading these docs.
 
-
-
-
 ## Introduction
 
 AbstractGPs provides the abstract type `AbstractGP`, and the concrete type `FiniteGP`.
@@ -19,9 +16,11 @@ A `FiniteGP` `fx = f(x)` represents the distribution over functions at the finit
 `fx` is a multivariate Normal distribution, so `rand(fx)` produces a `Vector` of `Real`s.
 
 A `FiniteGP` is the interesting object computationally, so if you create a new subtype `MyNewGP` of `AbstractGP`, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
+
 ```julia
 FiniteGP{<:MyNewGP}
 ```
+
 We provide two ways in which to do this.
 The first is to implement methods directly on `Finite{<:MyNewGP}` -- this is detailed in the [FiniteGP APIs](@ref).
 The second is to implement some methods directly involving `MyNewGP`, and utilise default `FiniteGP` methods implemented in terms of these -- this is detailed in the [Internal AbstractGPs API](@ref).
@@ -30,16 +29,11 @@ For example, the first method involves implementing methods like `AbstractGPs.me
 The second interface is generally easier to implement, but isn't always the best choice.
 See [Which API should I implement?](@ref) for further discussion.
 
-
-
-
-
-
-
 ## FiniteGP APIs
 
 Let `f` be an `AbstractGP`, `x` an `AbstractVector` representing a collection of inputs, and `Σ` a positive-definite matrix of size `(length(x), length(x))`.
 A `FiniteGP` represents the multivariate Gaussian induced by "indexing" into `f` at each point in `x`, and adding independent zero-mean noise with covariance matrix `Σ`:
+
 ```julia
 fx = f(x, Σ)
 
@@ -51,8 +45,6 @@ fx = AbstractGPs.FiniteGP(f, x, Σ)
 The `FiniteGP` has two API levels.
 The [Primary Public API](@ref) should be supported by all `FiniteGP`s, while the [Secondary Public API](@ref) will only be supported by a subset.
 Use only the primary API when possible.
-
-
 
 ### Primary Public API
 
@@ -75,6 +67,7 @@ var(::AbstractGPs.FiniteGP)
 #### Optional methods
 
 Default implementations are provided for these, but you may wish to specialise for performance.
+
 ```@docs
 mean_and_var(::AbstractGPs.FiniteGP)
 ```
@@ -98,10 +91,10 @@ cov(::AbstractGPs.FiniteGP)
 
 #### Optional Methods
 Default implementations are provided for these, but you may wish to specialise for performance.
+
 ```@docs
 mean_and_cov(::AbstractGPs.FiniteGP)
 ```
-
 
 ## Internal AbstractGPs API
 
@@ -114,11 +107,11 @@ Implementing the following API for your own `AbstractGP` subtype automatically i
 
 Existing implementations of this interface include
 1. [`GP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/gp/gp.jl#L56)
-1. [`PosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/posterior_gp.jl#L1)
-1. [`ApproxPosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/approx_posterior_gp.jl#L4)
-1. [`WrappedGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gp/gp.jl#L11)
-1. [`CompositeGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/composite/composite_gp.jl#L7)
-1. [`GaussianProcessProbabilisticProgramme`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gaussian_process_probabilistic_programme.jl#L8)
+2. [`PosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/posterior_gp.jl#L1)
+3. [`ApproxPosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/approx_posterior_gp.jl#L4)
+4. [`WrappedGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gp/gp.jl#L11)
+5. [`CompositeGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/composite/composite_gp.jl#L7)
+6. [`GaussianProcessProbabilisticProgramme`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gaussian_process_probabilistic_programme.jl#L8)
 
 #### Required Methods
 
@@ -138,16 +131,12 @@ mean_and_var(::AbstractGPs.AbstractGP, ::AbstractVector)
 
 Note that, while we _could_ provide a default implementation for `var(f, x)` as `diag(cov(f, x))`, this is generally such an inefficient fallback, that we find it preferable to error if it's not implemented than to ever hit a fallback.
 
-
-
 ## Which API should I implement?
 
 To answer this question, you need to need to know whether or not the default implementations of the [FiniteGP APIs](@ref) work for your use case.
 There are a couple of reasons of which we are aware for why this might not be the case (see below) -- possibly there are others.
 
 If you are unsure, please open an issue to discuss.
-
-
 
 ### You want to avoid computing the covariance matrix
 
@@ -160,9 +149,6 @@ Do _not_ implement the [Secondary Public API](@ref).
 [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) is an example of a package that does this -- see the [`LTISDE`](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl/blob/24343744cf60a50e09b301dee6f14b03cba7ccba/src/gp/lti_sde.jl#L7) implementation for an example.
 The same is true of the [`BayesianLinearRegressor`](https://github.com/JuliaGaussianProcesses/BayesianLinearRegressors.jl/blob/ea20b1bb0603d27c67b3751ad2cf26e271b7acaa/src/bayesian_linear_regression.jl#L11) type.
 
-
-
-
 ### You don't want to use the default implementations
 
 Perhaps you just don't like the default implementations because you don't want to make use of Cholesky factorisations.
@@ -171,9 +157,6 @@ We don't have an example of this yet in Julia, however [GPyTorch](https://gpytor
 In this situation, implement _both_ the [Internal AbstractGPs API](@ref) _and_ the [FiniteGP APIs](@ref).
 
 In this situation you will benefit less from code reuse inside AbstractGPs, but will continue to benefit from the ability of others use your code, and to take advantage of any existing functionality which requires types which adhere to the AbstractGPs API.
-
-
-
 
 ## Testing Utilities
 
@@ -188,8 +171,8 @@ They are not, however, sufficient.
 
 You should only need to run one of the following test suites.
 1. If you implement the [Primary Public API](@ref), run `test_finitegp_primary_public_interface`.
-1. If you implement both the [Primary Public API](@ref) and the [Secondary Public API](@ref), then run `test_finitegp_primary_and_secondary_public_interface`.
-1. If you implement the [Internal AbstractGPs API](@ref), run `test_internal_abstractgps_interface`.
+2. If you implement both the [Primary Public API](@ref) and the [Secondary Public API](@ref), then run `test_finitegp_primary_and_secondary_public_interface`.
+3. If you implement the [Internal AbstractGPs API](@ref), run `test_internal_abstractgps_interface`.
 
 Also see [Which API should I implement?](@ref) for more information about the most appropriate API to implement.
 

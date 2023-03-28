@@ -73,7 +73,7 @@ end
 Test _very_ basic consistency properties of the mean function `m`.
 """
 function mean_function_tests(m::MeanFunction, x::AbstractVector)
-    mean = AbstractGPs._map_meanfunction(m, x)
+    mean = mean_vector(m, x)
     @test mean isa AbstractVector
     @test length(mean) == length(x)
 end
@@ -96,7 +96,7 @@ function differentiable_mean_function_tests(
     # Check adjoint.
     @assert length(ȳ) == length(x)
     adjoint_test(
-        x -> collect(AbstractGPs._map_meanfunction(m, x)), ȳ, x; rtol=rtol, atol=atol
+        x -> collect(mean_vector(m, x)), ȳ, x; rtol=rtol, atol=atol
     )
     return nothing
 end

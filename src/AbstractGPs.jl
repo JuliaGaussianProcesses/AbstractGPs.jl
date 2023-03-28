@@ -16,25 +16,22 @@ using KernelFunctions: ColVecs, RowVecs
 
 using ChainRulesCore: ChainRulesCore
 
-export GP,
-    rand!,
+export GP, LatentGP, VFE, DTC
+export rand!,
     mean,
     cov,
     var,
     std,
     mean_and_cov,
     mean_and_var,
-    marginals,
+    mean_vector,
+    marignals,
     logpdf,
     elbo,
     dtc,
     posterior,
-    VFE,
-    DTC,
-    update_posterior,
-    LatentGP,
-    ColVecs,
-    RowVecs
+    update_posterior
+export ColVecs, RowVecs
 
 # Various bits of utility functionality.
 include("util/common_covmat_ops.jl")
