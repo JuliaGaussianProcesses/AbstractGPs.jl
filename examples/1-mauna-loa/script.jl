@@ -262,7 +262,7 @@ opt_result
 #     and then picked the result with the highest marginal likelihood. We omit
 #     this for simplicity. For more details on how to fit GPs in practice,
 #     check out [A Practical Guide to Gaussian
-#     Processes](https://tinyurl.com/guide2gp).
+#     Processes](https://infallible-thompson-49de36.netlify.app/).
 #
 # Let's construct the posterior GP with the optimized hyperparameters:
 
