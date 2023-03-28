@@ -107,11 +107,11 @@ Implementing the following API for your own `AbstractGP` subtype automatically i
 
 Existing implementations of this interface include
 1. [`GP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/gp/gp.jl#L56)
-2. [`PosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/posterior_gp.jl#L1)
-3. [`ApproxPosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/approx_posterior_gp.jl#L4)
-4. [`WrappedGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gp/gp.jl#L11)
-5. [`CompositeGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/composite/composite_gp.jl#L7)
-6. [`GaussianProcessProbabilisticProgramme`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gaussian_process_probabilistic_programme.jl#L8)
+1. [`PosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/posterior_gp.jl#L1)
+1. [`ApproxPosteriorGP`](https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/approx_posterior_gp.jl#L4)
+1. [`WrappedGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gp/gp.jl#L11)
+1. [`CompositeGP`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/composite/composite_gp.jl#L7)
+1. [`GaussianProcessProbabilisticProgramme`](https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gaussian_process_probabilistic_programme.jl#L8)
 
 #### Required Methods
 
@@ -185,8 +185,8 @@ They are not, however, sufficient.
 
 You should only need to run one of the following test suites.
 1. If you implement the [Primary Public API](@ref), run `test_finitegp_primary_public_interface`.
-2. If you implement both the [Primary Public API](@ref) and the [Secondary Public API](@ref), then run `test_finitegp_primary_and_secondary_public_interface`.
-3. If you implement the [Internal AbstractGPs API](@ref), run `test_internal_abstractgps_interface`.
+1. If you implement both the [Primary Public API](@ref) and the [Secondary Public API](@ref), then run `test_finitegp_primary_and_secondary_public_interface`.
+1. If you implement the [Internal AbstractGPs API](@ref), run `test_internal_abstractgps_interface`.
 
 Also see [Which API should I implement?](@ref) for more information about the most appropriate API to implement.
 
