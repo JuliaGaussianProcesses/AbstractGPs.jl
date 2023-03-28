@@ -16,7 +16,7 @@ using KernelFunctions: ColVecs, RowVecs
 
 using ChainRulesCore: ChainRulesCore
 
-export GP, LatentGP, VFE, DTC
+export GP, LatentGP, VFE, DTC, ZeroMean, ConstMean, CustomMean
 export rand!,
     mean,
     cov,

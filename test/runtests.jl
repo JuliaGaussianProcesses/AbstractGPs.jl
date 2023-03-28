@@ -2,10 +2,6 @@ using AbstractGPs
 using AbstractGPs:
     AbstractGP,
     MeanFunction,
-    ConstMean,
-    ZeroMean,
-    ConstMean,
-    CustomMean,
     Xt_A_X,
     Xt_A_Y,
     Xt_invA_Y,

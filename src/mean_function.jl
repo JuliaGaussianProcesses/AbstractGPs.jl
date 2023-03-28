@@ -18,13 +18,10 @@ mean_vector
 """
     ZeroMean{T<:Real} <: MeanFunction
 
-Returns `zero(T)` everywhere.
+Returns `zero(T)` everywhere, `T` is `Float64` by default.
 """
 struct ZeroMean{T<:Real} <: MeanFunction end
 
-"""
-This is an AbstractGPs-internal workaround for AD issues; ideally we would just extend Base.map
-"""
 mean_vector(::ZeroMean{T}, x::AbstractVector) where {T} = Zeros{T}(length(x))
 
 ZeroMean() = ZeroMean{Float64}()
