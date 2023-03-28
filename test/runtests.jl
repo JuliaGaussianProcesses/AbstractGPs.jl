@@ -3,7 +3,6 @@ using AbstractGPs:
     AbstractGP,
     MeanFunction,
     ConstMean,
-    GP,
     ZeroMean,
     ConstMean,
     CustomMean,
