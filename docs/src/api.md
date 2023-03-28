@@ -123,6 +123,7 @@ var(::AbstractGPs.AbstractGP, ::AbstractVector)
 
 #### Optional Methods
 Default implementations are provided for these, but you may wish to specialise for performance.
+
 ```@docs
 cov(::AbstractGPs.AbstractGP, ::AbstractVector)
 mean_and_cov(::AbstractGPs.AbstractGP, ::AbstractVector)
@@ -157,6 +158,19 @@ We don't have an example of this yet in Julia, however [GPyTorch](https://gpytor
 In this situation, implement _both_ the [Internal AbstractGPs API](@ref) _and_ the [FiniteGP APIs](@ref).
 
 In this situation you will benefit less from code reuse inside AbstractGPs, but will continue to benefit from the ability of others use your code, and to take advantage of any existing functionality which requires types which adhere to the AbstractGPs API.
+
+## Mean functions
+
+We define an API for prior mean functions with the abstract type [`MeanFunction`](@ref)
+and the [`mean_vector`](@ref) function.
+
+```@docs
+MeanFunction
+mean_vector
+```
+
+We provide standard mean functions like [`ZeroMean`](@ref) and [`ConstMean`](@ref)
+as well as [`CustomMean`](@ref) to simply wrap a function.
 
 ## Testing Utilities
 
