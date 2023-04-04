@@ -8,7 +8,7 @@
         x = collect(range(-1.0, 1.0; length=N))
         x′ = collect(range(-1.0, 1.0; length=N′))
 
-        @test mean(f, x) == AbstractGPs._map_meanfunction(m, x)
+        @test mean(f, x) == mean_vector(m, x)
         @test cov(f, x) == kernelmatrix(k, x)
         TestUtils.test_internal_abstractgps_interface(rng, f, x, x′)
     end

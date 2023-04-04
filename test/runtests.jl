@@ -2,11 +2,6 @@ using AbstractGPs
 using AbstractGPs:
     AbstractGP,
     MeanFunction,
-    ConstMean,
-    GP,
-    ZeroMean,
-    ConstMean,
-    CustomMean,
     Xt_A_X,
     Xt_A_Y,
     Xt_invA_Y,
@@ -87,19 +82,12 @@ include("test_util.jl")
                 :(using AbstractGPs, Random, Documenter, LinearAlgebra);
                 recursive=true,
             )
-            doctest(
-                AbstractGPs;
-                doctestfilters=[
-                    r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
-                    r"(Array{[a-zA-Z0-9]+,\s?1}|\s?Vector{[a-zA-Z0-9]+})",
-                    r"(Array{[a-zA-Z0-9]+,\s?2}|\s?Matrix{[a-zA-Z0-9]+})",
-                ],
-            )
+            doctest(AbstractGPs)
         end
     end
 
     if (GROUP == "All" || GROUP == "PPL") && VERSION >= v"1.5"
-        Pkg.activate("ppl")
+        Pkg.activate(joinpath(@__DIR__, "ppl"))
         Pkg.develop(PackageSpec(; path=PKGDIR))
         Pkg.instantiate()
         include("ppl/runtests.jl")

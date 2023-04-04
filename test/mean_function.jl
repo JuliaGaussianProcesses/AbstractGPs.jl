@@ -20,7 +20,7 @@
     ]
         for x in [x1, xD_colvecs, xD_rowvecs]
             m = testcase.mean_function
-            @test AbstractGPs._map_meanfunction(m, x) == testcase.calc_expected(x)
+            @test mean_vector(m, x) == testcase.calc_expected(x)
             differentiable_mean_function_tests(rng, m, x)
         end
     end
