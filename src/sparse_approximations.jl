@@ -252,11 +252,9 @@ function approx_log_evidence(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 end
 
 elbo(vfe::VFE, fx, y) = approx_log_evidence(vfe, fx, y)  # TODO deprecate?
-elbo(dtc::DTC, fx, y) = approx_log_evidence(dtc, fx, y)  # TODO deprecation warning
 
 """
     approx_log_evidence(dtc::DTC, fx::FiniteGP, y::AbstractVector{<:Real})
-    dtc(d::DTC, fx::FiniteGP, y::AbstractVector{<:Real})  [deprecated]
 
 The Deterministic Training Conditional (DTC) [1]. `y` are observations of `fx`, and `v.z`
 are inducing points.
@@ -286,8 +284,6 @@ function approx_log_evidence(dtc::DTC, fx::FiniteGP, y::AbstractVector{<:Real})
     dtc_objective, _ = _compute_intermediates(fx, y, dtc.fz)
     return dtc_objective
 end
-
-dtc(vfe::Union{VFE,DTC}, fx, y) = approx_log_evidence(vfe, fx, y)  # TODO deprecation warning
 
 # Factor out computations of `approx_log_evidence` common to `VFE` and `DTC`
 function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
