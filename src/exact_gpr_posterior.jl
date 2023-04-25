@@ -3,6 +3,12 @@ struct PosteriorGP{Tprior,Tdata} <: AbstractGP
     data::Tdata
 end
 
+struct ExactGP end
+
+posterior(::ExactGP, fx::FiniteGP, y::AbstractVector{<:Real}) = posterior(fx, y)
+
+approx_log_evidence(::ExactGP, fx::FiniteGP, y::AbstractVector{<:Real}) = logpdf(fx, y)
+
 """
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
 
