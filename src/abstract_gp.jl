@@ -105,12 +105,10 @@ or `lfx.fx.f`), given the observations `y` corresponding to the process's
 finite projection (`fx` or `lfx`).
 
 In the two-argument form, this describes exact GP regression with `y` observed
-under a Gaussian likelihood.
+under a Gaussian likelihood, and returns a `PosteriorGP`.
 
 In the three-argument form, the first argument specifies the approximation to
-be used (e.g. `VFE` or defined in other packages such as ApproximateGPs.jl).
-
-In any case, the implementation should return an AbstractGP object that can be
-used to evaluate the GP statistics such as `mean` and `cov`.
+be used (e.g. `VFE` or defined in other packages such as ApproximateGPs.jl),
+and returns an `ApproxPosteriorGP`.
 """
 function posterior end
