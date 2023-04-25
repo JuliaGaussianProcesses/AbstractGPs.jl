@@ -6,7 +6,7 @@ end
 """
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
 
-Construct the posterior distribution over `fx.f` given observations `y` at `x` made under
+Construct the posterior distribution over `fx.f` given observations `y` at `fx.x` made under
 noise `fx.Σy`. This is another `AbstractGP` object. See chapter 2 of [1] for a recap on
 exact inference in GPs. This posterior process has mean function
 ```julia
