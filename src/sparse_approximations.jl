@@ -85,7 +85,9 @@ Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain 
 set of pseudo-points.
 """
 function update_posterior(
-    f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}}, fx::FiniteGP, y::AbstractVector{<:Real}
+    f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}},
+    fx::FiniteGP,
+    y::AbstractVector{<:Real},
 )
     @assert f_post_approx.prior === fx.f
 
@@ -168,7 +170,9 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}}, fz
         x=f_post_approx.data.x,
         Σy=f_post_approx.data.Σy,
     )
-    return ApproxPosteriorGP(_update_approx(f_post_approx.approx, fz_new), f_post_approx.prior, cache)
+    return ApproxPosteriorGP(
+        _update_approx(f_post_approx.approx, fz_new), f_post_approx.prior, cache
+    )
 end
 
 _update_approx(vfe::VFE, fz_new::FiniteGP) = VFE(fz_new)
@@ -190,7 +194,9 @@ function Statistics.var(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVecto
     return var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector, y::AbstractVector)
+function Statistics.cov(
+    f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector, y::AbstractVector
+)
     A_zx = f.data.U' \ cov(f.prior, inducing_points(f), x)
     A_zy = f.data.U' \ cov(f.prior, inducing_points(f), y)
     return cov(f.prior, x, y) - A_zx'A_zy + Xt_invA_Y(A_zx, f.data.Λ_ε, A_zy)
