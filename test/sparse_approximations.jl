@@ -94,7 +94,8 @@
             @test approx_log_evidence(ApproxType(f(x)), fx, y) ≈ logpdf(fx, y)
 
             if ApproxType === VFE
-                @test elbo(ApproxType(f(x)), fx, y) == approx_log_evidence(ApproxType(f(x)), fx, y)
+                @test elbo(ApproxType(f(x)), fx, y) ==
+                    approx_log_evidence(ApproxType(f(x)), fx, y)
                 @test elbo(ApproxType(f(x .+ randn(rng, N_cond))), fx, y) < logpdf(fx, y)
             end
         end
