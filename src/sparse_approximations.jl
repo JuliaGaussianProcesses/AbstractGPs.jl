@@ -251,7 +251,7 @@ function approx_log_evidence(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
     return dtc_objective - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
 end
 
-elbo(vfe::VFE, fx, y) = approx_log_evidence(vfe, fx, y)  # TODO deprecate?
+elbo(vfe::VFE, fx, y) = approx_log_evidence(vfe, fx, y)
 
 """
     approx_log_evidence(dtc::DTC, fx::FiniteGP, y::AbstractVector{<:Real})
@@ -267,11 +267,11 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=256);
 
-julia> v = VFE(f(z));
+julia> d = DTC(f(z));
 
 julia> y = rand(f(x, 0.1));
 
-julia> isapprox(dtc(v, f(x, 0.1), y), logpdf(f(x, 0.1), y); atol=1e-6, rtol=1e-6)
+julia> isapprox(approx_log_evidence(d, f(x, 0.1), y), logpdf(f(x, 0.1), y); atol=1e-6, rtol=1e-6)
 true
 ```
 
