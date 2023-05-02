@@ -7,7 +7,9 @@ struct ExactInference end
 
 posterior(::ExactInference, fx::FiniteGP, y::AbstractVector{<:Real}) = posterior(fx, y)
 
-approx_log_evidence(::ExactInference, fx::FiniteGP, y::AbstractVector{<:Real}) = logpdf(fx, y)
+function approx_log_evidence(::ExactInference, fx::FiniteGP, y::AbstractVector{<:Real})
+    return logpdf(fx, y)
+end
 
 """
     posterior(fx::FiniteGP, y::AbstractVector{<:Real})
