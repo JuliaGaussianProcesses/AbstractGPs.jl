@@ -85,3 +85,30 @@ for (m, f) in [
         )
     end
 end
+
+"""
+    approx_log_evidence(approx::<Approximation>, lfx::LatentFiniteGP, ys)
+
+Compute an approximation to the log of the marginal likelihood (also known as
+"evidence") under the given `approx`imation to the posterior. The return value
+of `approx_log_evidence` can be used to optimise the hyperparameters of `lfx`.
+"""
+function approx_log_evidence end
+
+"""
+    posterior(fx::FiniteGP, y::AbstractVector{<:Real})
+    posterior(approx::<Approximation>, fx::FiniteGP, y::AbstractVector{<:Real})
+    posterior(approx::<Approximation>, lfx::LatentFiniteGP, y::AbstractVector)
+
+Construct the posterior distribution over the latent Gaussian process (`fx.f`
+or `lfx.fx.f`), given the observations `y` corresponding to the process's
+finite projection (`fx` or `lfx`).
+
+In the two-argument form, this describes exact GP regression with `y` observed
+under a Gaussian likelihood, and returns a `PosteriorGP`.
+
+In the three-argument form, the first argument specifies the approximation to
+be used (e.g. `VFE` or defined in other packages such as ApproximateGPs.jl),
+and returns an `ApproxPosteriorGP`.
+"""
+function posterior end

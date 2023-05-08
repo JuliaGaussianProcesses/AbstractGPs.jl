@@ -13,7 +13,14 @@ struct VFE{Tfz<:FiniteGP}
     fz::Tfz
 end
 
-const DTC = VFE
+"""
+    DTC(fz::FiniteGP)
+
+Similar to `VFE`, but uses a different objective for `approx_log_evidence`.
+"""
+struct DTC{Tfz<:FiniteGP}
+    fz::Tfz
+end
 
 struct ApproxPosteriorGP{Tapprox,Tprior,Tdata} <: AbstractGP
     approx::Tapprox
@@ -48,7 +55,7 @@ true
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-function posterior(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+function posterior(vfe::Union{VFE,DTC}, fx::FiniteGP, y::AbstractVector{<:Real})
     @assert vfe.fz.f === fx.f
 
     U_y = _cholesky(_symmetric(fx.Σy)).U
@@ -69,7 +76,7 @@ end
 
 """
     function update_posterior(
-        f_post_approx::ApproxPosteriorGP{<:VFE},
+        f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}},
         fx::FiniteGP,
         y::AbstractVector{<:Real}
     )
@@ -78,7 +85,9 @@ Update the `ApproxPosteriorGP` given a new set of observations. Here, we retain 
 set of pseudo-points.
 """
 function update_posterior(
-    f_post_approx::ApproxPosteriorGP{<:VFE}, fx::FiniteGP, y::AbstractVector{<:Real}
+    f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}},
+    fx::FiniteGP,
+    y::AbstractVector{<:Real},
 )
     @assert f_post_approx.prior === fx.f
 
@@ -111,14 +120,14 @@ end
 
 """
     function update_posterior(
-        f_post_approx::ApproxPosteriorGP{<:VFE},
+        f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}},
         z::FiniteGP,
     )
 
 Update the `ApproxPosteriorGP` given a new set of pseudo-points to append to the existing 
 set of pseudo-points.
 """
-function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
+function update_posterior(f_post_approx::ApproxPosteriorGP{<:Union{VFE,DTC}}, fz::FiniteGP)
     @assert f_post_approx.prior === fz.f
 
     z_old = inducing_points(f_post_approx)
@@ -161,48 +170,56 @@ function update_posterior(f_post_approx::ApproxPosteriorGP{<:VFE}, fz::FiniteGP)
         x=f_post_approx.data.x,
         Σy=f_post_approx.data.Σy,
     )
-    return ApproxPosteriorGP(VFE(fz_new), f_post_approx.prior, cache)
+    return ApproxPosteriorGP(
+        _update_approx(f_post_approx.approx, fz_new), f_post_approx.prior, cache
+    )
 end
+
+_update_approx(vfe::VFE, fz_new::FiniteGP) = VFE(fz_new)
+_update_approx(dtc::DTC, fz_new::FiniteGP) = DTC(fz_new)
 
 # AbstractGP interface implementation.
 
-function Statistics.mean(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+function Statistics.mean(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector)
     return mean(f.prior, x) + cov(f.prior, x, inducing_points(f)) * f.data.α
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+function Statistics.cov(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     return cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+function Statistics.var(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     return var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
 end
 
-function Statistics.cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector, y::AbstractVector)
+function Statistics.cov(
+    f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector, y::AbstractVector
+)
     A_zx = f.data.U' \ cov(f.prior, inducing_points(f), x)
     A_zy = f.data.U' \ cov(f.prior, inducing_points(f), y)
     return cov(f.prior, x, y) - A_zx'A_zy + Xt_invA_Y(A_zx, f.data.Λ_ε, A_zy)
 end
 
-function StatsBase.mean_and_cov(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+function StatsBase.mean_and_cov(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     C_post = cov(f.prior, x) - At_A(A) + Xt_invA_X(f.data.Λ_ε, A)
     return m_post, C_post
 end
 
-function StatsBase.mean_and_var(f::ApproxPosteriorGP{<:VFE}, x::AbstractVector)
+function StatsBase.mean_and_var(f::ApproxPosteriorGP{<:Union{VFE,DTC}}, x::AbstractVector)
     A = f.data.U' \ cov(f.prior, inducing_points(f), x)
     m_post = mean(f.prior, x) + A' * f.data.m_ε
     c_post = var(f.prior, x) - diag_At_A(A) + diag_Xt_invA_X(f.data.Λ_ε, A)
     return m_post, c_post
 end
 
-inducing_points(f::ApproxPosteriorGP{<:VFE}) = f.approx.fz.x
+inducing_points(f::ApproxPosteriorGP{<:Union{VFE,DTC}}) = f.approx.fz.x
 
 """
+    approx_log_evidence(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
     elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
 
 The Titsias Evidence Lower BOund (ELBO) [1]. `y` are observations of `fx`, and `v.z`
@@ -228,14 +245,16 @@ true
 processes". In: Proceedings of the Twelfth International Conference on Artificial
 Intelligence and Statistics. 2009.
 """
-function elbo(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+function approx_log_evidence(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
     @assert vfe.fz.f === fx.f
-    _dtc, A = _compute_intermediates(fx, y, vfe.fz)
-    return _dtc - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
+    dtc_objective, A = _compute_intermediates(fx, y, vfe.fz)
+    return dtc_objective - (tr_Cf_invΣy(fx, fx.Σy) - sum(abs2, A)) / 2
 end
 
+elbo(vfe::VFE, fx, y) = approx_log_evidence(vfe, fx, y)
+
 """
-    dtc(v::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
+    approx_log_evidence(dtc::DTC, fx::FiniteGP, y::AbstractVector{<:Real})
 
 The Deterministic Training Conditional (DTC) [1]. `y` are observations of `fx`, and `v.z`
 are inducing points.
@@ -248,11 +267,11 @@ julia> x = randn(1000);
 
 julia> z = range(-5.0, 5.0; length=256);
 
-julia> v = VFE(f(z));
+julia> d = DTC(f(z));
 
 julia> y = rand(f(x, 0.1));
 
-julia> isapprox(dtc(v, f(x, 0.1), y), logpdf(f(x, 0.1), y); atol=1e-6, rtol=1e-6)
+julia> isapprox(approx_log_evidence(d, f(x, 0.1), y), logpdf(f(x, 0.1), y); atol=1e-6, rtol=1e-6)
 true
 ```
 
@@ -260,13 +279,13 @@ true
 Sparse Gaussian Process Regression". In: Proceedings of the Ninth International Workshop on
 Artificial Intelligence and Statistics. 2003
 """
-function dtc(vfe::VFE, fx::FiniteGP, y::AbstractVector{<:Real})
-    @assert vfe.fz.f === fx.f
-    _dtc, _ = _compute_intermediates(fx, y, vfe.fz)
-    return _dtc
+function approx_log_evidence(dtc::DTC, fx::FiniteGP, y::AbstractVector{<:Real})
+    @assert dtc.fz.f === fx.f
+    dtc_objective, _ = _compute_intermediates(fx, y, dtc.fz)
+    return dtc_objective
 end
 
-# Factor out computations common to the `elbo` and `dtc`.
+# Factor out computations of `approx_log_evidence` common to `VFE` and `DTC`
 function _compute_intermediates(fx::FiniteGP, y::AbstractVector{<:Real}, fz::FiniteGP)
     length(fx) == length(y) || throw(
         DimensionMismatch(
