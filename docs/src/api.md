@@ -172,6 +172,12 @@ mean_vector
 We provide standard mean functions like [`ZeroMean`](@ref) and [`ConstMean`](@ref)
 as well as [`CustomMean`](@ref) to simply wrap a function.
 
+```@docs
+ZeroMean
+ConstMean
+CustomMean
+```
+
 ## Testing Utilities
 
 AbstractGPs provides several consistency tests in the `AbstractGPs.TestUtils` module.
