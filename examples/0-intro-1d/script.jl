@@ -190,7 +190,7 @@ integrator = Leapfrog(initial_ϵ)
 # - generalised No-U-Turn criteria, and
 # - windowed adaption for step-size and diagonal mass matrix
 
-proposal = NUTS{MultinomialTS,GeneralisedNoUTurn}(integrator)
+proposal = HMCKernel(Trajectory{MultinomialTS}(integrator, GeneralisedNoUTurn()))
 adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
 #md nothing #hide
 
