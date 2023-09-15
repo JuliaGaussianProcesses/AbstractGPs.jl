@@ -165,7 +165,7 @@ We define an API for prior mean functions with the abstract type [`MeanFunction`
 and the [`mean_vector`](@ref) function.
 
 ```@docs
-MeanFunction
+AbstractGPs.MeanFunction
 mean_vector
 ```
 
