@@ -75,7 +75,7 @@ logpdf(fx, y_train)
 # log-likelihood of the test dataset.
 
 p_fx = posterior(fx, y_train)
-logpdf(p_fx(x_test), y_test)
+logpdf(p_fx(x_test, 0.1), y_test)
 
 # We plot the posterior Gaussian process (its mean and a ribbon of 2 standard deviations
 # around it) on a grid along with the observations.
@@ -232,7 +232,7 @@ function gp_posterior(x, y, p)
     return posterior(f(x, 0.1), y)
 end
 
-mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test, 0.1), y_test) for p in samples)
 
 # We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
@@ -422,7 +422,7 @@ opt_kernel =
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
 ap = posterior(VFE(opt_f(logistic.(opt.minimizer[3:end]), jitter)), opt_fx, y_train)
-logpdf(ap(x_test), y_test)
+logpdf(ap(x_test, 0.1), y_test)
 
 # We visualize the approximate posterior with optimized parameters.
 
@@ -498,7 +498,7 @@ opt_kernel =
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, 0.1)
 opt_p_fx = posterior(opt_fx, y_train)
-logpdf(opt_p_fx(x_test), y_test)
+logpdf(opt_p_fx(x_test, 0.1), y_test)
 
 # We visualize the posterior with optimized parameters.
 
