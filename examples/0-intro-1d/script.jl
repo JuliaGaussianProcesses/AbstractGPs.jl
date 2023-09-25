@@ -65,17 +65,18 @@ f = GP(Matern52Kernel())
 #md nothing #hide
 
 # We create a finite dimensional projection at the inputs of the training dataset
-# observed under Gaussian noise with variance $\sigma^2 = 0.1$, and compute the
+# observed under Gaussian noise with variance $noise_var = 0.1$, and compute the
 # log-likelihood of the outputs of the training dataset.
 
-fx = f(x_train, 0.1)
+noise_var = 0.1
+fx = f(x_train, noise_var)
 logpdf(fx, y_train)
 
 # We compute the posterior Gaussian process given the training data, and calculate the
 # log-likelihood of the test dataset.
 
 p_fx = posterior(fx, y_train)
-logpdf(p_fx(x_test, 0.1), y_test)
+logpdf(p_fx(x_test, noise_var), y_test)
 
 # We plot the posterior Gaussian process (its mean and a ribbon of 2 standard deviations
 # around it) on a grid along with the observations.
@@ -111,7 +112,7 @@ function gp_loglikelihood(x, y)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, noise_var)
         return logpdf(fx, y)
     end
     return loglikelihood
@@ -229,10 +230,10 @@ vline!(mean_samples'; linewidth=2)
 function gp_posterior(x, y, p)
     kernel = softplus(p[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(p[2])))
     f = GP(kernel)
-    return posterior(f(x, 0.1), y)
+    return posterior(f(x, noise_var), y)
 end
 
-mean(logpdf(gp_posterior(x_train, y_train, p)(x_test, 0.1), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test, noise_var), y_test) for p in samples)
 
 # We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
@@ -385,7 +386,7 @@ function objective_function(x, y)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, noise_var)
         z = logistic.(params[3:end])
         approx = VFE(f(z, jitter))
         return -elbo(approx, fx, y)
@@ -420,9 +421,9 @@ opt_kernel =
     softplus(opt.minimizer[1]) *
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
-opt_fx = opt_f(x_train, 0.1)
+opt_fx = opt_f(x_train, noise_var)
 ap = posterior(VFE(opt_f(logistic.(opt.minimizer[3:end]), jitter)), opt_fx, y_train)
-logpdf(ap(x_test, 0.1), y_test)
+logpdf(ap(x_test, noise_var), y_test)
 
 # We visualize the approximate posterior with optimized parameters.
 
@@ -460,7 +461,7 @@ function loss_function(x, y)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, noise_var)
         return -logpdf(fx, y)
     end
     return negativelogmarginallikelihood
@@ -496,9 +497,9 @@ opt_kernel =
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 
 opt_f = GP(opt_kernel)
-opt_fx = opt_f(x_train, 0.1)
+opt_fx = opt_f(x_train, noise_var)
 opt_p_fx = posterior(opt_fx, y_train)
-logpdf(opt_p_fx(x_test, 0.1), y_test)
+logpdf(opt_p_fx(x_test, noise_var), y_test)
 
 # We visualize the posterior with optimized parameters.
 
