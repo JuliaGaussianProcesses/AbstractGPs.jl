@@ -35,7 +35,7 @@ makedocs(;
         "Concrete Features" => "concrete_features.md",
         "Examples" => JuliaGPsDocs.find_generated_examples(AbstractGPs),
     ],
-    #strict=true,
+    warnonly=true,
     checkdocs=:exports,
     doctestfilters=JuliaGPsDocs.DOCTEST_FILTERS,
 )
