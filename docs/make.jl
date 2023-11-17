@@ -29,9 +29,9 @@ makedocs(;
     sitename="AbstractGPs.jl",
     format=Documenter.HTML(;
         size_threshold_ignore=[
-            "../examples/0-intro-1d/index.md",
-            "../examples/1-mauna-loa/index.md",
-            "../examples/2-deep-kernel-learning/index.md"
+            "examples/0-intro-1d/index.md",
+            "examples/1-mauna-loa/index.md",
+            "examples/2-deep-kernel-learning/index.md"
         ]
     ),
     modules=[AbstractGPs],
