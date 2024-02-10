@@ -100,7 +100,7 @@ plotdata()
 # We define a couple of helper functions to simplify the kernel construction:
 
 SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
-Per(θ) = with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
+Per(θ) = with_lengthscale(PeriodicKernel(; r=[θ.ℓ / 2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 #md nothing #hide
 
