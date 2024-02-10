@@ -100,9 +100,7 @@ plotdata()
 # We define a couple of helper functions to simplify the kernel construction:
 
 SE(θ) = θ.σ^2 * with_lengthscale(SqExponentialKernel(), θ.ℓ)
-## PeriodicKernel is broken, see https://github.com/JuliaGaussianProcesses/KernelFunctions.jl/issues/389
-##Per(θ) = with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
-Per(θ) = with_lengthscale(SqExponentialKernel(), θ.ℓ) ∘ PeriodicTransform(1 / θ.p)
+Per(θ) = with_lengthscale(PeriodicKernel(; r=[θ.ℓ/2]), θ.p)  # NOTE- discrepancy with GaussianProcesses.jl
 RQ(θ) = θ.σ^2 * with_lengthscale(RationalQuadraticKernel(; α=θ.α), θ.ℓ)
 #md nothing #hide
 
