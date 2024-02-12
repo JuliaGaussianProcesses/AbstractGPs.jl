@@ -10,7 +10,7 @@ jobs:
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.genmat1.outputs.matrix || steps.genmat2.outputs.matrix }}
+      matrix: ${{ steps.genmat.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@latest
@@ -19,7 +19,9 @@ jobs:
           arch: x64
       - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
       - run: julia -e 'using Pkg; pkg"add AbstractGPs#master"'
-      - run: |
+      - if: ${{ always() }}
+        id: genmat
+        run: |
           echo '::echo::on'
           julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; projfile = joinpath(pathof(AbstractGPs) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_all_compats_combinations(projfile)))'
   test:
