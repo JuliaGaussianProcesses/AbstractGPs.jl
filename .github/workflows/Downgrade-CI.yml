@@ -19,11 +19,11 @@ jobs:
           arch: x64
       - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
       - run: julia -e 'using Pkg; pkg"add AbstractGPs#master"'
-      - if: ${{ always() }}
+      - if: 'two' == 'two'
         id: genmat
         run: |
           echo '::echo::on'
-          julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; projfile = joinpath(pathof(AbstractGPs) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_all_compats_combinations(projfile)))'
+          julia -e 'import CompatHelperLocal as CHL; import ${{ github.event.inputs.package }}; projfile = joinpath(pathof(${{ github.event.inputs.package }}) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_compats_combinations(projfile, only_resolveable=true)))'
   test:
     needs: generate-matrix
     runs-on: ubuntu-latest
