@@ -19,7 +19,7 @@ jobs:
           arch: x64
       - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
       - run: julia -e 'using Pkg; pkg"add AbstractGPs#master"'
-      - if: 'two' == 'two'
+      - if: ${{ always() }}
         id: genmat
         run: |
           echo '::echo::on'
