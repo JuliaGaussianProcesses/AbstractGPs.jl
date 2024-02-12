@@ -19,14 +19,7 @@ jobs:
           arch: x64
       - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
       - run: julia -e 'using Pkg; pkg"add AbstractGPs#master"'
-      - if: github.event.inputs.mode == 'two'
-        id: genmat1
-        run: |
-          echo '::echo::on'
-          julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; projfile = joinpath(pathof(AbstractGPs) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_compats_combinations(projfile, only_resolveable=true)))'
-      - if: github.event.inputs.mode == 'all'
-        id: genmat2
-        run: |
+      - run: |
           echo '::echo::on'
           julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; projfile = joinpath(pathof(AbstractGPs) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_all_compats_combinations(projfile)))'
   test:
@@ -39,8 +32,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@latest
         with:
-          version: ${{ github.event.inputs.julia-version }}
-          arch: ${{ github.event.inputs.arch }}
+          version: 1
+          arch: x64
       - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
       - run: julia -e 'using Pkg; pkg"add AbstractGPs#master"'
       - run: julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; CHL.test_compats_combinations(AbstractGPs, [${{ matrix.compats }}])'
