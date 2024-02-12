@@ -1,0 +1,65 @@
+name: Downgrade CI
+
+on: 
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode: all/two'
+        required: true
+      package:
+        description: 'Package name'
+        required: true
+      revision:
+        description: 'Package revision'
+        required: false
+      julia-version:
+        description: 'Julia version'
+        required: false
+        default: 1
+      os:
+        description: 'OS: ubuntu-latest, windows-latest, macOS-latest'
+        required: false
+        default: ubuntu-latest
+      arch:
+        description: 'Arch: x86, x64'
+        required: false
+        default: x64
+
+jobs:
+  generate-matrix:
+    runs-on: ${{ github.event.inputs.os }}
+    outputs:
+      matrix: ${{ steps.genmat1.outputs.matrix || steps.genmat2.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ github.event.inputs.julia-version }}
+          arch: ${{ github.event.inputs.arch }}
+      - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
+      - run: julia -e 'using Pkg; pkg"add ${{ github.event.inputs.package }}${{ github.event.inputs.revision }}"'
+      - if: github.event.inputs.mode == 'two'
+        id: genmat1
+        run: |
+          echo '::echo::on'
+          julia -e 'import CompatHelperLocal as CHL; import ${{ github.event.inputs.package }}; projfile = joinpath(pathof(${{ github.event.inputs.package }}) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_compats_combinations(projfile, only_resolveable=true)))'
+      - if: github.event.inputs.mode == 'all'
+        id: genmat2
+        run: |
+          echo '::echo::on'
+          julia -e 'import CompatHelperLocal as CHL; import ${{ github.event.inputs.package }}; projfile = joinpath(pathof(${{ github.event.inputs.package }}) |> dirname |> dirname, "Project.toml"); println(CHL.compats_combinations_to_gha_string(CHL.get_all_compats_combinations(projfile)))'
+  test:
+    needs: generate-matrix
+    runs-on: ${{ github.event.inputs.os }}
+    strategy:
+      matrix: ${{fromJSON(needs.generate-matrix.outputs.matrix)}}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ github.event.inputs.julia-version }}
+          arch: ${{ github.event.inputs.arch }}
+      - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
+      - run: julia -e 'using Pkg; pkg"add ${{ github.event.inputs.package }}${{ github.event.inputs.revision }}"'
+      - run: julia -e 'import CompatHelperLocal as CHL; import ${{ github.event.inputs.package }}; CHL.test_compats_combinations(${{ github.event.inputs.package }}, [${{ matrix.compats }}])'
