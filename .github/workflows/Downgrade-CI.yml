@@ -47,7 +47,8 @@ jobs:
       matrix:
         version: 
           - '1'
-        arch: x64
+        arch: 
+          - x64
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
