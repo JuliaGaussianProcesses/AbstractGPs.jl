@@ -56,6 +56,6 @@ jobs:
           version: ${{ matrix.version }}
       - uses: cjdoris/julia-downgrade-compat-action@v1
         with:
-          skip: Pkg,TOML,Statistics,Random,LinearAlgebra
+          skip: Pkg,TOML,Statistics,Random,LinearAlgebra,Test
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
