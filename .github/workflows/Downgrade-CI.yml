@@ -45,7 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: '1'
+        version: 
+          - '1'
         arch: x64
     steps:
       - uses: actions/checkout@v4
