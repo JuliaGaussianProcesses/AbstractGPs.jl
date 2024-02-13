@@ -20,7 +20,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 ChainRulesCore = "1.16"
-Distributions = "0.25"
+Distributions = "0.25.53"
 FillArrays = "0.7, 0.8, 0.9, 0.10, 0.11, 0.12, 0.13, 1"
 IrrationalConstants = "0.1.1, 0.2"
 KernelFunctions = "0.10.39"
