@@ -41,7 +41,7 @@ jobs:
       - run: julia -e 'import Pkg; Pkg.add(path=".")'
       - run: julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; CHL.test_compats_combinations(AbstractGPs, [${{ matrix.compats }}])'
   test-simple:
-    if: ${{ ! contains(github.event.pull_request.labels.*.name, 'downgrade-ci') }}
+    if: contains(github.event.pull_request.labels.*.name, 'downgrade-ci')
     runs-on: ubuntu-latest
     strategy:
       matrix:
