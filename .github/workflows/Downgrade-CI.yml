@@ -8,6 +8,7 @@ on:
 
 jobs:
   generate-matrix:
+    if: contains(github.event.pull_request.labels.*.name, 'downgrade-ci')
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.genmat.outputs.matrix }}
@@ -39,3 +40,20 @@ jobs:
       - run: julia -e 'using Pkg; pkg"add CompatHelperLocal"'
       - run: julia -e 'using Pkg; pkg"add ."'
       - run: julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; CHL.test_compats_combinations(AbstractGPs, [${{ matrix.compats }}])'
+  test-simple:
+    if: ${{ ! contains(github.event.pull_request.labels.*.name, 'downgrade-ci') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: 1
+        arch: x64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.version }}
+      - uses: cjdoris/julia-downgrade-compat-action@v1
+        with:
+          skip: Pkg,TOML
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
