@@ -19,7 +19,7 @@ jobs:
           version: '1'
           arch: x64
       - run: julia -e 'import Pkg; Pkg.add("CompatHelperLocal")'
-      - run: julia -e 'import Pkg; Pkg.add(".")'
+      - run: julia -e 'import Pkg; Pkg.add(path=".")'
       - if: ${{ always() }}
         id: genmat
         run: |
@@ -38,7 +38,7 @@ jobs:
           version: '1'
           arch: x64
       - run: julia -e 'import Pkg; Pkg.add("CompatHelperLocal")'
-      - run: julia -e 'import Pkg; Pkg.add(".")'
+      - run: julia -e 'import Pkg; Pkg.add(path=".")'
       - run: julia -e 'import CompatHelperLocal as CHL; import AbstractGPs; CHL.test_compats_combinations(AbstractGPs, [${{ matrix.compats }}])'
   test-simple:
     if: ${{ ! contains(github.event.pull_request.labels.*.name, 'downgrade-ci') }}
