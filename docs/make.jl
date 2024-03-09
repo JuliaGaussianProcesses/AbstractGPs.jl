@@ -27,7 +27,13 @@ DocMeta.setdocmeta!(
 
 makedocs(;
     sitename="AbstractGPs.jl",
-    format=Documenter.HTML(),
+    format=Documenter.HTML(;
+        size_threshold_ignore=[
+            "examples/0-intro-1d/index.md",
+            "examples/1-mauna-loa/index.md",
+            "examples/2-deep-kernel-learning/index.md",
+        ],
+    ),
     modules=[AbstractGPs],
     pages=[
         "Home" => "index.md",
@@ -35,7 +41,7 @@ makedocs(;
         "Concrete Features" => "concrete_features.md",
         "Examples" => JuliaGPsDocs.find_generated_examples(AbstractGPs),
     ],
-    #strict=true,
+    warnonly=true,
     checkdocs=:exports,
     doctestfilters=JuliaGPsDocs.DOCTEST_FILTERS,
 )
