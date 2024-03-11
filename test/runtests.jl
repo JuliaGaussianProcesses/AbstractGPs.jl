@@ -17,6 +17,7 @@ using AbstractGPs:
     inducing_points,
     TestUtils
 
+using Aqua
 using Documenter
 using Distributions: MvNormal, PDMat, loglikelihood, Distributions
 using FillArrays
@@ -39,6 +40,11 @@ include("test_util.jl")
 
 @testset "AbstractGPs" begin
     if GROUP == "All" || GROUP == "AbstractGPs"
+        @testset "Code quality (Aqua.jl)" begin
+            Aqua.test_all(AbstractGPs; ambiguities=false)
+            # Ref https://github.com/JuliaTesting/Aqua.jl/issues/77
+            Aqua.test_ambiguities(AbstractGPs; recursive=false)
+        end
         @testset "util" begin
             include("util/common_covmat_ops.jl")
             include("util/plotting.jl")
