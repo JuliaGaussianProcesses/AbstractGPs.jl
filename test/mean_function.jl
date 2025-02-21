@@ -24,4 +24,34 @@
             differentiable_mean_function_tests(rng, m, x)
         end
     end
+
+    @testset "ColVecs & RowVecs" begin
+        m = custom_mean_testcase.mean_function
+
+        @test mean_vector(m, xD_colvecs) == map(foo_mean, eachcol(xD_colvecs.X))
+        @test mean_vector(m, xD_rowvecs) == map(foo_mean, eachrow(xD_rowvecs.X))
+    end
+
+    # This test fails without the specialized methods
+    #   `mean_vector(m::CustomMean, x::ColVecs)`
+    #   `mean_vector(m::CustomMean, x::RowVecs)`
+    @testset "Zygote gradients" begin
+        X = [1.;; 2.;; 3.;;]
+        y = [1., 2., 3.]
+        foo_mean = x -> sum(abs2, x)
+
+        function construct_finite_gp(X, lengthscale, noise)
+            mean = CustomMean(foo_mean)
+            kernel = with_lengthscale(Matern52Kernel(), lengthscale)
+            return GP(mean, kernel)(X, noise)
+        end
+
+        function loglike(lengthscale, noise)
+            gp = construct_finite_gp(X, lengthscale, noise)
+            return logpdf(gp, y)
+        end
+
+        @test Zygote.gradient(n -> loglike(1., n), 1.)[1] isa Real
+        @test Zygote.gradient(l -> loglike(l, 1.), 1.)[1] isa Real    
+    end
 end
