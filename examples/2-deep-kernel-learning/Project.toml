@@ -12,7 +12,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [compat]
 AbstractGPs = "0.3,0.4,0.5"
 Distributions = "0.25"
-Flux = "0.12, 0.13, 0.14"
+Flux = "0.12, 0.13, 0.14, 0.15"
 KernelFunctions = "0.10"
 Literate = "2"
 MLDataUtils = "0.5"
