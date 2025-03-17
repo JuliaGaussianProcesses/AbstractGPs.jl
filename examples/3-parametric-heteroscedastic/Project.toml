@@ -13,7 +13,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [compat]
 AbstractGPs = "0.5"
 AbstractGPsMakie = "0.2"
-CairoMakie = "0.7, 0.8, 0.9, 0.10, 0.11"
+CairoMakie = "0.7, 0.8, 0.9, 0.10, 0.11, 0.12"
 KernelFunctions = "0.10"
 Literate = "2"
 Optim = "1"
