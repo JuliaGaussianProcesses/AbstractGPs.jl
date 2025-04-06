@@ -13,6 +13,7 @@ using RecipesBase
 using IrrationalConstants: log2π
 
 using KernelFunctions: ColVecs, RowVecs
+using KernelSpectralDensities
 
 using ChainRulesCore: ChainRulesCore
 
@@ -33,6 +34,7 @@ export rand!,
     posterior,
     update_posterior
 export ColVecs, RowVecs
+export GPSampler, CholeskySampling, Conditional, Independent, RFFSampling, PathwiseSampling
 
 # Various bits of utility functionality.
 include("util/common_covmat_ops.jl")
@@ -55,6 +57,9 @@ include("sparse_approximations.jl")
 
 # LatentGP and LatentFiniteGP objects to accommodate GPs with non-Gaussian likelihoods.
 include("latent_gp.jl")
+
+# Different sampling methods
+include("sampling.jl")
 
 # Plotting utilities.
 include("util/plotting.jl")
