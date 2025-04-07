@@ -1,5 +1,5 @@
 @testset "Sampling" begin
-    rng = Xoshiro(123456)
+    rng = Xoshiro(1234)
 
     nx = 8
     x1 = collect(range(0, 2; length=nx))
@@ -35,7 +35,7 @@
     @testset "Basic Functional" begin
         function test_basic_fun(gp, method)
             gps = GPSampler(gp, method)
-            gps1 = rand(gps)
+            gps1 = rand(rng, gps)
             @test gps1(0.4) isa Float64
             @test gps1([0.6, 0.7]) isa Vector{Float64}
         end
@@ -66,13 +66,13 @@
 
     # Evaluate sample all at once
     function oneshot_error(x, gp, gps, n)
-        resv = [rand(gps)(x) for _ in 1:n]
+        resv = [rand(rng, gps)(x) for _ in 1:n]
         return eval_res(x, gp, resv)
     end
 
     # Evaluate samples one by one
     function onebyone(gpsampler, x)
-        gps = rand(gpsampler)
+        gps = rand(rng, gpsampler)
         y = [gps(xi) for xi in x]
         return y
     end

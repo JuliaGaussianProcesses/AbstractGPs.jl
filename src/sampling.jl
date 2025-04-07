@@ -26,9 +26,9 @@ Creates a sampler for the given `gp` using the specified `method`.
 ```jldoctest
 julia> f = GP(Matern32Kernel());
 
-julia> gps = GPSampler(f, CholeskySampling())
+julia> gps = GPSampler(f, CholeskySampling());
 
-julia> rand(gps)
+julia> rand(gps);
 ```   
 """
 struct GPSampler{F,S} <: Random.Sampler{GPSample}
