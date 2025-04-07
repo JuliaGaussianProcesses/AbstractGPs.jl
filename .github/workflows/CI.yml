@@ -53,7 +53,7 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         with:
-          coverage: ${{ matrix.version == '1' && matrix.os == 'ubuntu-latest' }}
+          coverage: ${{ matrix.version == '1.10' && matrix.os == 'ubuntu-latest' }}
         env:
           GROUP: AbstractGPs
       - uses: julia-actions/julia-processcoverage@v1
