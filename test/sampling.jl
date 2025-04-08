@@ -116,13 +116,12 @@
 
         @testset "WeightSpace" begin
             l = 80
+            wsp = RFFSampling(rng, l)
             @testset "Prior, DoubleRFF" begin
-                wsp = RFFSampling(l)
                 @test grid_test(g1, x, nv, wsp, oneshot_error)
                 @test grid_test(g1, x, nv, wsp, onebyone_error)
             end
             @testset "Posterior, DoubleRFF" begin
-                wsp = RFFSampling(l)
                 @test grid_test(pg1, x, nv, wsp, oneshot_error)
                 @test grid_test(pg1, x, nv, wsp, onebyone_error)
             end

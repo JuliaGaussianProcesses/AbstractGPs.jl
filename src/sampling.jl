@@ -162,11 +162,18 @@ Arguments:
 - `l`: Number of random Fourier features to use.
 - `rff_type`: Type of random Fourier features to use. Default is `DoubleRFF`.
 """
-struct RFFSampling{RFF} <: AbstractGPSamplingMethod
+struct RFFSampling{RFF,RNG} <: AbstractGPSamplingMethod
     l::Int
-    function RFFSampling(l, rff_type::Type{<:KernelSpectralDensities.AbstractRFF}=DoubleRFF)
-        return new{rff_type}(l)
+    rng::RNG
+    function RFFSampling(
+        rng, l; rff_type::Type{<:KernelSpectralDensities.AbstractRFF}=DoubleRFF
+    )
+        return new{rff_type,typeof(rng)}(l, rng)
     end
+end
+
+function RFFSampling(l; rff_type::Type{<:KernelSpectralDensities.AbstractRFF}=DoubleRFF)
+    return RFFSampling(Random.default_rng(), l; rff_type)
 end
 
 function (rffs::RFFSampling{RFF})(gp) where {RFF}
@@ -174,7 +181,7 @@ function (rffs::RFFSampling{RFF})(gp) where {RFF}
     # for now, hardcoding "1", later expand for multi-input
     S = SpectralDensity(prior.kernel, 1)
     # ToDo: add rng to RFF
-    rff = RFF(S, rffs.l)
+    rff = RFF(rffs.rng, S, rffs.l)
 
     ws = get_weight_distribution(gp, rff)
 
