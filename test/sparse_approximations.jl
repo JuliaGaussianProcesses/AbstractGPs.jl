@@ -108,7 +108,7 @@
             jitter = T(1e-12)
 
             @test elbo(ApproxType(f(x, jitter)), fx, y) isa T
-            @test dtc(ApproxType(f(x, jitter)), fx, y) isa T
+            @test approx_log_evidence(ApproxType(f(x, jitter)), fx, y) isa T
 
             post = posterior(ApproxType(f(x, jitter)), fx, y)
             p_fx = post(x, jitter)
