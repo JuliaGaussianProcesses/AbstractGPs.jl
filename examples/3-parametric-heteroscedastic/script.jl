@@ -12,74 +12,97 @@ using AbstractGPs
 using AbstractGPsMakie
 using CairoMakie
 using KernelFunctions
-using LinearAlgebra
-using Literate
 using Optim
 using ParameterHandling
-using Random
 using Zygote
 
-# Specify simple GP:
-build_gp(θ) = GP(0, θ.s * with_lengthscale(SEKernel(), θ.l));
+using LinearAlgebra
+using Random
+Random.seed!(42)  # setting the seed for reproducibility of this notebook
+#md nothing #hide
 
-# Observation variance is some scaling of $x^2$:
-observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(θ.σ² .* x .^ 2);
-
-# Specify hyperparameters:
-flat_init_params, unflatten = ParameterHandling.value_flatten((
-    s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
-));
-θ_init = unflatten(flat_init_params);
-
-# Build inputs:
-const x = range(0.0, 10.0; length=100);
-const y = rand(Xoshiro(123456), build_gp(θ_init)(x, observation_variance(θ_init, x)));
-
-# Specify objective function:
-function objective(θ)
-    f = build_gp(θ)
+# In this example we work with a simple GP with a Gaussian kernel and heteroscedastic observation variance.
+observation_variance(θ, x::AbstractVector{<:Real}) = Diagonal(0.01 .+ θ.σ² .* x .^ 2)
+function build_gpx(θ, x::AbstractVector{<:Real})
     Σ = observation_variance(θ, x)
-    return -logpdf(f(x, Σ), y)
+    return GP(0, θ.s * with_lengthscale(SEKernel(), θ.l))(x, Σ)
 end;
 
-# Optimise the hyperparameters. They've been initialised near the correct values, so
-# they ought not to deviate too far.
+# We specify the following hyperparameters:
+const flat_θ, unflatten = ParameterHandling.value_flatten((
+    s=positive(1.0), l=positive(3.0), σ²=positive(0.1)
+));
+θ = unflatten(flat_θ);
+
+# We generate some observations:
+const x = 0.0:0.1:10.0
+const y = rand(build_gpx(θ, x));
+
+# We specify the objective function:
+function objective(flat_θ)
+    θ = unflatten(flat_θ)
+    fx = build_gpx(θ, x)
+    return -logpdf(fx, y)
+end;
+
+# We use L-BFGS for optimising the objective function.
+# It is a first-order method and hence requires computing the gradient of the objective function.
+# We do not derive and implement the gradient function manually here but instead use reverse-mode automatic differentiation with Zygote.
+# When computing gradients with Zygote, the objective function is evaluated as well.
+# We can exploit this and [avoid re-evaluating the objective function](https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations) in such cases.
+function objective_and_gradient(F, G, flat_θ)
+    if G !== nothing
+        val_grad = Zygote.withgradient(objective, flat_θ)
+        copyto!(G, only(val_grad.grad))
+        if F !== nothing
+            return val_grad.val
+        end
+    end
+    if F !== nothing
+        return objective(flat_θ)
+    end
+    return nothing
+end;
+
+# We optimise the hyperparameters using initializations close to the values that the observations were generated with.
+flat_θ_init = flat_θ + 0.01 * randn(length(flat_θ))
 result = optimize(
-    objective ∘ unflatten,
-    θ -> only(Zygote.gradient(objective ∘ unflatten, θ)),
-    flat_init_params + 0.01 * randn(Xoshiro(123456), length(flat_init_params)),
+    Optim.only_fg!(objective_and_gradient),
+    flat_θ_init,
     LBFGS(;
         alphaguess=Optim.LineSearches.InitialStatic(; scaled=true),
         linesearch=Optim.LineSearches.BackTracking(),
     ),
-    Optim.Options(; iterations=4_000);
-    inplace=false,
-);
-θ_final = unflatten(result.minimizer);
+    Optim.Options(; show_every=100),
+)
 
-# Construct the posterior GP with the optimal model parameters:
-Σ_obs_final = observation_variance(θ_final, x);
-fx_final = build_gp(θ_final)(x, Σ_obs_final);
+# The optimal model parameters are:
+θ_final = unflatten(result.minimizer)
+
+# We compute the posterior GP with these optimal model parameters:
+fx_final = build_gpx(θ_final, x)
 f_post = posterior(fx_final, y);
 
-# Plot the results, making use of [AbstractGPsMakie](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl):
+# We visualize the results with [AbstractGPsMakie](https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl):
 using CairoMakie.Makie.ColorSchemes: Set1_4
 
-#! format: off
-set_theme!(
-    palette=(color=Set1_4,),
-    patchcolor=(Set1_4[2], 0.2),
-    Axis=(limits=((0, 10), nothing),),
-)
-#! format: on
-
-let
-    fig = Figure()
-    ax = Axis(fig[1, 1])
-    plot!(ax, x, f_post(x, Σ_obs_final); bandscale=3, label="posterior + noise", color=(:orange, 0.3))
-    plot!(ax, x, f_post(x, 1e-9); bandscale=3, label="posterior")
-    gpsample!(ax, x, f_post(x, 1e-9); samples=10, color=Set1_4[3])
-    scatter!(ax, x, y; label="y")
-    axislegend(ax)
-    fig
+with_theme(
+    Theme(;
+        palette=(color=Set1_4,),
+        patchcolor=(Set1_4[2], 0.2),
+        Axis=(limits=((0, 10), nothing),),
+    ),
+) do
+    plot(
+        x,
+        f_post(x, observation_variance(θ_final, x));
+        bandscale=3,
+        label="posterior + noise",
+        color=(:orange, 0.3),
+    )
+    plot!(x, f_post; bandscale=3, label="posterior")
+    gpsample!(x, f_post; samples=10, color=Set1_4[3])
+    scatter!(x, y; label="y")
+    axislegend()
+    current_figure()
 end

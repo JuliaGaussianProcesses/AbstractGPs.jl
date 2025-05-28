@@ -212,7 +212,9 @@ function test_internal_abstractgps_interface(
     @test logpdf(fx, y) isa Real
     @test elbo(VFE(f(x, jitter)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
     @test elbo(VFE(f(z, jitter)), fx, y) <= logpdf(fx, y)
-    @test dtc(VFE(f(x, jitter)), fx, y) ≈ logpdf(fx, y) rtol = 1e-5 atol = 1e-5
+    @test isapprox(
+        approx_log_evidence(VFE(f(x, jitter)), fx, y), logpdf(fx, y); rtol=1e-5, atol=1e-5
+    )
 end
 
 end

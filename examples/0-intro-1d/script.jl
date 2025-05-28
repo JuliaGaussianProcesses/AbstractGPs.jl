@@ -6,6 +6,7 @@
 
 using AbstractGPs
 using Distributions
+using FillArrays
 using StatsFuns
 
 using Plots
@@ -64,17 +65,18 @@ f = GP(Matern52Kernel())
 #md nothing #hide
 
 # We create a finite dimensional projection at the inputs of the training dataset
-# observed under Gaussian noise with standard deviation $\sigma = 0.1$, and compute the
+# observed under Gaussian noise with variance $noise\_var = 0.1$, and compute the
 # log-likelihood of the outputs of the training dataset.
 
-fx = f(x_train, 0.1)
+noise_var = 0.1
+fx = f(x_train, noise_var)
 logpdf(fx, y_train)
 
 # We compute the posterior Gaussian process given the training data, and calculate the
 # log-likelihood of the test dataset.
 
 p_fx = posterior(fx, y_train)
-logpdf(p_fx(x_test), y_test)
+logpdf(p_fx(x_test, noise_var), y_test)
 
 # We plot the posterior Gaussian process (its mean and a ribbon of 2 standard deviations
 # around it) on a grid along with the observations.
@@ -110,7 +112,7 @@ function gp_loglikelihood(x, y)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, noise_var)
         return logpdf(fx, y)
     end
     return loglikelihood
@@ -122,7 +124,7 @@ const loglik_train = gp_loglikelihood(x_train, y_train)
 # We define a Gaussian prior for the joint distribution of the two transformed kernel
 # parameters. We assume that both parameters are independent with mean 0 and variance 1.
 
-logprior(params) = logpdf(MvNormal(2, 1), params)
+logprior(params) = logpdf(MvNormal(Eye(2)), params)
 #md nothing #hide
 
 # ### Hamiltonian Monte Carlo
@@ -146,11 +148,35 @@ n_samples = 2_000
 n_adapts = 1_000
 #md nothing #hide
 
-# Define a Hamiltonian system of the log joint probability.
+# AdvancedHMC and DynamicHMC below require us to implement the LogDensityProblems interface for the log joint probability.
 
-logjoint_train(params) = loglik_train(params) + logprior(params)
+using LogDensityProblems
+
+struct LogJointTrain end
+
+## Log joint density
+LogDensityProblems.logdensity(::LogJointTrain, θ) = loglik_train(θ) + logprior(θ)
+
+## The parameter space is two-dimensional
+LogDensityProblems.dimension(::LogJointTrain) = 2
+
+## `LogJointTrain` does not allow to evaluate derivatives of the log density function
+function LogDensityProblems.capabilities(::Type{LogJointTrain})
+    return LogDensityProblems.LogDensityOrder{0}()
+end
+#md nothing #hide
+
+# We use [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) to compute the derivatives of the log joint density with automatic differentiation.
+
+using LogDensityProblemsAD
+
+const logjoint_train = ADgradient(Val(:ForwardDiff), LogJointTrain())
+#md nothing #hide
+
+# We define an Hamiltonian system of the log joint probability.
+
 metric = DiagEuclideanMetric(2)
-hamiltonian = Hamiltonian(metric, logjoint_train, ForwardDiff)
+hamiltonian = Hamiltonian(metric, logjoint_train)
 #md nothing #hide
 
 # Define a leapfrog solver, with initial step size chosen heuristically.
@@ -165,7 +191,7 @@ integrator = Leapfrog(initial_ϵ)
 # - generalised No-U-Turn criteria, and
 # - windowed adaption for step-size and diagonal mass matrix
 
-proposal = NUTS{MultinomialTS,GeneralisedNoUTurn}(integrator)
+proposal = HMCKernel(Trajectory{MultinomialTS}(integrator, GeneralisedNoUTurn()))
 adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
 #md nothing #hide
 
@@ -204,10 +230,10 @@ vline!(mean_samples'; linewidth=2)
 function gp_posterior(x, y, p)
     kernel = softplus(p[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(p[2])))
     f = GP(kernel)
-    return posterior(f(x, 0.1), y)
+    return posterior(f(x, noise_var), y)
 end
 
-mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test, noise_var), y_test) for p in samples)
 
 # We sample 5 functions from each posterior GP given by the final 100 samples of kernel
 # parameters.
@@ -229,50 +255,27 @@ plt
 
 # #### DynamicHMC
 #
-# We repeat the inference with DynamicHMC. DynamicHMC requires us to
-# implement the LogDensityProblems interface for `loglik_train`.
+# We repeat the inference with DynamicHMC.
 
 using DynamicHMC
-using LogDensityProblems
-
-## Log joint density
-function LogDensityProblems.logdensity(ℓ::typeof(loglik_train), params)
-    return ℓ(params) + logprior(params)
-end
-
-## The parameter space is two-dimensional
-LogDensityProblems.dimension(::typeof(loglik_train)) = 2
-
-## `loglik_train` does not allow to evaluate derivatives of
-## the log-likelihood function
-function LogDensityProblems.capabilities(::Type{<:typeof(loglik_train)})
-    return LogDensityProblems.LogDensityOrder{0}()
-end
-
-# Now we can draw samples from the posterior distribution of kernel parameters with
-# DynamicHMC. Again we use [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl)
-# to compute the derivatives of the log joint density with automatic differentiation.
 
 samples =
     mcmc_with_warmup(
-        Random.GLOBAL_RNG,
-        ADgradient(:ForwardDiff, loglik_train),
-        n_samples;
-        reporter=NoProgressReport(),
-    ).chain
+        Random.GLOBAL_RNG, logjoint_train, n_samples; reporter=NoProgressReport()
+    ).posterior_matrix
 #md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
 # parameters:
 
-samples_constrained = [map(softplus, p) for p in samples]
-mean_samples = mean(samples_constrained)
+samples_constrained = map(softplus, samples)
+mean_samples = vec(mean(samples_constrained; dims=2))
 
 # We plot a histogram of the samples for the two parameters.
 # The vertical line in each graph indicates the mean of the samples.
 
 histogram(
-    reduce(hcat, samples_constrained)';
+    samples_constrained';
     xlabel="sample",
     ylabel="counts",
     layout=2,
@@ -285,7 +288,7 @@ vline!(mean_samples'; linewidth=2)
 # of the test data with respect to the posterior Gaussian process with default kernel
 # parameters.
 
-mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
+mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in eachcol(samples))
 
 # We sample a function from the posterior GP for the final 100 samples of kernel
 # parameters.
@@ -293,7 +296,8 @@ mean(logpdf(gp_posterior(x_train, y_train, p)(x_test), y_test) for p in samples)
 plt = plot(; xlim=(0, 1), xlabel="x", ylabel="y", title="posterior (DynamicHMC)")
 scatter!(plt, x_train, y_train; label="Train Data")
 scatter!(plt, x_test, y_test; label="Test Data")
-for p in samples[(end - 100):end]
+for i in (n_samples - 100):n_samples
+    p = @view samples[:, i]
     sampleplot!(plt, 0:0.02:1, gp_posterior(x_train, y_train, p); seriescolor="red")
 end
 plt
@@ -310,7 +314,7 @@ using EllipticalSliceSampling
 # We draw 2000 samples from the posterior distribution of kernel parameters.
 
 samples = sample(ESSModel(
-    MvNormal(2, 1), # Gaussian prior
+    MvNormal(Eye(2)), # Gaussian prior
     loglik_train,
 ), ESS(), n_samples; progress=false)
 #md nothing #hide
@@ -382,7 +386,7 @@ function objective_function(x, y)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, noise_var)
         z = logistic.(params[3:end])
         approx = VFE(f(z, jitter))
         return -elbo(approx, fx, y)
@@ -417,9 +421,9 @@ opt_kernel =
     softplus(opt.minimizer[1]) *
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
-opt_fx = opt_f(x_train, 0.1)
+opt_fx = opt_f(x_train, noise_var)
 ap = posterior(VFE(opt_f(logistic.(opt.minimizer[3:end]), jitter)), opt_fx, y_train)
-logpdf(ap(x_test), y_test)
+logpdf(ap(x_test, noise_var), y_test)
 
 # We visualize the approximate posterior with optimized parameters.
 
@@ -457,7 +461,7 @@ function loss_function(x, y)
         kernel =
             softplus(params[1]) * (Matern52Kernel() ∘ ScaleTransform(softplus(params[2])))
         f = GP(kernel)
-        fx = f(x, 0.1)
+        fx = f(x, noise_var)
         return -logpdf(fx, y)
     end
     return negativelogmarginallikelihood
@@ -493,9 +497,9 @@ opt_kernel =
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 
 opt_f = GP(opt_kernel)
-opt_fx = opt_f(x_train, 0.1)
+opt_fx = opt_f(x_train, noise_var)
 opt_p_fx = posterior(opt_fx, y_train)
-logpdf(opt_p_fx(x_test), y_test)
+logpdf(opt_p_fx(x_test, noise_var), y_test)
 
 # We visualize the posterior with optimized parameters.
 

@@ -2,11 +2,6 @@ using AbstractGPs
 using AbstractGPs:
     AbstractGP,
     MeanFunction,
-    ConstMean,
-    GP,
-    ZeroMean,
-    ConstMean,
-    CustomMean,
     Xt_A_X,
     Xt_A_Y,
     Xt_invA_Y,
@@ -22,8 +17,8 @@ using AbstractGPs:
     inducing_points,
     TestUtils
 
+using Aqua
 using Documenter
-using ChainRulesCore
 using Distributions: MvNormal, PDMat, loglikelihood, Distributions
 using FillArrays
 using FiniteDifferences
@@ -45,6 +40,11 @@ include("test_util.jl")
 
 @testset "AbstractGPs" begin
     if GROUP == "All" || GROUP == "AbstractGPs"
+        @testset "Code quality (Aqua.jl)" begin
+            Aqua.test_all(AbstractGPs; ambiguities=false)
+            # Ref https://github.com/JuliaTesting/Aqua.jl/issues/77
+            Aqua.test_ambiguities(AbstractGPs; recursive=false)
+        end
         @testset "util" begin
             include("util/common_covmat_ops.jl")
             include("util/plotting.jl")
@@ -88,19 +88,12 @@ include("test_util.jl")
                 :(using AbstractGPs, Random, Documenter, LinearAlgebra);
                 recursive=true,
             )
-            doctest(
-                AbstractGPs;
-                doctestfilters=[
-                    r"{([a-zA-Z0-9]+,\s?)+[a-zA-Z0-9]+}",
-                    r"(Array{[a-zA-Z0-9]+,\s?1}|\s?Vector{[a-zA-Z0-9]+})",
-                    r"(Array{[a-zA-Z0-9]+,\s?2}|\s?Matrix{[a-zA-Z0-9]+})",
-                ],
-            )
+            doctest(AbstractGPs)
         end
     end
 
     if (GROUP == "All" || GROUP == "PPL") && VERSION >= v"1.5"
-        Pkg.activate("ppl")
+        Pkg.activate(joinpath(@__DIR__, "ppl"))
         Pkg.develop(PackageSpec(; path=PKGDIR))
         Pkg.instantiate()
         include("ppl/runtests.jl")

@@ -5,9 +5,6 @@
 This page is best read once you have a sense of what this package is trying to achieve.
 Therefore, we recommend reading (or at least skimming) some of the examples before reading these docs.
 
-
-
-
 ## Introduction
 
 AbstractGPs provides the abstract type `AbstractGP`, and the concrete type `FiniteGP`.
@@ -19,27 +16,24 @@ A `FiniteGP` `fx = f(x)` represents the distribution over functions at the finit
 `fx` is a multivariate Normal distribution, so `rand(fx)` produces a `Vector` of `Real`s.
 
 A `FiniteGP` is the interesting object computationally, so if you create a new subtype `MyNewGP` of `AbstractGP`, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving `MyNewGP`, but rather those involving
+
 ```julia
 FiniteGP{<:MyNewGP}
 ```
+
 We provide two ways in which to do this.
-The first is to implement methods directly on `Finite{<:MyNewGP}` -- this is detailed in the [FiniteGP APIs](@ref).
+The first is to implement methods directly on `FiniteGP{<:MyNewGP}` -- this is detailed in the [FiniteGP APIs](@ref).
 The second is to implement some methods directly involving `MyNewGP`, and utilise default `FiniteGP` methods implemented in terms of these -- this is detailed in the [Internal AbstractGPs API](@ref).
 For example, the first method involves implementing methods like `AbstractGPs.mean(fx::FiniteGP{<:MyNewGP})`, while the second involves `AbstractGPs.mean(f::MyNewGP, x::AbstractVector)`.
 
 The second interface is generally easier to implement, but isn't always the best choice.
 See [Which API should I implement?](@ref) for further discussion.
 
-
-
-
-
-
-
 ## FiniteGP APIs
 
 Let `f` be an `AbstractGP`, `x` an `AbstractVector` representing a collection of inputs, and `Σ` a positive-definite matrix of size `(length(x), length(x))`.
 A `FiniteGP` represents the multivariate Gaussian induced by "indexing" into `f` at each point in `x`, and adding independent zero-mean noise with covariance matrix `Σ`:
+
 ```julia
 fx = f(x, Σ)
 
@@ -51,8 +45,6 @@ fx = AbstractGPs.FiniteGP(f, x, Σ)
 The `FiniteGP` has two API levels.
 The [Primary Public API](@ref) should be supported by all `FiniteGP`s, while the [Secondary Public API](@ref) will only be supported by a subset.
 Use only the primary API when possible.
-
-
 
 ### Primary Public API
 
@@ -75,6 +67,7 @@ var(::AbstractGPs.FiniteGP)
 #### Optional methods
 
 Default implementations are provided for these, but you may wish to specialise for performance.
+
 ```@docs
 mean_and_var(::AbstractGPs.FiniteGP)
 ```
@@ -98,10 +91,10 @@ cov(::AbstractGPs.FiniteGP)
 
 #### Optional Methods
 Default implementations are provided for these, but you may wish to specialise for performance.
+
 ```@docs
 mean_and_cov(::AbstractGPs.FiniteGP)
 ```
-
 
 ## Internal AbstractGPs API
 
@@ -130,6 +123,7 @@ var(::AbstractGPs.AbstractGP, ::AbstractVector)
 
 #### Optional Methods
 Default implementations are provided for these, but you may wish to specialise for performance.
+
 ```@docs
 cov(::AbstractGPs.AbstractGP, ::AbstractVector)
 mean_and_cov(::AbstractGPs.AbstractGP, ::AbstractVector)
@@ -138,16 +132,12 @@ mean_and_var(::AbstractGPs.AbstractGP, ::AbstractVector)
 
 Note that, while we _could_ provide a default implementation for `var(f, x)` as `diag(cov(f, x))`, this is generally such an inefficient fallback, that we find it preferable to error if it's not implemented than to ever hit a fallback.
 
-
-
 ## Which API should I implement?
 
 To answer this question, you need to need to know whether or not the default implementations of the [FiniteGP APIs](@ref) work for your use case.
 There are a couple of reasons of which we are aware for why this might not be the case (see below) -- possibly there are others.
 
 If you are unsure, please open an issue to discuss.
-
-
 
 ### You want to avoid computing the covariance matrix
 
@@ -160,9 +150,6 @@ Do _not_ implement the [Secondary Public API](@ref).
 [TemporalGPs.jl](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl) is an example of a package that does this -- see the [`LTISDE`](https://github.com/JuliaGaussianProcesses/TemporalGPs.jl/blob/24343744cf60a50e09b301dee6f14b03cba7ccba/src/gp/lti_sde.jl#L7) implementation for an example.
 The same is true of the [`BayesianLinearRegressor`](https://github.com/JuliaGaussianProcesses/BayesianLinearRegressors.jl/blob/ea20b1bb0603d27c67b3751ad2cf26e271b7acaa/src/bayesian_linear_regression.jl#L11) type.
 
-
-
-
 ### You don't want to use the default implementations
 
 Perhaps you just don't like the default implementations because you don't want to make use of Cholesky factorisations.
@@ -172,8 +159,24 @@ In this situation, implement _both_ the [Internal AbstractGPs API](@ref) _and_ t
 
 In this situation you will benefit less from code reuse inside AbstractGPs, but will continue to benefit from the ability of others use your code, and to take advantage of any existing functionality which requires types which adhere to the AbstractGPs API.
 
+## Mean functions
 
+We define an API for prior mean functions with the abstract type [`MeanFunction`](@ref)
+and the [`mean_vector`](@ref) function.
 
+```@docs
+AbstractGPs.MeanFunction
+mean_vector
+```
+
+We provide standard mean functions like [`ZeroMean`](@ref) and [`ConstMean`](@ref)
+as well as [`CustomMean`](@ref) to simply wrap a function.
+
+```@docs
+ZeroMean
+ConstMean
+CustomMean
+```
 
 ## Testing Utilities
 

@@ -1,47 +1,57 @@
 @testset "mean_functions" begin
-    @testset "ZeroMean" begin
-        P = 3
-        Q = 2
-        D = 4
-        # X = ColVecs(randn(rng, D, P))
-        x = randn(P)
-        x̄ = randn(P)
-        f = ZeroMean{Float64}()
+    rng = MersenneTwister(123456)
+    N, D = 5, 3
+    x1 = randn(rng, N)
+    xD_colvecs = ColVecs(randn(rng, D, N))
+    xD_rowvecs = RowVecs(randn(rng, N, D))
 
-        for x in [x]
-            @test AbstractGPs._map_meanfunction(f, x) == zeros(size(x))
-            # differentiable_mean_function_tests(f, randn(rng, P), x)
-        end
+    zero_mean_testcase = (; mean_function=ZeroMean(), calc_expected=_ -> zeros(N))
 
-        # Manually verify the ChainRule. Really, this should employ FiniteDifferences, but
-        # currently ChainRulesTestUtils isn't up to handling this, so this will have to do
-        # for now.
-        y, pb = rrule(AbstractGPs._map_meanfunction, f, x)
-        @test y == AbstractGPs._map_meanfunction(f, x)
-        Δmap, Δf, Δx = pb(randn(P))
-        @test iszero(Δmap)
-        @test iszero(Δf)
-        @test iszero(Δx)
-    end
-    @testset "ConstMean" begin
-        rng, D, N = MersenneTwister(123456), 5, 3
-        # X = ColVecs(randn(rng, D, N))
-        x = randn(rng, N)
-        c = randn(rng)
-        m = ConstMean(c)
+    c = randn(rng)
+    const_mean_testcase = (; mean_function=ConstMean(c), calc_expected=_ -> fill(c, N))
 
-        for x in [x]
-            @test AbstractGPs._map_meanfunction(m, x) == fill(c, N)
-            # differentiable_mean_function_tests(m, randn(rng, N), x)
+    foo_mean = x -> sum(abs2, x)
+    custom_mean_testcase = (;
+        mean_function=CustomMean(foo_mean), calc_expected=x -> map(foo_mean, x)
+    )
+
+    @testset "$(typeof(testcase.mean_function))" for testcase in [
+        zero_mean_testcase, const_mean_testcase, custom_mean_testcase
+    ]
+        for x in [x1, xD_colvecs, xD_rowvecs]
+            m = testcase.mean_function
+            @test mean_vector(m, x) == testcase.calc_expected(x)
+            differentiable_mean_function_tests(rng, m, x)
         end
     end
-    @testset "CustomMean" begin
-        rng, N, D = MersenneTwister(123456), 11, 2
-        x = randn(rng, N)
+
+    @testset "ColVecs & RowVecs" begin
+        m = custom_mean_testcase.mean_function
+
+        @test mean_vector(m, xD_colvecs) == map(foo_mean, eachcol(xD_colvecs.X))
+        @test mean_vector(m, xD_rowvecs) == map(foo_mean, eachrow(xD_rowvecs.X))
+    end
+
+    # This test fails without the specialized methods
+    #   `mean_vector(m::CustomMean, x::ColVecs)`
+    #   `mean_vector(m::CustomMean, x::RowVecs)`
+    @testset "Zygote gradients" begin
+        X = [1.;; 2.;; 3.;;]
+        y = [1., 2., 3.]
         foo_mean = x -> sum(abs2, x)
-        f = CustomMean(foo_mean)
 
-        @test AbstractGPs._map_meanfunction(f, x) == map(foo_mean, x)
-        # differentiable_mean_function_tests(f, randn(rng, N), x)
+        function construct_finite_gp(X, lengthscale, noise)
+            mean = CustomMean(foo_mean)
+            kernel = with_lengthscale(Matern52Kernel(), lengthscale)
+            return GP(mean, kernel)(X, noise)
+        end
+
+        function loglike(lengthscale, noise)
+            gp = construct_finite_gp(X, lengthscale, noise)
+            return logpdf(gp, y)
+        end
+
+        @test Zygote.gradient(n -> loglike(1., n), 1.)[1] isa Real
+        @test Zygote.gradient(l -> loglike(l, 1.), 1.)[1] isa Real    
     end
 end

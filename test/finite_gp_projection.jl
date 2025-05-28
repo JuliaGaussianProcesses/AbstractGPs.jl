@@ -102,57 +102,29 @@ end
             @test mean(abs.(Σ′ - cov(f))) < 1e-2
         end
     end
-    # @testset "rand (gradients)" begin
-    #     rng, N, S = MersenneTwister(123456), 10, 3
-    #     x = collect(range(-3.0, stop=3.0, length=N))
-    #     Σy = 1e-12
+    @testset "rand (gradients)" begin
+        rng, N, S = MersenneTwister(123456), 10, 3
+        x = collect(range(-3.0; stop=3.0, length=N))
+        Σy = 1e-12
 
-    #     # Check that the gradient w.r.t. the samples is correct (single-sample).
-    #     adjoint_test(
-    #         x->rand(MersenneTwister(123456), GP(sin, EQ(), GPC())(x, Σy)),
-    #         randn(rng, N),
-    #         x;
-    #         atol=1e-9, rtol=1e-9,
-    #     )
+        # Check that the gradient w.r.t. the samples is correct (single-sample).
+        adjoint_test(
+            x -> rand(MersenneTwister(123456), GP(sin, SqExponentialKernel())(x, Σy)),
+            randn(rng, N),
+            x;
+            atol=1e-9,
+            rtol=1e-9,
+        )
 
-    #     # Check that the gradient w.r.t. the samples is correct (multisample).
-    #     adjoint_test(
-    #         x->rand(MersenneTwister(123456), GP(sin, EQ(), GPC())(x, Σy), S),
-    #         randn(rng, N, S),
-    #         x;
-    #         atol=1e-9, rtol=1e-9,
-    #     )
-    # end
-    # @testset "tr_Cf_invΣy" begin
-    #     N = 11
-    #     x = collect(range(-3.0, 3.0; length=N))
-    #     @testset "dense" begin
-    #         rng = MersenneTwister(123456)
-    #         A = randn(rng, N, N - 2)
-    #         adjoint_test(
-    #             (x, A)->begin
-    #                 f = GP(sin, EQ(), GPC())
-    #                 Σy = _to_psd(A)
-    #                 C = cholesky(Σy)
-    #                 return tr_Cf_invΣy(f(x, Σy), Σy, C)
-    #             end,
-    #             randn(rng), x, A,
-    #         )
-    #     end
-    #     @testset "Diagonal" begin
-    #         rng = MersenneTwister(123456)
-    #         a = 0.01 .* randn(rng, N)
-    #         adjoint_test(
-    #             (x, a)->begin
-    #                 f = GP(sin, EQ(), GPC())
-    #                 Σy = Diagonal(exp.(a .+ 1))
-    #                 C = cholesky(Σy)
-    #                 return tr_Cf_invΣy(f(x, Σy), Σy, C)
-    #             end,
-    #             randn(rng), x, a,
-    #         )
-    #     end
-    # end
+        # Check that the gradient w.r.t. the samples is correct (multisample).
+        adjoint_test(
+            x -> rand(MersenneTwister(123456), GP(sin, SqExponentialKernel())(x, Σy), S),
+            randn(rng, N, S),
+            x;
+            atol=1e-9,
+            rtol=1e-9,
+        )
+    end
     @testset "logpdf / loglikelihood" begin
         rng = MersenneTwister(123456)
         N = 10
@@ -177,43 +149,33 @@ end
         @test logpdf(y, Ŷ) ≈ [logpdf(y, Ŷ[:, n]) for n in 1:S]
         @test loglikelihood(y, Ŷ) == sum(logpdf(y, Ŷ))
 
-        # # Check gradient of logpdf at mean is zero for `f`.
-        # adjoint_test(ŷ->logpdf(fx, ŷ), 1, ones(size(ŷ)))
-        # lp, back = Zygote.pullback(ŷ->logpdf(fx, ŷ), ones(size(ŷ)))
-        # @test back(randn(rng))[1] == zeros(size(ŷ))
+        # Check gradient of logpdf at mean is zero for `f`.
+        adjoint_test(ŷ -> logpdf(fx, ŷ), 1, ones(size(ŷ)))
+        lp, back = Zygote.pullback(ŷ -> logpdf(fx, ŷ), ones(size(ŷ)))
+        @test back(randn(rng))[1] == zeros(size(ŷ))
 
-        # # Check that gradient of logpdf at mean is zero for `y`.
-        # adjoint_test(ŷ->logpdf(y, ŷ), 1, ones(size(ŷ)))
-        # lp, back = Zygote.pullback(ŷ->logpdf(y, ŷ), ones(size(ŷ)))
-        # @test back(randn(rng))[1] == zeros(size(ŷ))
+        # Check that gradient of logpdf at mean is zero for `y`.
+        adjoint_test(ŷ -> logpdf(y, ŷ), 1, ones(size(ŷ)))
+        lp, back = Zygote.pullback(ŷ -> logpdf(y, ŷ), ones(size(ŷ)))
+        @test back(randn(rng))[1] == zeros(size(ŷ))
 
-        # # Check that gradient w.r.t. inputs is approximately correct for `f`.
-        # x, l̄ = randn(rng, N), randn(rng)
-        # adjoint_test(
-        #     x->logpdf(f(x, 1e-3), ones(size(x))),
-        #     l̄, collect(x);
-        #     atol=1e-8, rtol=1e-8,
-        # )
-        # adjoint_test(
-        #     x->sum(logpdf(f(x, 1e-3), ones(size(Ŷ)))),
-        #     l̄, collect(x);
-        #     atol=1e-8, rtol=1e-8,
-        # )
+        # Check that gradient w.r.t. inputs is approximately correct for `f`.
+        x, l̄ = randn(rng, N), randn(rng)
+        adjoint_test(
+            x -> logpdf(f(x, 1e-3), ones(size(x))), l̄, collect(x); atol=1e-8, rtol=1e-8
+        )
+        adjoint_test(
+            x -> sum(logpdf(f(x, 1e-3), ones(size(Ŷ)))),
+            l̄,
+            collect(x);
+            atol=1e-8,
+            rtol=1e-8,
+        )
 
-        # # Check that the gradient w.r.t. the noise is approximately correct for `f`.
-        # σ_ = randn(rng)
-        # adjoint_test((σ_, ŷ)->logpdf(f(x, exp(σ_)), ŷ), l̄, σ_, ŷ)
-        # adjoint_test((σ_, Ŷ)->sum(logpdf(f(x, exp(σ_)), Ŷ)), l̄, σ_, Ŷ)
-
-        # # Check that the gradient w.r.t. a scaling of the GP works.
-        # adjoint_test(
-        #     α->logpdf((α * f)(x, 1e-1), ŷ), l̄, randn(rng);
-        #     atol=1e-8, rtol=1e-8,
-        # )
-        # adjoint_test(
-        #     α->sum(logpdf((α * f)(x, 1e-1), Ŷ)), l̄, randn(rng);
-        #     atol=1e-8, rtol=1e-8,
-        # )
+        # Check that the gradient w.r.t. the noise is approximately correct for `f`.
+        σ_ = randn(rng)
+        adjoint_test((σ_, ŷ) -> logpdf(f(x, exp(σ_)), ŷ), l̄, σ_, ŷ)
+        adjoint_test((σ_, Ŷ) -> sum(logpdf(f(x, exp(σ_)), Ŷ)), l̄, σ_, Ŷ)
     end
     @testset "Type Stability - $T" for T in [Float64, Float32]
         rng = MersenneTwister(123456)

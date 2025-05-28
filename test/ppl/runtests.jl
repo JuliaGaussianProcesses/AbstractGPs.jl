@@ -1,8 +1,6 @@
 using AbstractGPs
 
-using Distributions: Poisson, LogNormal
-using SampleChainsDynamicHMC
-using Soss: Soss, For
+using Distributions: Poisson, LogNormal, product_distribution
 using Test
 using Turing: Turing
 
@@ -10,8 +8,4 @@ using Turing: Turing
     include("turing.jl")
     println(" ")
     @info "Ran Turing tests"
-
-    include("soss.jl")
-    println(" ")
-    @info "Ran Soss tests"
 end

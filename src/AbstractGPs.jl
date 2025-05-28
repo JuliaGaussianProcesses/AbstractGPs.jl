@@ -1,6 +1,5 @@
 module AbstractGPs
 
-using ChainRulesCore
 using Distributions
 using FillArrays
 using LinearAlgebra
@@ -15,25 +14,25 @@ using IrrationalConstants: log2π
 
 using KernelFunctions: ColVecs, RowVecs
 
-export GP,
-    rand!,
+using ChainRulesCore: ChainRulesCore
+
+export GP, LatentGP, VFE, DTC, ZeroMean, ConstMean, CustomMean
+export rand!,
     mean,
     cov,
     var,
     std,
     mean_and_cov,
     mean_and_var,
+    mean_vector,
     marginals,
     logpdf,
+    approx_log_evidence,
     elbo,
     dtc,
     posterior,
-    VFE,
-    DTC,
-    update_posterior,
-    LatentGP,
-    ColVecs,
-    RowVecs
+    update_posterior
+export ColVecs, RowVecs
 
 # Various bits of utility functionality.
 include("util/common_covmat_ops.jl")
