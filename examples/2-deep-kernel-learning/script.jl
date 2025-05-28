@@ -71,13 +71,14 @@ plot!(vcat(x_test...), mean.(pred_init); ribbon=std.(pred_init), label="Predicti
 # ## Training
 nmax = 200
 opt = Flux.Adam(0.1)
+state = Flux.setup(opt, ps)
 
 anim = Animation()
 for i in 1:nmax
     grads = gradient(ps) do
         loss(y_train)
     end
-    Flux.Optimise.update!(opt, ps, grads)
+    Flux.Optimise.update!(state, ps, grads)
 
     if i % 10 == 0
         L = loss(y_train)
