@@ -35,7 +35,7 @@
             f = GP(Matern32Kernel())
             u ~ f(X)
             λ = exp.(u)
-            return y .~ Poisson.(λ)
+            return y ~ product_distribution([Poisson(λ_i) for λ_i in λ])
         end
         m = latent_gp_regression(y, RowVecs(X))
         @test length(Turing.sample(m, Turing.NUTS(), 5)) == 5
