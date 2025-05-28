@@ -1,6 +1,6 @@
 using AbstractGPs
 
-using Distributions: Poisson, LogNormal
+using Distributions: Poisson, LogNormal, product_distribution
 using Test
 using Turing: Turing
 
