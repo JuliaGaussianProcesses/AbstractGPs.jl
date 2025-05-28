@@ -3,10 +3,10 @@ env:
   SECRET_CODECOV_TOKEN: "JLCJz1NwGpgcY/+lqJ5u0UwHa2jfff200KR3EJFTykWruv8ZKX9trdPlZMC7FzyRReMlT439OZVZxh/YipGsa3lgp74oVfFUPQzOC8JGI3YnpvG6aIn03dR/3RsgRQR44Hh0GnTUFskIR9y9V4GVR+X25dlpBIgZ3z5xhlvLKezYBGRfstv4ZhwEsgdEkIs1AmLITi0Px9D3PNXTfoi4w2ZW4Y+kjeqKsaMUpc5v8atNIojP/G05JKKoOaVmY4i+jTiSJyhDcCFFmcQCmIT7xX+KYEoYZPaHAGZGgH+scuiXWVXt9ROUXQ20YdPB8E2zPonhbkLPmg87F/j6tCqB5g==;U2FsdGVkX1/fFoqgeV4V7jypc2seI4AMUEEz1XbIJbH7jRdyP6tsHQWPLxo9guk7R5HxKzlKKgR7sUfxVyd0KA=="
 
 steps:
-  - label: "Julia v1"
+  - label: "Julia v1.10"
     plugins:
       - JuliaCI/julia#v1:
-          version: "1"
+          version: "1.10"
       - JuliaCI/julia-test#v1: ~
       - JuliaCI/julia-coverage#v1:
           codecov: true
