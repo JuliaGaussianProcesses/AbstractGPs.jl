@@ -70,7 +70,7 @@ plot!(vcat(x_test...), mean.(pred_init); ribbon=std.(pred_init), label="Predicti
 
 # ## Training
 nmax = 200
-opt = Flux.ADAM(0.1)
+opt = Flux.Adam(0.1)
 
 anim = Animation()
 for i in 1:nmax
