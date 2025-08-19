@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>The Main APIs · AbstractGPs.jl</title><meta name="title" content="The Main APIs · AbstractGPs.jl"/><meta property="og:title" content="The Main APIs · AbstractGPs.jl"/><meta property="twitter:title" content="The Main APIs · AbstractGPs.jl"/><meta name="description" content="Documentation for AbstractGPs.jl."/><meta property="og:description" content="Documentation for AbstractGPs.jl."/><meta property="twitter:description" content="Documentation for AbstractGPs.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">AbstractGPs.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>The Main APIs</a><ul class="internal"><li><a class="tocitem" href="#Intended-Audience"><span>Intended Audience</span></a></li><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#FiniteGP-APIs"><span>FiniteGP APIs</span></a></li><li><a class="tocitem" href="#Internal-AbstractGPs-API"><span>Internal AbstractGPs API</span></a></li><li><a class="tocitem" href="#Which-API-should-I-implement?"><span>Which API should I implement?</span></a></li><li><a class="tocitem" href="#Mean-functions"><span>Mean functions</span></a></li><li><a class="tocitem" href="#Testing-Utilities"><span>Testing Utilities</span></a></li></ul></li><li><a class="tocitem" href="../concrete_features/">Concrete Features</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../examples/0-intro-1d/">Intro to AbstractGPs: one-dimensional regression</a></li><li><a class="tocitem" href="../examples/1-mauna-loa/">Mauna Loa time series example</a></li><li><a class="tocitem" href="../examples/2-deep-kernel-learning/">Deep Kernel Learning with Flux</a></li><li><a class="tocitem" href="../examples/3-parametric-heteroscedastic/">Parametric Heteroscedastic Model</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>The Main APIs</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>The Main APIs</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/main/docs/src/api.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="FiniteGP-and-AbstractGP"><a class="docs-heading-anchor" href="#FiniteGP-and-AbstractGP">FiniteGP and AbstractGP</a><a id="FiniteGP-and-AbstractGP-1"></a><a class="docs-heading-anchor-permalink" href="#FiniteGP-and-AbstractGP" title="Permalink"></a></h1><h2 id="Intended-Audience"><a class="docs-heading-anchor" href="#Intended-Audience">Intended Audience</a><a id="Intended-Audience-1"></a><a class="docs-heading-anchor-permalink" href="#Intended-Audience" title="Permalink"></a></h2><p>This page is best read once you have a sense of what this package is trying to achieve. Therefore, we recommend reading (or at least skimming) some of the examples before reading these docs.</p><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><p>AbstractGPs provides the abstract type <code>AbstractGP</code>, and the concrete type <code>FiniteGP</code>. An <code>AbstractGP</code>, <code>f</code>, should be thought of as a distribution over functions. This means that the output of <code>rand(f)</code> would be a real-valued function. It&#39;s not usually possible to implement this though, so we don&#39;t.</p><p>A <code>FiniteGP</code> <code>fx = f(x)</code> represents the distribution over functions at the finite collection of points specified in <code>x</code>. <code>fx</code> is a multivariate Normal distribution, so <code>rand(fx)</code> produces a <code>Vector</code> of <code>Real</code>s.</p><p>A <code>FiniteGP</code> is the interesting object computationally, so if you create a new subtype <code>MyNewGP</code> of <code>AbstractGP</code>, and wish to make it interact well with the rest of the GP ecosystem, the methods that you must implement are not those directly involving <code>MyNewGP</code>, but rather those involving</p><pre><code class="language-julia hljs">FiniteGP{&lt;:MyNewGP}</code></pre><p>We provide two ways in which to do this. The first is to implement methods directly on <code>FiniteGP{&lt;:MyNewGP}</code> – this is detailed in the <a href="#FiniteGP-APIs">FiniteGP APIs</a>. The second is to implement some methods directly involving <code>MyNewGP</code>, and utilise default <code>FiniteGP</code> methods implemented in terms of these – this is detailed in the <a href="#Internal-AbstractGPs-API">Internal AbstractGPs API</a>. For example, the first method involves implementing methods like <code>AbstractGPs.mean(fx::FiniteGP{&lt;:MyNewGP})</code>, while the second involves <code>AbstractGPs.mean(f::MyNewGP, x::AbstractVector)</code>.</p><p>The second interface is generally easier to implement, but isn&#39;t always the best choice. See <a href="#Which-API-should-I-implement?">Which API should I implement?</a> for further discussion.</p><h2 id="FiniteGP-APIs"><a class="docs-heading-anchor" href="#FiniteGP-APIs">FiniteGP APIs</a><a id="FiniteGP-APIs-1"></a><a class="docs-heading-anchor-permalink" href="#FiniteGP-APIs" title="Permalink"></a></h2><p>Let <code>f</code> be an <code>AbstractGP</code>, <code>x</code> an <code>AbstractVector</code> representing a collection of inputs, and <code>Σ</code> a positive-definite matrix of size <code>(length(x), length(x))</code>. A <code>FiniteGP</code> represents the multivariate Gaussian induced by &quot;indexing&quot; into <code>f</code> at each point in <code>x</code>, and adding independent zero-mean noise with covariance matrix <code>Σ</code>:</p><pre><code class="language-julia hljs">fx = f(x, Σ)
+<!-- NAVBAR START -->
+<style>
+    html {
+        scroll-padding-top: calc(55px + 1rem);
+    }
+
+    /* Documenter css tweaks */
+    .docs-sidebar {
+        margin-top: 3.75rem;
+    }
+
+    #documenter {
+        margin-top: 3.75rem;
+    }
+
+    .docs-version-selector {
+        margin-bottom: 60px !important;
+    }
+
+    @media screen and (max-width: 1056px) {
+        .docs-version-selector {
+            margin-bottom: 60px !important;
+        }
+
+        .docs-sidebar {
+            margin-top: 0 !important;
+        }
+    }
+    /* Documenter css tweaks ends here */
+
+    :root {
+        --heading-color: white;
+        --item-color: rgb(165, 165, 165);
+        --primary-bg: #073c44;
+        --hover-color: #8faad2;
+    }
+
+    .ext-navigation {
+        position: fixed;
+        height: 3.75rem;
+        top: 0;
+        width: 100%;
+        background-color: var(--primary-bg);
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        padding: 0 1.0625rem;
+        transition: transform 0.3s;
+    }
+
+    .ext-navbar-logo {
+        margin-left: 0.625rem;
+    }
+
+    .ext-nav-links {
+        display: flex;
+        align-items: center;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        flex-grow: 1;
+    }
+
+    .ext-nav-links li {
+        margin-left: 1rem !important;
+    }
+
+    .ext-nav-link {
+        color: white !important;
+        text-decoration: none;
+        font-size: 1.0625rem !important;
+        transition: color 0.2s ease;
+        cursor: pointer;
+    }
+
+    .ext-nav-link:hover,
+    .ext-navbar-item-single a:hover {
+        color: var(--hover-color) !important;
+    }
+
+    .ext-navbar-item-single a {
+        color: #fff !important;
+    }
+
+    .ext-menu-toggle {
+        display: none;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+    }
+
+    .ext-dropdown {
+        display: none;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: auto auto auto;
+        padding: 1.875rem;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        background-color: #083c44;
+        line-height: 1.875rem;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        transform: translateY(-0.625rem);
+    }
+
+    #library-handler::after {
+        content: "▼";
+        font-size: 0.6875rem;
+        margin-left: 0.3125rem;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    #library-handler.open::after {
+        content: "▲";
+    }
+
+    .ext-dropdown.show {
+        display: grid;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .ext-dropdown ul {
+        height: auto;
+        width: 12.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .ext-dropdown ul li {
+        text-align: left;
+    }
+
+    .navbar-sub-item {
+        list-style: none;
+    }
+
+    .ext-dropdown ul a li {
+        color: var(--item-color);
+        width: 15.625rem;
+        border-radius: 3px;
+        padding: 0.125rem 0.625rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .ext-dropdown ul a li:hover {
+        background-color: rgba(107, 107, 107, 0.5);
+    }
+
+    .ext-dropdown-item-heading {
+        color: var(--heading-color);
+        text-align: center;
+    }
+
+    /* Responsive styling */
+    @media (max-width: 966px) {
+        .ext-dropdown {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ext-nav-links {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            background-color: var(--primary-bg);
+            position: absolute;
+            top: 3.75rem;
+            left: 0;
+            padding: 0.625rem 0;
+            height: auto;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgb(141, 141, 141) grey;
+        }
+
+        .ext-nav-links.show {
+            display: flex;
+        }
+
+        .ext-nav-links li {
+            margin: 0.625rem 0;
+            text-align: center;
+        }
+
+        .ext-menu-toggle {
+            display: block;
+            margin-left: auto;
+        }
+
+        .ext-navigation.hide {
+            transform: translateY(-3.75rem);
+        }
+
+        .ext-dropdown {
+            place-content: center;
+            text-align: center;
+            grid-template-columns: 1fr;
+            line-height: 1.25rem;
+            padding: 0.625rem;
+        }
+
+        .ext-dropdown ul {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 0.3125rem;
+        }
+
+        .ext-dropdown ul li {
+            text-align: center;
+        }
+
+        .ext-dropdown ul a li {
+            width: 100%;
+        }
+
+        .ext-dropdown ul a li:hover {
+            background-color: var(--primary-bg);
+            color: #fff;
+        }
+
+        /* Modified scroll bar */
+        .ext-nav-links::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .ext-nav-links::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 5px grey;
+        }
+
+        .ext-nav-links::-webkit-scrollbar-thumb {
+            background: rgb(141, 141, 141);
+            border-radius: 3px;
+        }
+
+        .ext-nav-links::-webkit-scrollbar-thumb:hover {
+            background: #9b9b9b;
+        }
+    }
+    @media only screen and (max-width: 768px) {
+        .turing-logo {
+            display: none !important;
+        }
+    }
+    @media only screen and (min-width: 768px) {
+        .turing-collab {
+            display: none !important;
+        }
+    }
+</style>
+<nav class="ext-navigation">
+    <a href="https://github.com/JuliaGaussianProcesses">
+        <img src="https://avatars.githubusercontent.com/u/57909728?s=200&v=4" alt="JuliaGP Logo" class="ext-navbar-logo" height="24px" width="40px">
+    </a>
+    <a style="color: white !important; font-size: 21.25px !important; margin-left: 10px;" href="https://github.com/JuliaGaussianProcesses">JuliaGP</a>
+    <ul class="ext-nav-links">
+        <li>
+            <a class="ext-nav-link" href="https://juliagaussianprocesses.github.io/AbstractGPs.jl/">AbstractGPs</a>
+        </li>
+        <li>
+            <a class="ext-nav-link" href="https://juliagaussianprocesses.github.io/KernelFunctions.jl/">KernelFunctions</a>
+        </li>
+        <li>
+            <a class="ext-nav-link" href="https://juliagaussianprocesses.github.io/GPLikelihoods.jl/">GPLikelihoods</a>
+        </li>
+        <li>
+            <a class="ext-nav-link" href="https://juliagaussianprocesses.github.io/ApproximateGPs.jl/">ApproximateGPs</a>
+        </li>
+        <li>
+            <a class="ext-nav-link turing-collab" href="https://turinglang.org">Co-developed with Turing.jl</a>
+        </li>
+        <!-- Add a Dropdown with these classes in case it's required so that the current CSS works fine -->
+        <!-- <li>
+            <p class="ext-nav-link" id="library-handler">Libraries</p>
+            <div class="ext-dropdown" id="ext-dropdown-items">
+                <ul>
+                    <li class="ext-dropdown-item-heading">Modellinglanguages</li>
+                    <a href="https://turinglang.org/DynamicPPL.jl/">
+                        <li>DynamicPPL</li>
+                    </a>
+                    <a href="https://turinglang.org/JuliaBUGS.jl/">
+                        <li>JuliaBUGS</li>
+                    </a>
+                    <a href="https://turinglang.org/TuringGLM.jl/">
+                        <li>TurineGLM</li>
+                    </a>
+                </ul>
+                <ul>
+                    <li class="ext-dropdown-item-heading">MCMC</li>
+                    <a href="https://turinglang.org/AdvancedHMC.jl/">
+                        <li>AdvancedHMC</li>
+                    </a>
+                    <a href="https://turinglang.org/AbstractMCMC.jl/">
+                        <li>AbstractMCMC</li>
+                    </a>
+                    <a href="https://github.com/theogf/ThermodynamicIntegration.jl">
+                        <li>ThermodynamicIntegration</li>
+                    </a>
+                    <a href="https://turinglang.org/AdvancedPS.jl/">
+                        <li>AdvancedPS</li>
+                    </a>
+                    <a href="https://turinglang.org/EllipticalSliceSampling.jl/">
+                        <li>EllipticalSliceSampling</li>
+                    </a>
+                    <a href="https://turinglang.org/NestedSamplers.jl/">
+                        <li>NestedSamplers</li>
+                    </a>
+                </ul>
+                <ul>
+                    <li class="ext-dropdown-item-heading">Diagnostics</li>
+                    <a href="https://turinglang.org/MCMCChains.jl/">
+                        <li>MCMCChains</li>
+                    </a>
+                    <a href="https://turinglang.org/MCMCDiagnosticTools.jl/">
+                        <li>MCMCDiagnosticTools</li>
+                    </a>
+                    <a href="https://turinglang.org/ParetoSmooth.jl/">
+                        <li>ParetoSmooth</li>
+                    </a>
+                </ul>
+                <ul>
+                    <li class="ext-dropdown-item-heading">Gaussion Processes</li>
+                    <a href="https://juliagaussianprocesses.github.io/AbstractGPs.jl/">
+                        <li>AbstractGPs</li>
+                    </a>
+                    <a href="https://juliagaussianprocesses.github.io/KernelFunctions.jl/">
+                        <li>KernelFunctions</li>
+                    </a>
+                    <a href="https://juliagaussianprocesses.github.io/ApproximateGPs.jl/">
+                        <li>ApproximateGPs</li>
+                    </a>
+                </ul>
+                <ul>
+                    <li class="ext-dropdown-item-heading ext-navbar-item-single">
+                        <a href="https://turinglang.org/Bijectors.jl/">Bijectors</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="ext-dropdown-item-heading ext-navbar-item-single">
+                        <a href="https://turinglang.org/TuringCallbacks.jl/">TuringCallbacks</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="ext-dropdown-item-heading ext-navbar-item-single">
+                        <a href="https://turinglang.org/TuringBenchmarking.jl/">TuringBenchmarking</a>
+                    </li>
+                </ul>
+            </div>
+        </li> -->
+    </ul>
+    <a href="https://turinglang.org/" title="Co-developed with Turing.jl">
+        <img src="https://turinglang.org/assets/images/turing-logo.svg" alt="Turing Logo" class="ext-navbar-logo turing-logo" height="24px" width="40px">
+    </a>
+    <!-- Github Logo -->
+    <!-- <a href="https://github.com/JuliaGaussianProcesses/">
+        <svg width="32px" height="32px" viewBox="-8.2 -8.2 36.40 36.40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+                <title>github [#142]</title>
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke-width="0.0002" fill="none" fill-rule="evenodd">
+                    <g id="Dribbble-Light-Preview" transform="translate(-140.000000, -7559.000000)" fill="#ffffff">
+                        <g id="icons" transform="translate(56.000000, 160.000000)">
+                            <path
+                                d="M94,7399 C99.523,7399 104,7403.59 104,7409.253 C104,7413.782 101.138,7417.624 97.167,7418.981 C96.66,7419.082 96.48,7418.762 96.48,7418.489 C96.48,7418.151 96.492,7417.047 96.492,7415.675 C96.492,7414.719 96.172,7414.095 95.813,7413.777 C98.04,7413.523 100.38,7412.656 100.38,7408.718 C100.38,7407.598 99.992,7406.684 99.35,7405.966 C99.454,7405.707 99.797,7404.664 99.252,7403.252 C99.252,7403.252 98.414,7402.977 96.505,7404.303 C95.706,7404.076 94.85,7403.962 94,7403.958 C93.15,7403.962 92.295,7404.076 91.497,7404.303 C89.586,7402.977 88.746,7403.252 88.746,7403.252 C88.203,7404.664 88.546,7405.707 88.649,7405.966 C88.01,7406.684 87.619,7407.598 87.619,7408.718 C87.619,7412.646 89.954,7413.526 92.175,7413.785 C91.889,7414.041 91.63,7414.493 91.54,7415.156 C90.97,7415.418 89.522,7415.871 88.63,7414.304 C88.63,7414.304 88.101,7413.319 87.097,7413.247 C87.097,7413.247 86.122,7413.234 87.029,7413.87 C87.029,7413.87 87.684,7414.185 88.139,7415.37 C88.139,7415.37 88.726,7417.2 91.508,7416.58 C91.513,7417.437 91.522,7418.245 91.522,7418.489 C91.522,7418.76 91.338,7419.077 90.839,7418.982 C86.865,7417.627 84,7413.783 84,7409.253 C84,7403.59 88.478,7399 94,7399"
+                                id="github-[#142]">
+                            </path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </a> -->
+    <span class="ext-menu-toggle">&#9776;</span>
+</nav>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const menuToggle = document.querySelector(".ext-menu-toggle");
+        const navLinks = document.querySelector(".ext-nav-links");
+        const nav = document.querySelector(".ext-navigation");
+        const navigationHandler = document.getElementById("library-handler");
+        const navigationItemsContainer =
+            document.getElementById("ext-dropdown-items");
+        let lastScrollY = window.scrollY;
+
+        function setAppropriateHeight() {
+            if (window.innerWidth <= 768) {
+                const viewportHeight = window.innerHeight;
+                const navHeight = nav.offsetHeight;
+                navLinks.style.maxHeight = `${viewportHeight - navHeight}px`;
+                navLinks.style.overflowY = "auto";
+            } else {
+                navLinks.style.maxHeight = "";
+                navLinks.style.overflowY = "";
+            }
+        }
+
+        // Toggle main menu for mobile
+        menuToggle.addEventListener("click", () => {
+            navLinks.classList.toggle("show");
+            if (navLinks.classList.contains("show")) {
+                setAppropriateHeight();
+                // Ensure the dropdown is hidden when menu is first opened
+                navigationItemsContainer.style.display = "none";
+                navigationItemsContainer.classList.remove("show");
+            }
+        });
+
+        // Close menus if clicked outside
+        document.addEventListener("click", (event) => {
+            if (
+                !navLinks.contains(event.target) &&
+                !menuToggle.contains(event.target)
+            ) {
+                navLinks.classList.remove("show");
+                navigationItemsContainer.classList.remove("show");
+                navigationHandler.classList.remove("open");
+            }
+        });
+
+        // Hide navigation bar on scroll down in mobile view
+        window.addEventListener("scroll", () => {
+            if (window.innerWidth <= 768) {
+                nav.classList.toggle("hide", window.scrollY > lastScrollY);
+                lastScrollY = window.scrollY;
+            }
+        });
+
+        // Library API script
+        navigationHandler.addEventListener("click", (event) => {
+            event.preventDefault(); // Prevent default action of the link
+            if (navigationItemsContainer.classList.contains("show")) {
+                navigationItemsContainer.classList.remove("show");
+                navigationHandler.classList.remove("open");
+                setTimeout(() => {
+                    navigationItemsContainer.style.display = "none";
+                }, 500); // Match the timeout to the CSS transition duration
+            } else {
+                navigationItemsContainer.style.display = "grid";
+                navigationHandler.classList.add("open");
+                setTimeout(() => {
+                    navigationItemsContainer.classList.add("show");
+                }, 10); // Delay to ensure the display change takes effect before adding class
+            }
+            setAppropriateHeight(); // Recalculate height when dropdown changes
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", setAppropriateHeight);
+
+        // Initial setup
+        setAppropriateHeight();
+    });
+</script>
+<!-- NAVBAR END -->
+
+# The code below is equivalent to the above, and is just for reference.
+# When writing code, prefer the above syntax.
+fx = AbstractGPs.FiniteGP(f, x, Σ)</code></pre><p>The <code>FiniteGP</code> has two API levels. The <a href="#Primary-Public-API">Primary Public API</a> should be supported by all <code>FiniteGP</code>s, while the <a href="#Secondary-Public-API">Secondary Public API</a> will only be supported by a subset. Use only the primary API when possible.</p><h3 id="Primary-Public-API"><a class="docs-heading-anchor" href="#Primary-Public-API">Primary Public API</a><a id="Primary-Public-API-1"></a><a class="docs-heading-anchor-permalink" href="#Primary-Public-API" title="Permalink"></a></h3><p>These are user-facing methods. You can expect them to be implemented whenever you encounter a <code>FiniteGP</code>. If you are building something on top of AbstractGPs, try to implement it in terms of these functions.</p><h4 id="Required-Methods"><a class="docs-heading-anchor" href="#Required-Methods">Required Methods</a><a id="Required-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Required-Methods" title="Permalink"></a></h4><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Base.rand" href="#Base.rand"><code>Base.rand</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">rand(rng::AbstractRNG, f::FiniteGP, N::Int=1)</code></pre><p>Obtain <code>N</code> independent samples from the marginals <code>f</code> using <code>rng</code>. Single-sample methods produce a <code>length(f)</code> vector. Multi-sample methods produce a <code>length(f)</code> × <code>N</code> <code>Matrix</code>.</p><pre><code class="language-julia-repl hljs">julia&gt; f = GP(Matern32Kernel());
+
+julia&gt; x = randn(11);
+
+julia&gt; rand(f(x)) isa Vector{Float64}
+true
+
+julia&gt; rand(MersenneTwister(123456), f(x)) isa Vector{Float64}
+true
+
+julia&gt; rand(f(x), 3) isa Matrix{Float64}
+true
+
+julia&gt; rand(MersenneTwister(123456), f(x), 3) isa Matrix{Float64}
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L208-L232">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Random.rand!" href="#Random.rand!"><code>Random.rand!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">rand!(rng::AbstractRNG, f::FiniteGP, y::AbstractVecOrMat{&lt;:Real})</code></pre><p>Obtain sample(s) from the marginals <code>f</code> using <code>rng</code> and write them to <code>y</code>.</p><p>If <code>y</code> is a matrix, then each column corresponds to an independent sample.</p><pre><code class="language-julia-repl hljs">julia&gt; f = GP(Matern32Kernel());
+
+julia&gt; x = randn(11);
+
+julia&gt; y = similar(x);
+
+julia&gt; rand!(f(x), y);
+
+julia&gt; rand!(MersenneTwister(123456), f(x), y);
+
+julia&gt; ys = similar(x, length(x), 3);
+
+julia&gt; rand!(f(x), ys);
+
+julia&gt; rand!(MersenneTwister(123456), f(x), ys);</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L243-L267">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.marginals" href="#AbstractGPs.marginals"><code>AbstractGPs.marginals</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">marginals(f::FiniteGP)</code></pre><p>Compute a vector of Normal distributions representing the marginals of <code>f</code> efficiently. In particular, the off-diagonal elements of <code>cov(f(x))</code> are never computed.</p><pre><code class="language-julia-repl hljs">julia&gt; f = GP(Matern32Kernel());
+
+julia&gt; x = randn(11);
+
+julia&gt; fs = marginals(f(x));
+
+julia&gt; mean.(fs) == mean(f(x))
+true
+
+julia&gt; std.(fs) == sqrt.(diag(cov(f(x))))
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L182-L202">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Distributions.logpdf-Tuple{AbstractGPs.FiniteGP, AbstractVector{&lt;:Real}}" href="#Distributions.logpdf-Tuple{AbstractGPs.FiniteGP, AbstractVector{&lt;:Real}}"><code>Distributions.logpdf</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">logpdf(f::FiniteGP, y::AbstractVecOrMat{&lt;:Real})</code></pre><p>The logpdf of <code>y</code> under <code>f</code> if <code>y isa AbstractVector</code>. The logpdf of each column of <code>y</code> if <code>y isa Matrix</code>.</p><pre><code class="language-julia-repl hljs">julia&gt; f = GP(Matern32Kernel());
+
+julia&gt; x = randn(11);
+
+julia&gt; y = rand(f(x));
+
+julia&gt; logpdf(f(x), y) isa Real
+true
+
+julia&gt; Y = rand(f(x), 3);
+
+julia&gt; logpdf(f(x), Y) isa AbstractVector{&lt;:Real}
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L279-L301">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.posterior-Tuple{AbstractGPs.FiniteGP, AbstractVector{&lt;:Real}}" href="#AbstractGPs.posterior-Tuple{AbstractGPs.FiniteGP, AbstractVector{&lt;:Real}}"><code>AbstractGPs.posterior</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">posterior(fx::FiniteGP, y::AbstractVector{&lt;:Real})</code></pre><p>Construct the posterior distribution over <code>fx.f</code> given observations <code>y</code> at <code>fx.x</code> made under noise <code>fx.Σy</code>. This is another <code>AbstractGP</code> object. See chapter 2 of [1] for a recap on exact inference in GPs. This posterior process has mean function</p><pre><code class="language-julia hljs">m_posterior(x) = m(x) + k(x, fx.x) inv(cov(fx)) (y - mean(fx))</code></pre><p>and kernel</p><pre><code class="language-julia hljs">k_posterior(x, z) = k(x, z) - k(x, fx.x) inv(cov(fx)) k(fx.x, z)</code></pre><p>where <code>m</code> and <code>k</code> are the mean function and kernel of <code>fx.f</code>, respectively.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/exact_gpr_posterior.jl#L14-L28">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.mean-Tuple{AbstractGPs.FiniteGP}" href="#Statistics.mean-Tuple{AbstractGPs.FiniteGP}"><code>Statistics.mean</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean(fx::FiniteGP)</code></pre><p>Compute the mean vector of <code>fx</code>.</p><pre><code class="language-julia-repl hljs">julia&gt; f = GP(Matern52Kernel());
+
+julia&gt; x = randn(11);
+
+julia&gt; mean(f(x)) == zeros(11)
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L39-L52">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.var-Tuple{AbstractGPs.FiniteGP}" href="#Statistics.var-Tuple{AbstractGPs.FiniteGP}"><code>Statistics.var</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">var(f::FiniteGP)</code></pre><p>Compute only the diagonal elements of <a href="#Statistics.cov-Tuple{AbstractGPs.FiniteGP}"><code>cov(f)</code></a>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; fx = GP(Matern52Kernel())(randn(10), 0.1);
+
+julia&gt; var(fx) == diag(cov(fx))
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L100-L113">source</a></section></article><h4 id="Optional-methods"><a class="docs-heading-anchor" href="#Optional-methods">Optional methods</a><a id="Optional-methods-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-methods" title="Permalink"></a></h4><p>Default implementations are provided for these, but you may wish to specialise for performance.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="StatsBase.mean_and_var-Tuple{AbstractGPs.FiniteGP}" href="#StatsBase.mean_and_var-Tuple{AbstractGPs.FiniteGP}"><code>StatsBase.mean_and_var</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean_and_var(f::FiniteGP)</code></pre><p>Compute both <code>mean(f)</code> and the diagonal elements of <code>cov(f)</code>.</p><p>Sometimes more efficient than computing them separately, particularly for posteriors.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
+
+julia&gt; mean_and_var(fx) == (mean(fx), var(fx))
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L138-L153">source</a></section></article><h3 id="Secondary-Public-API"><a class="docs-heading-anchor" href="#Secondary-Public-API">Secondary Public API</a><a id="Secondary-Public-API-1"></a><a class="docs-heading-anchor-permalink" href="#Secondary-Public-API" title="Permalink"></a></h3><p>Observe that the Primary Public API does <em>not</em> include a function to compute the covariance matrix of a <code>FiniteGP</code>. While the covariance matrix of any multivariate Gaussian is defined, it is not always a good idea to actually compute it. Fortunately, it&#39;s often the case that you&#39;re not actually interested in the covariance matrix per-se, rather the other quantities that you might use it to compute (<code>logpdf</code>, <code>rand</code>, <code>posterior</code>). This is similar to the well-known observation that you rarely need the inverse of a matrix, you just need to compute the inverse multiplied by something, so it&#39;s considered good practice to avoid ever explicitly computing the inverse of a matrix so as to avoid the numerical issues associated with it. This is important, for example, as <a href="https://github.com/JuliaGaussianProcesses/TemporalGPs.jl">TemporalGPs.jl</a> is able to <a href="https://github.com/JuliaGaussianProcesses/TemporalGPs.jl/blob/master/src/gp/lti_sde.jl">implement</a> all of the <a href="#Primary-Public-API">Primary Public API</a> in linear time in the dimension of the <code>FiniteGP</code>, as it never needs to evaluate the covariance matrix.</p><p>However, for many (probably the majority of) GPs, this acceleration isn&#39;t possible, and there is really nothing lost by explicitly evaluating the covariance matrix. We call this the <a href="#Secondary-Public-API">Secondary Public API</a>, because it&#39;s available a large proportion of the time, but should be avoided if at all possible.</p><h4 id="Required-Methods-2"><a class="docs-heading-anchor" href="#Required-Methods-2">Required Methods</a><a class="docs-heading-anchor-permalink" href="#Required-Methods-2" title="Permalink"></a></h4><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.cov-Tuple{AbstractGPs.FiniteGP}" href="#Statistics.cov-Tuple{AbstractGPs.FiniteGP}"><code>Statistics.cov</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">cov(f::FiniteGP)</code></pre><p>Compute the covariance matrix of <code>fx</code>.</p><p><strong>Noise-free observations</strong></p><pre><code class="language-julia-repl hljs">julia&gt; f = GP(Matern52Kernel());
+
+julia&gt; x = randn(11);
+
+julia&gt; cov(f(x)) == kernelmatrix(Matern52Kernel(), x)
+true</code></pre><p><strong>Isotropic observation noise</strong></p><pre><code class="language-julia-repl hljs">julia&gt; cov(f(x, 0.1)) == kernelmatrix(Matern52Kernel(), x) + 0.1 * I
+true</code></pre><p><strong>Independent anisotropic observation noise</strong></p><pre><code class="language-julia-repl hljs">julia&gt; s = rand(11);
+
+julia&gt; cov(f(x, s)) == kernelmatrix(Matern52Kernel(), x) + Diagonal(s)
+true</code></pre><p><strong>Correlated observation noise</strong></p><pre><code class="language-julia-repl hljs">julia&gt; A = randn(11, 11); S = A&#39;A;
+
+julia&gt; cov(f(x, S)) == kernelmatrix(Matern52Kernel(), x) + S
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L55-L95">source</a></section></article><h4 id="Optional-Methods"><a class="docs-heading-anchor" href="#Optional-Methods">Optional Methods</a><a id="Optional-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-Methods" title="Permalink"></a></h4><p>Default implementations are provided for these, but you may wish to specialise for performance.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="StatsBase.mean_and_cov-Tuple{AbstractGPs.FiniteGP}" href="#StatsBase.mean_and_cov-Tuple{AbstractGPs.FiniteGP}"><code>StatsBase.mean_and_cov</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean_and_cov(f::FiniteGP)</code></pre><p>Equivalent to <code>(mean(f), cov(f))</code>, but sometimes more efficient to compute them jointly than separately.</p><pre><code class="language-julia-repl hljs">julia&gt; fx = GP(SqExponentialKernel())(range(-3.0, 3.0; length=10), 0.1);
+
+julia&gt; mean_and_cov(fx) == (mean(fx), cov(fx))
+true</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/finite_gp_projection.jl#L119-L132">source</a></section></article><h2 id="Internal-AbstractGPs-API"><a class="docs-heading-anchor" href="#Internal-AbstractGPs-API">Internal AbstractGPs API</a><a id="Internal-AbstractGPs-API-1"></a><a class="docs-heading-anchor-permalink" href="#Internal-AbstractGPs-API" title="Permalink"></a></h2><p>This functionality is not intended to be used directly by the users, or those building functionality on top of this package – they should interact with <a href="#Primary-Public-API">Primary Public API</a>. If you believe you really do need to interact with this level of the API, please open an issue to discuss as you may have a use-case that was missed during the design of this API.</p><p>As discussed at the top of this page, instances of subtypes of <code>AbstractGP</code> represent Gaussian processes – collections of jointly-Gaussian random variables, which may be infinite-dimensional.</p><p>Implementing the following API for your own <code>AbstractGP</code> subtype automatically implements both the Primary and Secondary public APIs above in terms of them.</p><p>Existing implementations of this interface include</p><ol><li><a href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/gp/gp.jl#L56"><code>GP</code></a></li><li><a href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/posterior_gp.jl#L1"><code>PosteriorGP</code></a></li><li><a href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/3b5de4f4da80e4e3a7dcf716764b298d953a0b37/src/posterior_gp/approx_posterior_gp.jl#L4"><code>ApproxPosteriorGP</code></a></li><li><a href="https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gp/gp.jl#L11"><code>WrappedGP</code></a></li><li><a href="https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/composite/composite_gp.jl#L7"><code>CompositeGP</code></a></li><li><a href="https://github.com/JuliaGaussianProcesses/Stheno.jl/blob/b4e2d20f973a0816272fdf07bdd5896a614b99e1/src/gaussian_process_probabilistic_programme.jl#L8"><code>GaussianProcessProbabilisticProgramme</code></a></li></ol><h4 id="Required-Methods-3"><a class="docs-heading-anchor" href="#Required-Methods-3">Required Methods</a><a class="docs-heading-anchor-permalink" href="#Required-Methods-3" title="Permalink"></a></h4><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.mean-Tuple{AbstractGPs.AbstractGP, AbstractVector}" href="#Statistics.mean-Tuple{AbstractGPs.AbstractGP, AbstractVector}"><code>Statistics.mean</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean(f::AbstractGP, x::AbstractVector)</code></pre><p>Compute the mean vector of the multivariate Normal <code>f(x)</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/abstract_gp.jl#L14-L18">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.cov-Tuple{AbstractGPs.AbstractGP, AbstractVector, AbstractVector}" href="#Statistics.cov-Tuple{AbstractGPs.AbstractGP, AbstractVector, AbstractVector}"><code>Statistics.cov</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">cov(f::AbstractGP, x::AbstractVector, y::AbstractVector)</code></pre><p>Compute the <code>length(x)</code> by <code>length(y)</code> cross-covariance matrix between <code>f(x)</code> and <code>f(y)</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/abstract_gp.jl#L43-L47">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.var-Tuple{AbstractGPs.AbstractGP, AbstractVector}" href="#Statistics.var-Tuple{AbstractGPs.AbstractGP, AbstractVector}"><code>Statistics.var</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">var(f::AbstractGP, x::AbstractVector)</code></pre><p>Compute only the diagonal elements of <code>cov(f(x))</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/abstract_gp.jl#L36-L40">source</a></section></article><h4 id="Optional-Methods-2"><a class="docs-heading-anchor" href="#Optional-Methods-2">Optional Methods</a><a class="docs-heading-anchor-permalink" href="#Optional-Methods-2" title="Permalink"></a></h4><p>Default implementations are provided for these, but you may wish to specialise for performance.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.cov-Tuple{AbstractGPs.AbstractGP, AbstractVector}" href="#Statistics.cov-Tuple{AbstractGPs.AbstractGP, AbstractVector}"><code>Statistics.cov</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">cov(f::AbstractGP, x::AbstractVector)</code></pre><p>Compute the <code>length(x)</code> by <code>length(x)</code> covariance matrix of the multivariate Normal <code>f(x)</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/abstract_gp.jl#L29-L33">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="StatsBase.mean_and_cov-Tuple{AbstractGPs.AbstractGP, AbstractVector}" href="#StatsBase.mean_and_cov-Tuple{AbstractGPs.AbstractGP, AbstractVector}"><code>StatsBase.mean_and_cov</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean_and_cov(f::AbstractGP, x::AbstractVector)</code></pre><p>Compute both <code>mean(f(x))</code> and <code>cov(f(x))</code>. Sometimes more efficient than computing them separately, particularly for posteriors.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/abstract_gp.jl#L50-L55">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="StatsBase.mean_and_var-Tuple{AbstractGPs.AbstractGP, AbstractVector}" href="#StatsBase.mean_and_var-Tuple{AbstractGPs.AbstractGP, AbstractVector}"><code>StatsBase.mean_and_var</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean_and_var(f::AbstractGP, x::AbstractVector)</code></pre><p>Compute both <code>mean(f(x))</code> and the diagonal elements of <code>cov(f(x))</code>. Sometimes more efficient than computing them separately, particularly for posteriors.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/abstract_gp.jl#L58-L63">source</a></section></article><p>Note that, while we <em>could</em> provide a default implementation for <code>var(f, x)</code> as <code>diag(cov(f, x))</code>, this is generally such an inefficient fallback, that we find it preferable to error if it&#39;s not implemented than to ever hit a fallback.</p><h2 id="Which-API-should-I-implement?"><a class="docs-heading-anchor" href="#Which-API-should-I-implement?">Which API should I implement?</a><a id="Which-API-should-I-implement?-1"></a><a class="docs-heading-anchor-permalink" href="#Which-API-should-I-implement?" title="Permalink"></a></h2><p>To answer this question, you need to need to know whether or not the default implementations of the <a href="#FiniteGP-APIs">FiniteGP APIs</a> work for your use case. There are a couple of reasons of which we are aware for why this might not be the case (see below) – possibly there are others.</p><p>If you are unsure, please open an issue to discuss.</p><h3 id="You-want-to-avoid-computing-the-covariance-matrix"><a class="docs-heading-anchor" href="#You-want-to-avoid-computing-the-covariance-matrix">You want to avoid computing the covariance matrix</a><a id="You-want-to-avoid-computing-the-covariance-matrix-1"></a><a class="docs-heading-anchor-permalink" href="#You-want-to-avoid-computing-the-covariance-matrix" title="Permalink"></a></h3><p>We&#39;ve already discussed this a bit on this page. The default implementations of the <a href="#FiniteGP-APIs">FiniteGP APIs</a> rely on computing the covariance matrix. If your <code>AbstractGP</code> subtype needs to avoid computing the covariance matrix for performance reasons, then do <em>not</em> implement the <a href="#Internal-AbstractGPs-API">Internal AbstractGPs API</a>. <em>Do</em> implement the <a href="#Primary-Public-API">Primary Public API</a>. Do <em>not</em> implement the <a href="#Secondary-Public-API">Secondary Public API</a>.</p><p><a href="https://github.com/JuliaGaussianProcesses/TemporalGPs.jl">TemporalGPs.jl</a> is an example of a package that does this – see the <a href="https://github.com/JuliaGaussianProcesses/TemporalGPs.jl/blob/24343744cf60a50e09b301dee6f14b03cba7ccba/src/gp/lti_sde.jl#L7"><code>LTISDE</code></a> implementation for an example. The same is true of the <a href="https://github.com/JuliaGaussianProcesses/BayesianLinearRegressors.jl/blob/ea20b1bb0603d27c67b3751ad2cf26e271b7acaa/src/bayesian_linear_regression.jl#L11"><code>BayesianLinearRegressor</code></a> type.</p><h3 id="You-don&#39;t-want-to-use-the-default-implementations"><a class="docs-heading-anchor" href="#You-don&#39;t-want-to-use-the-default-implementations">You don&#39;t want to use the default implementations</a><a id="You-don&#39;t-want-to-use-the-default-implementations-1"></a><a class="docs-heading-anchor-permalink" href="#You-don&#39;t-want-to-use-the-default-implementations" title="Permalink"></a></h3><p>Perhaps you just don&#39;t like the default implementations because you don&#39;t want to make use of Cholesky factorisations. We don&#39;t have an example of this yet in Julia, however <a href="https://gpytorch.ai/">GPyTorch</a> avoids the Cholesky factorisation in favour of iterative solvers.</p><p>In this situation, implement <em>both</em> the <a href="#Internal-AbstractGPs-API">Internal AbstractGPs API</a> <em>and</em> the <a href="#FiniteGP-APIs">FiniteGP APIs</a>.</p><p>In this situation you will benefit less from code reuse inside AbstractGPs, but will continue to benefit from the ability of others use your code, and to take advantage of any existing functionality which requires types which adhere to the AbstractGPs API.</p><h2 id="Mean-functions"><a class="docs-heading-anchor" href="#Mean-functions">Mean functions</a><a id="Mean-functions-1"></a><a class="docs-heading-anchor-permalink" href="#Mean-functions" title="Permalink"></a></h2><p>We define an API for prior mean functions with the abstract type <a href="@ref"><code>MeanFunction</code></a> and the <a href="#AbstractGPs.mean_vector"><code>mean_vector</code></a> function.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.MeanFunction" href="#AbstractGPs.MeanFunction"><code>AbstractGPs.MeanFunction</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type MeanFunction end</code></pre><p><code>MeanFunction</code> introduces an API for treating the prior mean function appropriately. On the abstract level, all <code>MeanFunction</code> are functions. However we generally want to evaluate them on a collection of inputs. To this effect, we provide the <code>mean_vector(::MeanFunction, ::AbstractVector)</code> function, which is equivalent to <code>map</code> but with possibilities of optimizations (for <a href="#AbstractGPs.ZeroMean"><code>ZeroMean</code></a> and <a href="#AbstractGPs.ConstMean"><code>ConstMean</code></a> for example).</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/mean_function.jl#L1-L10">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.mean_vector" href="#AbstractGPs.mean_vector"><code>AbstractGPs.mean_vector</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">mean_vector(m::MeanFunction, x::AbstractVector)::AbstractVector{&lt;:Real}</code></pre><p><code>mean_vector</code> is the function to call to apply a <code>MeanFunction</code> to a collection of inputs.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/mean_function.jl#L13-L17">source</a></section></article><p>We provide standard mean functions like <a href="#AbstractGPs.ZeroMean"><code>ZeroMean</code></a> and <a href="#AbstractGPs.ConstMean"><code>ConstMean</code></a> as well as <a href="#AbstractGPs.CustomMean"><code>CustomMean</code></a> to simply wrap a function.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.ZeroMean" href="#AbstractGPs.ZeroMean"><code>AbstractGPs.ZeroMean</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">ZeroMean{T&lt;:Real} &lt;: MeanFunction</code></pre><p>Returns <code>zero(T)</code> everywhere, <code>T</code> is <code>Float64</code> by default.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/mean_function.jl#L20-L24">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.ConstMean" href="#AbstractGPs.ConstMean"><code>AbstractGPs.ConstMean</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">ConstMean{T&lt;:Real} &lt;: MeanFunction</code></pre><p>Returns <code>c</code> everywhere.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/mean_function.jl#L31-L35">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.CustomMean" href="#AbstractGPs.CustomMean"><code>AbstractGPs.CustomMean</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">CustomMean{Tf} &lt;: MeanFunction</code></pre><p>A wrapper around whatever unary function you fancy. Must be able to be mapped over an <code>AbstractVector</code> of inputs.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/mean_function.jl#L42-L47">source</a></section></article><h2 id="Testing-Utilities"><a class="docs-heading-anchor" href="#Testing-Utilities">Testing Utilities</a><a id="Testing-Utilities-1"></a><a class="docs-heading-anchor-permalink" href="#Testing-Utilities" title="Permalink"></a></h2><p>AbstractGPs provides several consistency tests in the <code>AbstractGPs.TestUtils</code> module. These tests will ensure that, for example, the size and type of everything produced by an implementation of the API is correct, and consistent with the other methods. It will not ensure correctness in any absolute sense though (e.g. that <code>logpdf</code> indeed computes what you wanted it to compute). Consequently, these tests should be seen as a set of necessary conditions for your code to be correct. They are not, however, sufficient.</p><p>You should only need to run one of the following test suites.</p><ol><li>If you implement the <a href="#Primary-Public-API">Primary Public API</a>, run <code>test_finitegp_primary_public_interface</code>.</li><li>If you implement both the <a href="#Primary-Public-API">Primary Public API</a> and the <a href="#Secondary-Public-API">Secondary Public API</a>, then run <code>test_finitegp_primary_and_secondary_public_interface</code>.</li><li>If you implement the <a href="#Internal-AbstractGPs-API">Internal AbstractGPs API</a>, run <code>test_internal_abstractgps_interface</code>.</li></ol><p>Also see <a href="#Which-API-should-I-implement?">Which API should I implement?</a> for more information about the most appropriate API to implement.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.TestUtils.test_finitegp_primary_public_interface" href="#AbstractGPs.TestUtils.test_finitegp_primary_public_interface"><code>AbstractGPs.TestUtils.test_finitegp_primary_public_interface</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">test_finitegp_primary_public_interface(
+    rng::AbstractRNG, fx::FiniteGP; atol::Real=1e-12
+)</code></pre><p>Basic consistency tests for the Primary Public FiniteGP API. You should run these tests if you only implement the Primary Public API – see API section of docs for details about this API.</p><p>These are consistency checks, not correctness tests in the absolute sense. For example, these tests ensure that samples generated by <code>rand</code> are of the correct size, but does not check that they come from the intended distribution.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/util/TestUtils.jl#L11-L23">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.TestUtils.test_finitegp_primary_and_secondary_public_interface" href="#AbstractGPs.TestUtils.test_finitegp_primary_and_secondary_public_interface"><code>AbstractGPs.TestUtils.test_finitegp_primary_and_secondary_public_interface</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">test_finitegp_primary_and_secondary_public_interface(
+    rng::AbstractRNG, fx::FiniteGP; atol::Real=1e-12
+)</code></pre><p>Basic consistency tests for both the Primary and Secondary Public FiniteGP APIs. Runs <code>test_finitegp_primary_public_interface</code> as part of these tests. You should run these tests if you implement both the primary and secondary public APIs – see API section of the docs for more information about these APIs.</p><p>These are consistency checks, not correctness tests in the absolute sense. For example, these tests ensure that samples generated by <code>rand</code> are of the correct size, but does not check that they come from the intended distribution.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/util/TestUtils.jl#L73-L86">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractGPs.TestUtils.test_internal_abstractgps_interface" href="#AbstractGPs.TestUtils.test_internal_abstractgps_interface"><code>AbstractGPs.TestUtils.test_internal_abstractgps_interface</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">test_internal_abstractgps_interface(
+    rng::AbstractRNG,
+    f::AbstractGP,
+    x::AbstractVector,
+    z::AbstractVector;
+    atol=1e-12,
+    σ²::Real=1e-1,
+    jitter::Real=AbstractGPs.default_σ²,
+)</code></pre><p>Basic consistency tests for the Internal AbstractGPs API. Runs <code>test_finitegp_primary_and_secondary_public_interface</code> as part of these tests. Run these tests if you implement the Internal AbstractGPs API – see the API section of the docs for more information about this API.</p><p>These are consistency checks, not correctness tests in the absolute sense. For example, these tests ensure that samples generated by <code>rand</code> are of the correct size, but does not check that they come from the intended distribution.</p><p><strong>kwargs</strong></p><ul><li>atol: the minimum eigenvalue of <code>cov(f, x)</code> must be greater than this.</li><li>σ²: the observation noise under which things are observed.</li><li>jitter: constant added to diagonal of <code>cov(f, x)</code> and <code>cov(f, z)</code> before inversion.</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaGaussianProcesses/AbstractGPs.jl/blob/f3f7e84cb0abe00bcfc1c203b1a7dc79fd3d0891/src/util/TestUtils.jl#L108-L132">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../concrete_features/">Concrete Features »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Friday 6 June 2025 02:04">Friday 6 June 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+
