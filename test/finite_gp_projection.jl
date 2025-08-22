@@ -205,6 +205,15 @@ end
             first(FiniteDifferences.grad(central_fdm(3, 1), Base.Fix1(logpdf, fx), y))
         @test Distributions.sqmahal!(r, fx, Y) ≈ Distributions.sqmahal(fx, Y)
     end
+
+    @testset "FiniteGP with UniformScaling" begin
+        f = GP(SqExponentialKernel())
+        fx = f(rand(10), 2.0 * I)
+        # for now, just check that it runs
+        _ = mean(fx)
+        _ = mean_and_cov(fx)
+        _ = rand(fx)
+    end
 end
 
 @testset "Docs" begin
