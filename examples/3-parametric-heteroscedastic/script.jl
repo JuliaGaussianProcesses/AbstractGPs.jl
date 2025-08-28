@@ -54,9 +54,8 @@ end;
 backend = AutoMooncake()
 function objective_and_gradient(F, G, flat_θ)
     if G !== nothing
-        val = objective(flat_θ)
-        grad = only(gradient(objective, backend, flat_θ))
-        copyto!(G, grad)
+        val, grad = value_and_gradient(objective, backend, flat_θ)
+        copyto!(G, only(grad))
         if F !== nothing
             return val
         end

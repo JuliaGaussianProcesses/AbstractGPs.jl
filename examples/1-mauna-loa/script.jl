@@ -229,9 +229,8 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
     backend = AutoMooncake()
     function fg!(F, G, x)
         if F !== nothing && G !== nothing
-            val = loss_packed(x)
-            grad = only(gradient(loss_packed, backend, x))
-            G .= grad
+            val, grad = value_and_gradient(loss_packed, backend, x)
+            G .= only(grad)
             return val
         elseif G !== nothing
             grad = only(gradient(loss_packed, backend, x))
