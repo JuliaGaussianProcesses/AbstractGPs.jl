@@ -259,9 +259,10 @@ plt
 
 using DynamicHMC
 
-samples = mcmc_with_warmup(
-    Random.GLOBAL_RNG, logjoint_train, n_samples; reporter=NoProgressReport()
-).posterior_matrix
+samples =
+    mcmc_with_warmup(
+        Random.GLOBAL_RNG, logjoint_train, n_samples; reporter=NoProgressReport()
+    ).posterior_matrix
 #md nothing #hide
 
 # We transform the samples back to the constrained space and compute the mean of both
