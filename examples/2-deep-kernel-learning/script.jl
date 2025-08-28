@@ -54,9 +54,9 @@ rng = Random.default_rng()
 ps, st = Lux.setup(rng, neuralnet)
 
 # Create a wrapper function for the neural network that will be updated during training
-function neural_transform(x, params)
-    # neuralnet returns (output, new_state), we only need the output
-    return first(neuralnet(x, params, st))
+function neural_transform(x, θ)
+    # neuralnet returns (output, new_state), we only need the output  
+    return first(neuralnet(x, θ, st))
 end
 
 # We use the Squared Exponential Kernel:
