@@ -1,6 +1,7 @@
 [deps]
 AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+JuliaGPsDocs = "53893f40-9e0f-42af-881a-c9dd8f22742d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
