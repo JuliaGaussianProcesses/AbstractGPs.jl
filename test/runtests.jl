@@ -19,6 +19,7 @@ using AbstractGPs:
 
 using Aqua
 using DifferentiationInterface
+using DifferentiationInterface: gradient, jacobian, value_and_gradient, value_and_jacobian
 using Documenter
 using Distributions: MvNormal, PDMat, loglikelihood, Distributions
 using FillArrays
