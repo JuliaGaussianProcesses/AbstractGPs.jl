@@ -53,8 +53,14 @@ neuralnet = Chain(Dense(1 => 20), Dense(20 => 30), Dense(30 => 5))
 rng = Random.default_rng()
 ps, st = Lux.setup(rng, neuralnet)
 
+# Create a wrapper function for the neural network that will be updated during training
+function neural_transform(x, params)
+    # neuralnet returns (output, new_state), we only need the output
+    return first(neuralnet(x, params, st))
+end
+
 # We use the Squared Exponential Kernel:
-k = SqExponentialKernel() ∘ FunctionTransform(x -> first(neuralnet(x, ps, st)))
+k = SqExponentialKernel() ∘ FunctionTransform(x -> neural_transform(x, ps))
 
 # We now define our model:
 gpprior = GP(k)  # GP Prior
@@ -67,9 +73,6 @@ loss(y) = -logpdf(fx, y)
 
 @info "Initial loss = $(loss(y_train))"
 
-# We track the neural network parameters for optimization
-θ = ps  # Neural network parameters
-
 # We show the initial prediction with the untrained model
 p_init = plot(; title="Loss = $(round(loss(y_train); sigdigits=6))")
 plot!(vcat(x_test...), target_f; label="true f")
@@ -79,11 +82,11 @@ plot!(vcat(x_test...), mean.(pred_init); ribbon=std.(pred_init), label="Predicti
 
 # ## Training
 nmax = 200
-opt_state = Optimisers.setup(Optimisers.Adam(0.1), θ)
+opt_state = Optimisers.setup(Optimisers.Adam(0.1), ps)
 
 # Create a wrapper function that updates the kernel with current parameters
 function update_kernel_and_loss(θ_current)
-    k_updated = SqExponentialKernel() ∘ FunctionTransform(x -> first(neuralnet(x, θ_current, st)))
+    k_updated = SqExponentialKernel() ∘ FunctionTransform(x -> neural_transform(x, θ_current))
     fx_updated = AbstractGPs.FiniteGP(GP(k_updated), x_train, noise_std^2)
     return -logpdf(fx_updated, y_train)
 end
@@ -91,13 +94,13 @@ end
 anim = Animation()
 for i in 1:nmax
     # Compute gradients with respect to neural network parameters
-    loss_val, grads = Zygote.withgradient(update_kernel_and_loss, θ)
+    loss_val, grads = Zygote.withgradient(update_kernel_and_loss, ps)
     
     # Update parameters using Optimisers.jl
-    opt_state, θ = Optimisers.update(opt_state, θ, grads[1])
+    opt_state, ps = Optimisers.update(opt_state, ps, grads[1])
     
-    # Update the kernel with new parameters
-    k = SqExponentialKernel() ∘ FunctionTransform(x -> first(neuralnet(x, θ, st)))
+    # Update the kernel with new parameters for visualization
+    k = SqExponentialKernel() ∘ FunctionTransform(x -> neural_transform(x, ps))
     fx = AbstractGPs.FiniteGP(GP(k), x_train, noise_std^2)
 
     if i % 10 == 0
