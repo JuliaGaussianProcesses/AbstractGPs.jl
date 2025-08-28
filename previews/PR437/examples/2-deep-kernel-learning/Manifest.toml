@@ -17,8 +17,8 @@ weakdeps = ["ChainRulesCore", "Test"]
 
 [[deps.AbstractGPs]]
 deps = ["ChainRulesCore", "Distributions", "FillArrays", "IrrationalConstants", "KernelFunctions", "LinearAlgebra", "PDMats", "Random", "RecipesBase", "Reexport", "Statistics", "StatsBase", "Test"]
-git-tree-sha1 = "562f307af03945fcd6d1093fb34d858aa91ac1a8"
-repo-rev = "c94e4464fb39ccdc4eb2155c26553744b139756c"
+git-tree-sha1 = "3f7796f5175df5d0001c24c9863db7ad779696d1"
+repo-rev = "9b0115e79049278e1957e03b72173af0baf1eea4"
 repo-url = "/home/runner/work/AbstractGPs.jl/AbstractGPs.jl"
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
 version = "0.5.24"
