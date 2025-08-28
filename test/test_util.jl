@@ -65,7 +65,7 @@ function adjoint_test(
     else
         # Multiple input case - simplified approach for testing
         adj_ad = ntuple(length(x)) do i
-            f_i(xi) = f(x[1:i-1]..., xi, x[i+1:end]...)
+            f_i(xi) = f(x[1:(i - 1)]..., xi, x[(i + 1):end]...)
             grad_i = gradient(f_i, backend, x[i])
             grad_i .* ȳ
         end
