@@ -57,7 +57,6 @@ function adjoint_test(
     # Compute forwards-pass and j′vp.
     backend = AutoMooncake()
     y = f(x...)
-    
     # Compute gradient using DifferentiationInterface
     if length(x) == 1
         # Single input case

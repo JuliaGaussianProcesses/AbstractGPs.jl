@@ -36,8 +36,8 @@
     #   `mean_vector(m::CustomMean, x::ColVecs)`
     #   `mean_vector(m::CustomMean, x::RowVecs)`
     @testset "DifferentiationInterface gradients" begin
-        X = [1.;; 2.;; 3.;;]
-        y = [1., 2., 3.]
+        X = [1.0;; 2.0;; 3.0;;]
+        y = [1.0, 2.0, 3.0]
         foo_mean = x -> sum(abs2, x)
 
         function construct_finite_gp(X, lengthscale, noise)
@@ -52,7 +52,7 @@
         end
 
         backend = AutoMooncake()
-        @test only(gradient(n -> loglike(1., n), backend, 1.)) isa Real
-        @test only(gradient(l -> loglike(l, 1.), backend, 1.)) isa Real    
+        @test only(gradient(n -> loglike(1.0, n), backend, 1.0)) isa Real
+        @test only(gradient(l -> loglike(l, 1.0), backend, 1.0)) isa Real
     end
 end
