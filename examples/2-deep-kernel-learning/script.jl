@@ -55,7 +55,6 @@ ps, st = Lux.setup(rng, neuralnet)
 
 # Create a wrapper function for the neural network that will be updated during training
 function neural_transform(x, θ)
-    # neuralnet returns (output, new_state), we only need the output  
     return first(neuralnet(x, θ, st))
 end
 
@@ -94,11 +93,8 @@ end
 
 anim = Animation()
 for i in 1:nmax
-    # Compute gradients with respect to neural network parameters
     loss_val, grads = Zygote.withgradient(update_kernel_and_loss, ps)
-    # Update parameters using Optimisers.jl
     opt_state, ps = Optimisers.update(opt_state, ps, grads[1])
-    # Update the kernel with new parameters for visualization
     k = SqExponentialKernel() ∘ FunctionTransform(x -> neural_transform(x, ps))
     fx = AbstractGPs.FiniteGP(GP(k), x_train, noise_std^2)
 
