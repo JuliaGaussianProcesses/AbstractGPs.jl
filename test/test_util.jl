@@ -61,14 +61,17 @@ function adjoint_test(
     # Compute gradient using DifferentiationInterface
     if length(x) == 1
         # Single input case
-        _, pullback_extras = prepare_pullback(f, backend, x[1])
-        adj_ad = (pullback(f, backend, x[1], ȳ, pullback_extras),)
+        grad_ad = gradient(f, backend, x[1])
+        adj_ad = (grad_ad .* ȳ,)
     else
-        # Multiple input case  
-        _, pullback_extras = prepare_pullback(f, backend, x...)
-        adj_ad = pullback(f, backend, x, ȳ, pullback_extras)
+        # Multiple input case - simplified approach for testing
+        adj_ad = ntuple(length(x)) do i
+            f_i(xi) = f(x[1:i-1]..., xi, x[i+1:end]...)
+            grad_i = gradient(f_i, backend, x[i])
+            grad_i .* ȳ
+        end
     end
-    adj_fd = j′vp(fdm, f, ȳ, x...)
+    adj_fd = j′vp(fdm, f, ȳ, x...)
 
     # Check that forwards-pass agrees with plain forwards-pass.
     @test y ≈ f(x...)
