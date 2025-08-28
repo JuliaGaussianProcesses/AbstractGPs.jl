@@ -53,6 +53,55 @@ AbstractGPs.jl is a Julia package that defines a low-level API for working with 
   - NEVER CANCEL: Takes 5-10 minutes but may fail due to external example dependencies
   - Failure is expected in sandboxed environments due to gitlab.com connectivity issues
 
+### Running Examples
+Examples are located in the `examples/` directory and use Literate.jl for notebook-style scripts:
+
+- Navigate to specific example directory:
+  ```bash
+  cd examples/0-intro-1d  # or any other example
+  ```
+
+- Set up example dependencies (takes 2-5 minutes depending on network):
+  ```bash
+  julia --project=. -e "using Pkg; Pkg.instantiate()"
+  ```
+
+- Run example directly:
+  ```bash
+  julia --project=. script.jl
+  ```
+
+- Or run interactively:
+  ```bash
+  julia --project=.
+  julia> include("script.jl")
+  ```
+
+- Available examples:
+  - `0-intro-1d/` - Basic 1D GP regression introduction
+  - `1-mauna-loa/` - Real-world CO2 data modeling
+  - `2-deep-kernel-learning/` - Advanced kernel learning
+  - `3-parametric-heteroscedastic/` - Heteroscedastic modeling
+
+**⚠️ CRITICAL: Literate.jl Limitation**
+When working with code in the `examples/` folder, **NEVER insert comments inside function definitions**. This breaks Literate.jl processing. Only add comments:
+- At the top level (outside functions)
+- Between function definitions
+- As single-line comments before functions
+
+```julia
+# ✓ Good: Comment outside function
+function my_function()
+    # This will break Literate.jl processing
+    return 42
+end
+
+# ✓ Good: Comment between functions
+function another_function()
+    return 24  # This will also break
+end
+```
+
 ## Validation
 
 ### Core Package Functionality
@@ -110,12 +159,34 @@ pred_mean, pred_cov = mean_and_cov(posterior_f([0.0, 1.0]))
 println("✓ Posterior predictions successful")
 ```
 
+### Example Validation
+To validate changes affecting examples or when working with example code:
+```bash
+# Navigate to an example (e.g., basic intro)
+cd examples/0-intro-1d
+
+# Install example dependencies (may take 2-5 minutes)
+julia --project=. -e "using Pkg; Pkg.instantiate()"
+
+# Run the example to ensure it works
+julia --project=. script.jl
+
+# Return to repository root
+cd ../..
+```
+
+Expected output for `0-intro-1d` example includes:
+- GP regression plots
+- Posterior mean and variance predictions  
+- No errors during execution
+
 ### Before Committing Changes
 Always run these validation steps before committing:
 1. Format code: `julia -e "using JuliaFormatter; format(\".\"; verbose=true)"`
 2. Run main tests: `GROUP="AbstractGPs" julia --project=. -e "using Pkg; Pkg.test()"`
 3. Validate basic GP functionality with the test above
-4. Check that CI workflows will pass by ensuring formatting and tests succeed
+4. If working with examples, validate at least one example runs successfully
+5. Check that CI workflows will pass by ensuring formatting and tests succeed
 
 ## Repository Structure
 
@@ -219,6 +290,10 @@ ls src/util/  # Utilities: TestUtils.jl, plotting.jl, common_covmat_ops.jl
 # Test structure
 ls test/  # Mirrors src/ structure plus ppl/ subdirectory
 ls test/ppl/  # PPL integration tests (runtests.jl, turing.jl)
+
+# Example structure
+ls examples/  # Example directories: 0-intro-1d/, 1-mauna-loa/, etc.
+ls examples/0-intro-1d/  # Contains: script.jl, Project.toml
 ```
 
 ### Package Information
@@ -243,4 +318,7 @@ julia -e "using JuliaFormatter; format(\".\"; overwrite=false, verbose=true)"
 
 # Get git status
 git status --short  # See modified files quickly
+
+# Quick example validation (from repo root)
+cd examples/0-intro-1d && julia --project=. -e "include(\"script.jl\")" && cd ../..
 ```
