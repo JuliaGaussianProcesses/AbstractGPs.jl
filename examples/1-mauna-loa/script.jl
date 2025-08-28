@@ -12,7 +12,8 @@ using CSV, DataFrames  # data loading
 using AbstractGPs  # exact GP regression
 using ParameterHandling  # for nested and constrained parameters
 using Optim  # optimization
-using Zygote  # auto-diff gradient computation
+using DifferentiationInterface  # auto-diff interface
+using Mooncake  # AD backend
 using Plots  # visualisation
 
 # Let's load and visualize the dataset.
@@ -225,14 +226,16 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
     loss_packed = loss ∘ unflatten
 
     ## https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations
+    backend = AutoMooncake()
     function fg!(F, G, x)
         if F !== nothing && G !== nothing
-            val, grad = Zygote.withgradient(loss_packed, x)
-            G .= only(grad)
+            val = loss_packed(x)
+            grad = only(gradient(loss_packed, backend, x))
+            G .= grad
             return val
         elseif G !== nothing
-            grad = Zygote.gradient(loss_packed, x)
-            G .= only(grad)
+            grad = only(gradient(loss_packed, backend, x))
+            G .= grad
             return nothing
         elseif F !== nothing
             return loss_packed(x)

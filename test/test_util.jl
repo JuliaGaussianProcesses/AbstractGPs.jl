@@ -55,8 +55,19 @@ function adjoint_test(
     f, ȳ, x...; rtol=_rtol, atol=_atol, fdm=central_fdm(5, 1), print_results=false
 )
     # Compute forwards-pass and j′vp.
-    y, back = Zygote.pullback(f, x...)
-    adj_ad = back(ȳ)
+    backend = AutoMooncake()
+    y = f(x...)
+    
+    # Compute gradient using DifferentiationInterface
+    if length(x) == 1
+        # Single input case
+        _, pullback_extras = prepare_pullback(f, backend, x[1])
+        adj_ad = (pullback(f, backend, x[1], ȳ, pullback_extras),)
+    else
+        # Multiple input case  
+        _, pullback_extras = prepare_pullback(f, backend, x...)
+        adj_ad = pullback(f, backend, x, ȳ, pullback_extras)
+    end
     adj_fd = j′vp(fdm, f, ȳ, x...)
 
     # Check that forwards-pass agrees with plain forwards-pass.

@@ -35,7 +35,7 @@
     # This test fails without the specialized methods
     #   `mean_vector(m::CustomMean, x::ColVecs)`
     #   `mean_vector(m::CustomMean, x::RowVecs)`
-    @testset "Zygote gradients" begin
+    @testset "DifferentiationInterface gradients" begin
         X = [1.;; 2.;; 3.;;]
         y = [1., 2., 3.]
         foo_mean = x -> sum(abs2, x)
@@ -51,7 +51,8 @@
             return logpdf(gp, y)
         end
 
-        @test Zygote.gradient(n -> loglike(1., n), 1.)[1] isa Real
-        @test Zygote.gradient(l -> loglike(l, 1.), 1.)[1] isa Real    
+        backend = AutoMooncake()
+        @test only(gradient(n -> loglike(1., n), backend, 1.)) isa Real
+        @test only(gradient(l -> loglike(l, 1.), backend, 1.)) isa Real    
     end
 end

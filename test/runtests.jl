@@ -18,6 +18,7 @@ using AbstractGPs:
     TestUtils
 
 using Aqua
+using DifferentiationInterface
 using Documenter
 using Distributions: MvNormal, PDMat, loglikelihood, Distributions
 using FillArrays
@@ -25,13 +26,13 @@ using FiniteDifferences
 using FiniteDifferences: j′vp, to_vec
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
+using Mooncake
 using PDMats: ScalMat
 using Pkg
 using Plots
 using Random
 using Statistics
 using Test
-using Zygote
 
 const GROUP = get(ENV, "GROUP", "All")
 const PKGDIR = dirname(dirname(pathof(AbstractGPs)))
