@@ -207,4 +207,3 @@ end
     docstring = string(Docs.doc(logpdf, Tuple{AbstractGPs.FiniteGP,Vector{Float64}}))
     @test occursin("logpdf(f::FiniteGP, y::AbstractVecOrMat{<:Real})", docstring)
 end
-
