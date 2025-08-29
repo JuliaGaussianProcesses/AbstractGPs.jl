@@ -23,7 +23,8 @@ using Lux
 using Optimisers
 using Plots
 using Random
-using Zygote
+using Mooncake
+import DifferentiationInterface as DI
 default(; legendfontsize=15.0, linewidth=3.0);
 
 Random.seed!(42)  # for reproducibility
@@ -91,7 +92,7 @@ anim = Animation()
 let tstate = Training.TrainState(neuralnet, ps, st, Optimisers.Adam(0.005))
     for i in 1:nmax
         _, loss_val, _, tstate = Training.single_train_step!(
-            AutoZygote(), update_kernel_and_loss, (), tstate
+            DI.AutoMooncake(), update_kernel_and_loss, (), tstate
         )
 
         if i % 10 == 0
