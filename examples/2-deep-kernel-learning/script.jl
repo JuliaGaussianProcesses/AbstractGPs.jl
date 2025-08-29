@@ -95,9 +95,10 @@ let tstate = Training.TrainState(neuralnet, ps, st, Optimisers.Adam(0.005))
         )
 
         if i % 10 == 0
-            k = SqExponentialKernel() ∘ FunctionTransform(
-                StatefulLuxLayer(neuralnet, tstate.parameters, tstate.states)
-            )
+            k =
+                SqExponentialKernel() ∘ FunctionTransform(
+                    StatefulLuxLayer(neuralnet, tstate.parameters, tstate.states)
+                )
             fx = AbstractGPs.FiniteGP(GP(k), x_train, noise_std^2)
 
             @info "iteration $i/$nmax: loss = $loss_val"
