@@ -51,8 +51,7 @@
             return logpdf(gp, y)
         end
 
-        backend = AutoMooncake()
-        @test only(gradient(n -> loglike(1.0, n), backend, 1.0)) isa Real
-        @test only(gradient(l -> loglike(l, 1.0), backend, 1.0)) isa Real
+        @test only(gradient(n -> loglike(1.0, n), AutoMooncake(), 1.0)) isa Real
+        @test only(gradient(l -> loglike(l, 1.0), AutoMooncake(), 1.0)) isa Real
     end
 end
