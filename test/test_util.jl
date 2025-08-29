@@ -55,38 +55,9 @@ function adjoint_test(
     f, ȳ, x...; rtol=_rtol, atol=_atol, fdm=central_fdm(5, 1), print_results=false
 )
     # Compute forwards-pass and j′vp.
-    backend = AutoMooncake()
-    y = f(x...)
-    # Compute VJP using DifferentiationInterface
-    # For vector-valued functions, we need to use value_and_jacobian and compute VJP manually
-    if length(x) == 1
-        # Single input case
-        if y isa AbstractVector
-            # Vector-valued function: compute jacobian and then VJP
-            val, jac = value_and_jacobian(f, backend, x[1])
-            adj_ad = (vec(ȳ' * jac),)
-        else
-            # Scalar-valued function: use gradient
-            grad_ad = gradient(f, backend, x[1])
-            adj_ad = (grad_ad .* ȳ,)
-        end
-    else
-        # Multiple input case - compute jacobian for each input
-        adj_ad = ntuple(length(x)) do i
-            f_i(xi) = f(x[1:(i - 1)]..., xi, x[(i + 1):end]...)
-            y_i = f_i(x[i])
-            if y_i isa AbstractVector
-                # Vector-valued function
-                val, jac = value_and_jacobian(f_i, backend, x[i])
-                vec(ȳ' * jac)
-            else
-                # Scalar-valued function
-                grad_i = gradient(f_i, backend, x[i])
-                grad_i .* ȳ
-            end
-        end
-    end
-    adj_fd = j′vp(fdm, f, ȳ, x...)
+    _f = (x) -> f(x...)
+    y, adj_ad = DI.value_and_pullback(_f, AutoMooncake(), x, ȳ)
+    adj_fd = j′vp(fdm, f, ȳ, x...)
 
     # Check that forwards-pass agrees with plain forwards-pass.
     @test y ≈ f(x...)
