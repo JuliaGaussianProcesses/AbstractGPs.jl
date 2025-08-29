@@ -28,6 +28,7 @@ using FiniteDifferences: j′vp, to_vec
 using LinearAlgebra
 using LinearAlgebra: AbstractTriangular
 using Mooncake
+using DifferentiationInterface
 using PDMats: ScalMat
 using Pkg
 using Plots
