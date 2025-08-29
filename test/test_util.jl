@@ -57,7 +57,6 @@ function adjoint_test(
     # Compute forwards-pass and j′vp.
     backend = AutoMooncake()
     y = f(x...)
-    
     # Compute VJP using DifferentiationInterface
     # For vector-valued functions, we need to use value_and_jacobian and compute VJP manually
     if length(x) == 1
