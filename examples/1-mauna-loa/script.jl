@@ -12,7 +12,7 @@ using CSV, DataFrames  # data loading
 using AbstractGPs  # exact GP regression
 using ParameterHandling  # for nested and constrained parameters
 using Optim  # optimization
-using DifferentiationInterface  # auto-diff interface
+import DifferentiationInterface as DI # auto-diff interface
 using Mooncake  # AD backend
 using Plots  # visualisation
 
@@ -226,14 +226,14 @@ function optimize_loss(loss, θ_init; optimizer=default_optimizer, maxiter=1_000
     loss_packed = loss ∘ unflatten
 
     ## https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations
-    backend = AutoMooncake()
+    ## TODO: enable `prep = DI.prepare_gradient(f, backend, x)`
     function fg!(F, G, x)
         if F !== nothing && G !== nothing
-            val, grad = value_and_gradient(loss_packed, backend, x)
-            G .= only(grad)
+            val, grad = DI.value_and_gradient(loss_packed, AutoMooncake(), x)
+            G .= grad
             return val
         elseif G !== nothing
-            grad = only(gradient(loss_packed, backend, x))
+            grad = DI.gradient(loss_packed, AutoMooncake(), x)
             G .= grad
             return nothing
         elseif F !== nothing
