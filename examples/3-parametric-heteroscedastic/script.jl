@@ -11,7 +11,7 @@
 using AbstractGPs
 using AbstractGPsMakie
 using CairoMakie
-using DifferentiationInterface
+import DifferentiationInterface as DI
 using KernelFunctions
 using Mooncake
 using Optim
@@ -51,11 +51,9 @@ end;
 # We do not derive and implement the gradient function manually here but instead use reverse-mode automatic differentiation with DifferentiationInterface + Mooncake.
 # When computing gradients, the objective function is evaluated as well.
 # We can exploit this and [avoid re-evaluating the objective function](https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations) in such cases.
-backend = AutoMooncake()
 function objective_and_gradient(F, G, flat_θ)
     if G !== nothing
-        val, grad = value_and_gradient(objective, backend, flat_θ)
-        copyto!(G, only(grad))
+        val, grad = DI.value_and_gradient!(objective, G, AutoMooncake(), flat_θ)
         if F !== nothing
             return val
         end
