@@ -56,7 +56,7 @@ function adjoint_test(
 )
     # Compute forwards-pass and j′vp.
     _f = (x) -> f(x...)
-    y, adj_ad = DI.value_and_pullback(_f, AutoMooncake(), x, ȳ)
+    y, adj_ad = DI.value_and_pullback(_f, DI.AutoMooncake(), x, ȳ)
     adj_fd = j′vp(fdm, f, ȳ, x...)
 
     # Check that forwards-pass agrees with plain forwards-pass.
