@@ -53,7 +53,7 @@ end;
 # We can exploit this and [avoid re-evaluating the objective function](https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations) in such cases.
 function objective_and_gradient(F, G, flat_θ)
     if G !== nothing
-        val, grad = DI.value_and_gradient!(objective, G, AutoMooncake(), flat_θ)
+        val, grad = DI.value_and_gradient!(objective, G, DI.AutoMooncake(), flat_θ)
         if F !== nothing
             return val
         end
