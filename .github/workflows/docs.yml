@@ -3,9 +3,10 @@ name: Documentation
 on:
   push:
     branches:
-      - master
+      - main
     tags: '*'
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   # Skip intermediate builds: always.
@@ -13,22 +14,19 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
-  build:
+  docs:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@latest
-        with:
-          version: '1.10'
-      - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-        env:
-          JULIA_PKG_SERVER: ''
-      - name: Build and deploy
+      - name: Build and deploy Documenter.jl docs
         env:
           GKSwstype: nul # turn off GR's interactive plotting for notebooks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
-          JULIA_DEBUG: Documenter # Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
-        run: julia --project=docs/ docs/make.jl
+        uses: TuringLang/actions/DocsDocumenter@main
+        with:
+          julia-version: '1.10'
+          navbar-url: https://raw.githubusercontent.com/JuliaGaussianProcesses/.github/refs/heads/main/DocumenterNavbar/JuliaGPNavbar.html
