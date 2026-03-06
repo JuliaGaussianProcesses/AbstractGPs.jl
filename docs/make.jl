@@ -45,5 +45,3 @@ makedocs(;
     checkdocs=:exports,
     doctestfilters=JuliaGPsDocs.DOCTEST_FILTERS,
 )
-
-deploydocs(; repo="github.com/JuliaGaussianProcesses/AbstractGPs.jl.git", push_preview=true)
