@@ -14,10 +14,11 @@ struct GPSample{F,S}
     sample::S
 end
 
-(gs::GPSample)(x::AbstractArray) = eval_at(gs.fun, gs.sample, x)
+(gs::GPSample)(x) = eval_at(gs.fun, gs.sample, x)
 
 # This may become more challenging once we extend to multi-input GPS
 (gs::GPSample)(x::Number) = only(gs([x]))
+(gs::GPSample)(x::Tuple{T,Int}) where {T} = only(eval_at(gs.fun, gs.sample, x))
 
 """
     GPSampler(gp::AbstractGPs.AbstractGP, method::AbstractGPSamplingMethod)
@@ -36,8 +37,10 @@ struct GPSampler{F,S} <: Random.Sampler{GPSample}
     sampler::S
 
     # Specify input types here, since it is a "public" interface
-    function GPSampler(gp::AbstractGPs.AbstractGP, method::AbstractGPSamplingMethod)
-        fun, sampler = method(gp)
+    function GPSampler(
+        gp::AbstractGPs.AbstractGP, method::AbstractGPSamplingMethod; dims=Val(:auto)
+    )
+        fun, sampler = method(gp, dims)
         return new{typeof(fun),typeof(sampler)}(fun, sampler)
     end
 end
@@ -54,9 +57,10 @@ _get_prior(gp::AbstractGPs.GP) = gp
 _get_prior(pgp::AbstractGPs.PosteriorGP) = pgp.prior
 
 function get_obs_variance(pgp::AbstractGPs.PosteriorGP)
-    σk = pgp.prior.kernel(0, 0)
+    x = pgp.data.x[1]
+    σk = pgp.prior.kernel(x, x)
     v = diag(pgp.data.C.L * pgp.data.C.U) .- σk
-    return v
+    return max.(v, default_σ²)
 end
 
 function get_target_prior(pgp::AbstractGPs.PosteriorGP)
@@ -81,7 +85,7 @@ struct CholeskySampling{M,G} <: AbstractGPSamplingMethod
     end
 end
 
-function (cs::CholeskySampling{M,G})(gp) where {M,G}
+function (cs::CholeskySampling{M,G})(gp, dims) where {M,G}
     return M(gp), G
 end
 
@@ -138,7 +142,8 @@ end
 
 # ### Utils
 
-get_weight_distribution(::AbstractGPs.GP, rff) = MvNormal(ones(rff.l))
+_rand(rng, t::Tuple{Normal,Int}) = rand(rng, t[1], t[2])
+get_weight_distribution(::AbstractGPs.GP, rff) = (Normal(), length(rff))
 
 function get_weight_distribution(pgp::AbstractGPs.PosteriorGP, rff)
     d = get_target_prior(pgp)
@@ -176,20 +181,57 @@ function RFFSampling(l; rff_type::Type{<:KernelSpectralDensities.AbstractRFF}=Do
     return RFFSampling(Random.default_rng(), l; rff_type)
 end
 
-function (rffs::RFFSampling{RFF})(gp) where {RFF}
+_extract_dims(x::AbstractVector{<:Tuple}) = (length(x[1][1]), x.out_dim)
+_extract_dims(x::AbstractVector) = (length(x[1]), 1)
+
+function determine_dims(pgp::AbstractGPs.PosteriorGP, ::Val{:auto})
+    d, p = _extract_dims(pgp.data.x)
+    return (d, p)
+end
+
+function determine_dims(pgp::AbstractGPs.PosteriorGP, dims)
+    det_dims = determine_dims(pgp, Val(:auto))
+    if det_sims == dims
+        return det_dims
+    else
+        throw(
+            ArgumentError(
+                "Specified dims $dims do not match dimensions inferred from data $(det_dims).",
+            ),
+        )
+    end
+end
+
+function determine_dims(::AbstractGPs.AbstractGP, ::Val{:auto})
+    throw(
+        ArgumentError(
+            "Cannot determine input/output dimensions for a non-posterior GP. Please specify dims explicitly.",
+        ),
+    )
+end
+determine_dims(::AbstractGPs.AbstractGP, dims) = dims
+
+# currently no way to infer the input domain of a prior GP
+# maybe additional optional arguments for the GPSampler? 
+function (rffs::RFFSampling{RFF})(gp::AbstractGPs.AbstractGP, dims) where {RFF}
     prior = _get_prior(gp)
-    # for now, hardcoding "1", later expand for multi-input
-    S = SpectralDensity(prior.kernel, 1)
-    # ToDo: add rng to RFF
-    rff = RFF(rffs.rng, S, rffs.l)
+    dims = determine_dims(gp, dims)
+
+    rff = sample_rff(rffs.rng, prior.kernel, rffs.l, dims...; rff_type=RFF)
 
     ws = get_weight_distribution(gp, rff)
 
     return rff, ws
 end
 
-function eval_at(rff::KernelSpectralDensities.AbstractRFF, w, x::AbstractArray)
-    return dot.(rff.(x), Ref(w))
+function eval_at(rff::KernelSpectralDensities.AbstractRFF, w, x)
+    # return dot.(rff.(x), Ref(w))
+    return dot(rff(x), w)
+end
+
+function eval_at(rff::KernelSpectralDensities.AbstractMORFF, w, x)
+    # return dot.(rff.(x), Ref(w))
+    return rff(x) * w
 end
 
 # ## PathwiseSampler
@@ -236,11 +278,12 @@ struct PathwiseSampler{PS,TS,D}
     data::D
 end
 
-function (ps::PathwiseSampling)(pgp::AbstractGPs.PosteriorGP)
+function (ps::PathwiseSampling)(pgp::AbstractGPs.PosteriorGP, dims)
     upd_fun = update_basis(pgp, ps.update)
 
+    dims = determine_dims(pgp, dims)
     prior = pgp.prior
-    prior_sampler = GPSampler(prior, ps.prior)
+    prior_sampler = GPSampler(prior, ps.prior; dims)
 
     target_dist = get_target_prior(pgp)
 
@@ -250,15 +293,18 @@ end
 
 function _rand(rng::AbstractRNG, ps::PathwiseSampler)
     prior = rand(rng, ps.prior_sampler)
-    f = prior(ps.data.x)
+    f = prior.(ps.data.x) # here
+    # display(f)
 
     ts = rand(rng, ps.target_sampler)
+    # display(ts)
 
     v = ps.data.C \ (ts - f)
 
     return (prior=prior, v=v)
 end
 
-function eval_at(basis::KernelBasis, s, x::AbstractArray)
-    return s.prior(x) .+ dot.(basis.(x), Ref(s.v))
+function eval_at(basis::KernelBasis, s, x)
+    # return s.prior(x) .+ dot.(basis.(x), Ref(s.v))
+    return s.prior(x) + dot(basis(x), s.v)
 end

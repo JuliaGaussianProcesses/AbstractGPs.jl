@@ -33,19 +33,19 @@
     end
 
     @testset "Basic Functional" begin
-        function test_basic_fun(gp, method)
-            gps = GPSampler(gp, method)
+        function test_basic_fun(gp, method, dims=Val(:auto))
+            gps = GPSampler(gp, method; dims)
             gps1 = rand(rng, gps)
             @test gps1(0.4) isa Float64
-            @test gps1([0.6, 0.7]) isa Vector{Float64}
+            @test gps1.([0.6, 0.7]) isa Vector{Float64}
         end
         @testset "Cholesky" begin
-            test_basic_fun(g1, CholeskySampling())
+            test_basic_fun(g1, CholeskySampling(), (1, 1))
             test_basic_fun(pg1, CholeskySampling())
         end
 
         @testset "RFF" begin
-            test_basic_fun(g1, RFFSampling(20))
+            test_basic_fun(g1, RFFSampling(20), (1, 1))
             test_basic_fun(pg1, RFFSampling(20))
         end
 
@@ -65,6 +65,8 @@
     end
 
     # Evaluate sample all at once
+    # ToDo: Paused, since the interface has changed
+    # Unsure whether I want to bring it back
     function oneshot_error(x, gp, gps, n)
         resv = [rand(rng, gps)(x) for _ in 1:n]
         return eval_res(x, gp, resv)
@@ -81,8 +83,8 @@
         return eval_res(x, gp, resv)
     end
 
-    function grid_test(gp, x, nv, method, evalfun)
-        gps = GPSampler(gp, method)
+    function grid_test(gp, x, nv, method, evalfun, dims=Val(:auto))
+        gps = GPSampler(gp, method; dims)
 
         res = [evalfun(x, gp, gps, n) for n in nv]
         return all(diff(res) .< 0)
@@ -94,22 +96,22 @@
     @testset "Correctness" begin
         @testset "FunctionSpace" begin
             @testset "Prior, FullMemory" begin
-                @test grid_test(g1, x, nv, CholeskySampling(Conditional), oneshot_error)
+                # @test grid_test(g1, x, nv, CholeskySampling(Conditional), oneshot_error)
                 @test grid_test(g1, x, nv, CholeskySampling(Conditional), onebyone_error)
             end
 
             @testset "Posterior, FullMemory" begin
-                @test grid_test(pg1, x, nv, CholeskySampling(Conditional), oneshot_error)
+                # @test grid_test(pg1, x, nv, CholeskySampling(Conditional), oneshot_error)
                 @test grid_test(pg1, x, nv, CholeskySampling(Conditional), onebyone_error)
             end
 
             @testset "Prior, NoMemory" begin
-                @test grid_test(g1, x, nv, CholeskySampling(Independent), oneshot_error)
+                # @test grid_test(g1, x, nv, CholeskySampling(Independent), oneshot_error)
                 # @test grid_test(g1, x, nv, FunctionSpace(NoMemory), onebyone_error)
             end
 
             @testset "Posterior, NoMemory" begin
-                @test grid_test(pg1, x, nv, CholeskySampling(Independent), oneshot_error)
+                # @test grid_test(pg1, x, nv, CholeskySampling(Independent), oneshot_error)
                 # @test grid_test(g1, x, nv, FunctionSpace(NoMemory), onebyone_error)
             end
         end
@@ -118,11 +120,11 @@
             l = 80
             wsp = RFFSampling(rng, l)
             @testset "Prior, DoubleRFF" begin
-                @test grid_test(g1, x, nv, wsp, oneshot_error)
-                @test grid_test(g1, x, nv, wsp, onebyone_error)
+                # @test grid_test(g1, x, nv, wsp, oneshot_error, (1, 1))
+                @test grid_test(g1, x, nv, wsp, onebyone_error, (1, 1))
             end
             @testset "Posterior, DoubleRFF" begin
-                @test grid_test(pg1, x, nv, wsp, oneshot_error)
+                # @test grid_test(pg1, x, nv, wsp, oneshot_error)
                 @test grid_test(pg1, x, nv, wsp, onebyone_error)
             end
         end
@@ -130,7 +132,7 @@
         l = 80
         @testset "Posterior, DoubleRFF" begin
             method = PathwiseSampling(RFFSampling(l), CholeskySampling())
-            @test grid_test(pg1, x, nv, method, oneshot_error)
+            # @test grid_test(pg1, x, nv, method, oneshot_error)
             @test grid_test(pg1, x, nv, method, onebyone_error)
         end
     end
