@@ -55,8 +55,8 @@ function adjoint_test(
     f, ȳ, x...; rtol=_rtol, atol=_atol, fdm=central_fdm(5, 1), print_results=false
 )
     # Compute forwards-pass and j′vp.
-    y, back = Zygote.pullback(f, x...)
-    adj_ad = back(ȳ)
+    _f = (x) -> f(x...)
+    y, adj_ad = DI.value_and_pullback(_f, DI.AutoMooncake(), x, ȳ)
     adj_fd = j′vp(fdm, f, ȳ, x...)
 
     # Check that forwards-pass agrees with plain forwards-pass.
