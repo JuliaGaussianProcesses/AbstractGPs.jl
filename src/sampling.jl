@@ -308,3 +308,9 @@ function eval_at(basis::KernelBasis, s, x)
     # return s.prior(x) .+ dot.(basis.(x), Ref(s.v))
     return s.prior(x) + dot(basis(x), s.v)
 end
+
+# ToDo: only to get results asap
+function (gs::GPSample{<:KernelBasis{<:MOKernel}})(x::AbstractVector)
+    dims = gs.sample.prior.fun.pr
+    return eval_at.(Ref(gs.fun), Ref(gs.sample), MOInput([x], dims[2]))
+end
