@@ -4,7 +4,8 @@
 The finite-dimensional projection of the AbstractGP `f` at `x`. Assumed to be observed under
 Gaussian noise with zero mean and covariance matrix `Σy`
 """
-struct FiniteGP{Tf<:AbstractGP,Tx<:AbstractVector,TΣ} <: AbstractMvNormal
+struct FiniteGP{Tf<:AbstractGP,Tx<:AbstractVector,TΣ<:AbstractMatrix{<:Real}} <:
+       AbstractMvNormal
     f::Tf
     x::Tx
     Σy::TΣ
@@ -17,7 +18,11 @@ end
 const default_σ² = 1e-18
 
 function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::Real=default_σ²)
-    return FiniteGP(f, x, Fill(σ², length(x)))
+    return FiniteGP(f, x, ScalMat(length(x), σ²))
+end
+
+function FiniteGP(f::AbstractGP, x::AbstractVector, σ²::UniformScaling)
+    return FiniteGP(f, x, σ²[1, 1])
 end
 
 ## conversions

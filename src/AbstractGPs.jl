@@ -59,6 +59,9 @@ include("latent_gp.jl")
 # Plotting utilities.
 include("util/plotting.jl")
 
+# Autodiff utilities
+include("util/ad.jl")
+
 # Testing utilities.
 include("util/TestUtils.jl")
 
