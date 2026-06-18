@@ -35,9 +35,9 @@
     # This test fails without the specialized methods
     #   `mean_vector(m::CustomMean, x::ColVecs)`
     #   `mean_vector(m::CustomMean, x::RowVecs)`
-    @testset "Zygote gradients" begin
-        X = [1.;; 2.;; 3.;;]
-        y = [1., 2., 3.]
+    @testset "DifferentiationInterface gradients" begin
+        X = [1.0;; 2.0;; 3.0;;]
+        y = [1.0, 2.0, 3.0]
         foo_mean = x -> sum(abs2, x)
 
         function construct_finite_gp(X, lengthscale, noise)
@@ -51,7 +51,7 @@
             return logpdf(gp, y)
         end
 
-        @test Zygote.gradient(n -> loglike(1., n), 1.)[1] isa Real
-        @test Zygote.gradient(l -> loglike(l, 1.), 1.)[1] isa Real    
+        @test only(gradient(n -> loglike(1.0, n), AutoMooncake(), 1.0)) isa Real
+        @test only(gradient(l -> loglike(l, 1.0), AutoMooncake(), 1.0)) isa Real
     end
 end

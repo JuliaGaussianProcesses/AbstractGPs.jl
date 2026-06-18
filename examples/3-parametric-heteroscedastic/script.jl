@@ -11,10 +11,11 @@
 using AbstractGPs
 using AbstractGPsMakie
 using CairoMakie
+import DifferentiationInterface as DI
 using KernelFunctions
+using Mooncake
 using Optim
 using ParameterHandling
-using Zygote
 
 using LinearAlgebra
 using Random
@@ -47,15 +48,14 @@ end;
 
 # We use L-BFGS for optimising the objective function.
 # It is a first-order method and hence requires computing the gradient of the objective function.
-# We do not derive and implement the gradient function manually here but instead use reverse-mode automatic differentiation with Zygote.
-# When computing gradients with Zygote, the objective function is evaluated as well.
+# We do not derive and implement the gradient function manually here but instead use reverse-mode automatic differentiation with DifferentiationInterface + Mooncake.
+# When computing gradients, the objective function is evaluated as well.
 # We can exploit this and [avoid re-evaluating the objective function](https://julianlsolvers.github.io/Optim.jl/stable/#user/tipsandtricks/#avoid-repeating-computations) in such cases.
 function objective_and_gradient(F, G, flat_θ)
     if G !== nothing
-        val_grad = Zygote.withgradient(objective, flat_θ)
-        copyto!(G, only(val_grad.grad))
+        val, grad = DI.value_and_gradient!(objective, G, DI.AutoMooncake(), flat_θ)
         if F !== nothing
-            return val_grad.val
+            return val
         end
     end
     if F !== nothing
