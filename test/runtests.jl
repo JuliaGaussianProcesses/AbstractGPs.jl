@@ -77,6 +77,10 @@ include("test_util.jl")
         println(" ")
         @info "Ran latent_gp tests"
 
+        include("sampling.jl")
+        println(" ")
+        @info "Ran sampling tests"
+
         include("deprecations.jl")
         println(" ")
         @info "Ran deprecation tests"
