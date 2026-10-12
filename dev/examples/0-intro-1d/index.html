@@ -434,10 +434,10 @@ adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integra
 │   h.metric =
 │    DiagEuclideanMetric{Float64} with size (2,) mass matrix:
 └    [0.378166, 0.52005]
-┌ Info: Finished 2000 sampling steps for 1 chains in 0.465201243 (s)
+┌ Info: Finished 2000 sampling steps for 1 chains in 0.449705313 (s)
 │   h = Hamiltonian with DiagEuclideanMetric and GaussianKinetic
 │   κ = AdvancedHMC.HMCKernel{AdvancedHMC.FullMomentumRefreshment, AdvancedHMC.Trajectory{AdvancedHMC.MultinomialTS, AdvancedHMC.Leapfrog{Float64}, AdvancedHMC.GeneralisedNoUTurn{Float64}}}(AdvancedHMC.FullMomentumRefreshment(), Trajectory{AdvancedHMC.MultinomialTS} with Leapfrog with step size ϵ=0.877 and termination criterion AdvancedHMC.GeneralisedNoUTurn{Float64}(10, 1000.0))
-│   EBFMI_est = 1.12728879766507
+│   EBFMI_est = 1.1272887976650698
 └   average_acceptance_rate = 0.8503065689665961
 </code></pre><p>We transform the samples back to the constrained space and compute the mean of both parameters:</p><pre><code class="language-julia hljs">samples_constrained = [map(softplus, p) for p in samples]
 mean_samples = mean(samples_constrained)</code></pre><pre><code class="nohighlight hljs">2-element Vector{Float64}:
@@ -536,31 +536,31 @@ opt = optimize(objective_function(x_train, y_train), x0, LBFGS())</code></pre><p
     Algorithm:     L-BFGS
 
  * Convergence measures
-    |x - x&#39;|               = 9.90e-09 ≰ 0.0e+00
-    |x - x&#39;|/|x&#39;|          = 1.18e-09 ≰ 0.0e+00
-    |f(x) - f(x&#39;)|         = 4.55e-13 ≰ 0.0e+00
-    |f(x) - f(x&#39;)|/|f(x&#39;)| = 4.18e-14 ≰ 0.0e+00
-    |g(x)|                 = 9.39e-09 ≤ 1.0e-08
+    |x - x&#39;|               = 8.79e-11 ≰ 0.0e+00
+    |x - x&#39;|/|x&#39;|          = 1.05e-11 ≰ 0.0e+00
+    |f(x) - f(x&#39;)|         = 0.00e+00 ≤ 0.0e+00
+    |f(x) - f(x&#39;)|/|f(x&#39;)| = 0.00e+00 ≤ 0.0e+00
+    |g(x)|                 = 9.55e-09 ≤ 1.0e-08
 
  * Work counters
     Seconds run:   0  (vs limit Inf)
-    Iterations:    48
-    f(x) calls:    143
-    ∇f(x) calls:   143
+    Iterations:    97
+    f(x) calls:    271
+    ∇f(x) calls:   271
 </code></pre><pre><code class="language-julia hljs">opt.minimizer</code></pre><pre><code class="nohighlight hljs">7-element Vector{Float64}:
-  8.37938014433597
-  3.932737543028306
-  1.847957118803967
-  1.2763097364520433
- -1.7583267686817643
-  0.6917102800332979
- -4.133679974595943</code></pre><p>The optimized value of the variance is</p><pre><code class="language-julia hljs">softplus(opt.minimizer[1])</code></pre><pre><code class="nohighlight hljs">8.379609670183488</code></pre><p>and of the inverse lengthscale is</p><pre><code class="language-julia hljs">softplus(opt.minimizer[2])</code></pre><pre><code class="nohighlight hljs">3.9521380999886975</code></pre><p>We compute the log-likelihood of the test data for the resulting approximate posterior. We can observe that there is a significant improvement over the log-likelihood with the default kernel parameters of value 1.</p><pre><code class="language-julia hljs">opt_kernel =
+  8.379380134985313
+  3.9327375512473473
+  1.8479571187599018
+  1.2763097367013956
+ -1.7583267680992036
+  0.6917102801214619
+ -4.13367997627129</code></pre><p>The optimized value of the variance is</p><pre><code class="language-julia hljs">softplus(opt.minimizer[1])</code></pre><pre><code class="nohighlight hljs">8.379609660834976</code></pre><p>and of the inverse lengthscale is</p><pre><code class="language-julia hljs">softplus(opt.minimizer[2])</code></pre><pre><code class="nohighlight hljs">3.9521381080498217</code></pre><p>We compute the log-likelihood of the test data for the resulting approximate posterior. We can observe that there is a significant improvement over the log-likelihood with the default kernel parameters of value 1.</p><pre><code class="language-julia hljs">opt_kernel =
     softplus(opt.minimizer[1]) *
     (Matern52Kernel() ∘ ScaleTransform(softplus(opt.minimizer[2])))
 opt_f = GP(opt_kernel)
 opt_fx = opt_f(x_train, noise_var)
 ap = posterior(VFE(opt_f(logistic.(opt.minimizer[3:end]), jitter)), opt_fx, y_train)
-logpdf(ap(x_test, noise_var), y_test)</code></pre><pre><code class="nohighlight hljs">-2.068599766792897</code></pre><p>We visualize the approximate posterior with optimized parameters.</p><pre><code class="language-julia hljs">scatter(
+logpdf(ap(x_test, noise_var), y_test)</code></pre><pre><code class="nohighlight hljs">-2.068599769658887</code></pre><p>We visualize the approximate posterior with optimized parameters.</p><pre><code class="language-julia hljs">scatter(
     x_train,
     y_train;
     xlim=(0, 1),
@@ -656,12 +656,12 @@ Build Info:
   Official https://julialang.org/ release
 Platform Info:
   OS: Linux &#40;x86_64-linux-gnu&#41;
-  CPU: 4 × AMD EPYC 9V45 96-Core Processor
+  CPU: 4 × Intel&#40;R&#41; Xeon&#40;R&#41; 6973P-C
   WORD_SIZE: 64
   LIBM: libopenlibm
-  LLVM: libLLVM-15.0.7 &#40;ORCJIT, generic&#41;
+  LLVM: libLLVM-15.0.7 &#40;ORCJIT, icelake-client&#41;
 Threads: 1 default, 0 interactive, 1 GC &#40;on 4 virtual cores&#41;
 Environment:
   JULIA_LOAD_PATH &#61; :/home/runner/.julia/packages/JuliaGPsDocs/7M86H/src
 </pre>
-</details><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concrete_features/">« Concrete Features</a><a class="docs-footer-nextpage" href="../1-mauna-loa/">Mauna Loa time series example »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 12 October 2026 13:10">Monday 12 October 2026</span>. Using Julia version 1.10.12.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</details><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concrete_features/">« Concrete Features</a><a class="docs-footer-nextpage" href="../1-mauna-loa/">Mauna Loa time series example »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 12 October 2026 13:25">Monday 12 October 2026</span>. Using Julia version 1.10.12.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -380,7 +380,7 @@ fp = posterior(fx, y_train)  # Posterior of f given the observations</code></pre
 
 @info &quot;Initial loss = $(loss(y_train))&quot;</code></pre><pre><code class="nohighlight hljs">┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Base.ReshapedArray{Float64, 2, SubArray{Float64, 1, Matrix{Float64}, Tuple{Int64, Base.Slice{Base.OneTo{Int64}}}, true}, Tuple{}}]). Converting to common type to to attempt to use BLAS. This may be slow.
 └ @ LuxLib.Impl ~/.julia/packages/LuxLib/zPBrt/src/impl/matmul.jl:198
-[ Info: Initial loss = 1193.2798548756004
+[ Info: Initial loss = 1193.2798548756007
 </code></pre><p>We show the initial prediction with the untrained model</p><pre><code class="language-julia hljs">p_init = plot(; title=&quot;Loss = $(round(loss(y_train); sigdigits=6))&quot;)
 plot!(vcat(x_test...), target_f; label=&quot;true f&quot;)
 scatter!(vcat(x_train...), y_train; label=&quot;data&quot;)
@@ -421,26 +421,26 @@ end
 
 gif(anim, &quot;train-dkl.gif&quot;; fps=3)</code></pre><pre><code class="nohighlight hljs">┌ Warning: Mixed-Precision `matmul_cpu_fallback!` detected and Octavian.jl cannot be used for this set of inputs (C [Matrix{Float64}]: A [Matrix{Float32}] x B [Base.ReshapedArray{Float64, 2, SubArray{Float64, 1, Matrix{Float64}, Tuple{Int64, Base.Slice{Base.OneTo{Int64}}}, true}, Tuple{}}]). Converting to common type to to attempt to use BLAS. This may be slow.
 └ @ LuxLib.Impl ~/.julia/packages/LuxLib/zPBrt/src/impl/matmul.jl:198
-[ Info: iteration 10/200: loss = -203.62267433956725
+[ Info: iteration 10/200: loss = -203.62267433956723
 [ Info: iteration 20/200: loss = -173.16969348105522
-[ Info: iteration 30/200: loss = -175.46988607185764
+[ Info: iteration 30/200: loss = -175.46988607185762
 [ Info: iteration 40/200: loss = -195.11599686638
 [ Info: iteration 50/200: loss = -203.13972870581455
 [ Info: iteration 60/200: loss = -202.62456679504575
-[ Info: iteration 70/200: loss = -203.77390852620098
+[ Info: iteration 70/200: loss = -203.77390852620096
 [ Info: iteration 80/200: loss = -203.81538378252412
-[ Info: iteration 90/200: loss = -203.9062739700144
-[ Info: iteration 100/200: loss = -203.94627827084892
-[ Info: iteration 110/200: loss = -203.9414524213472
+[ Info: iteration 90/200: loss = -203.90627397001438
+[ Info: iteration 100/200: loss = -203.9462782708489
+[ Info: iteration 110/200: loss = -203.94145242134724
 [ Info: iteration 120/200: loss = -203.95108209022743
 [ Info: iteration 130/200: loss = -203.9504199772116
-[ Info: iteration 140/200: loss = -203.9509040798106
-[ Info: iteration 150/200: loss = -203.95125059358608
+[ Info: iteration 140/200: loss = -203.95090407981058
+[ Info: iteration 150/200: loss = -203.95125059358605
 [ Info: iteration 160/200: loss = -203.9512077644079
 [ Info: iteration 170/200: loss = -203.95123502905483
 [ Info: iteration 180/200: loss = -203.95125053372834
 [ Info: iteration 190/200: loss = -203.9512492675085
-[ Info: iteration 200/200: loss = -203.95124975572173
+[ Info: iteration 200/200: loss = -203.95124975572176
 [ Info: Saved animation to /home/runner/work/AbstractGPs.jl/AbstractGPs.jl/docs/src/examples/2-deep-kernel-learning/train-dkl.gif
 </code></pre><p><img src="train-dkl.gif" alt/></p><hr />
 <h6>Package and system information</h6>
@@ -474,12 +474,12 @@ Build Info:
   Official https://julialang.org/ release
 Platform Info:
   OS: Linux &#40;x86_64-linux-gnu&#41;
-  CPU: 4 × AMD EPYC 9V45 96-Core Processor
+  CPU: 4 × Intel&#40;R&#41; Xeon&#40;R&#41; 6973P-C
   WORD_SIZE: 64
   LIBM: libopenlibm
-  LLVM: libLLVM-15.0.7 &#40;ORCJIT, generic&#41;
+  LLVM: libLLVM-15.0.7 &#40;ORCJIT, icelake-client&#41;
 Threads: 1 default, 0 interactive, 1 GC &#40;on 4 virtual cores&#41;
 Environment:
   JULIA_LOAD_PATH &#61; :/home/runner/.julia/packages/JuliaGPsDocs/7M86H/src
 </pre>
-</details><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-Calandra"><a class="tag is-link" href="#citeref-Calandra">Calandra</a>Calandra, R., Peters, J., Rasmussen, C. E., &amp; Deisenroth, M. P. (2016, July). <a href="https://ieeexplore.ieee.org/abstract/document/7727626">Manifold Gaussian processes for regression.</a> In 2016 International Joint Conference on Neural Networks (IJCNN) (pp. 3338-3345). IEEE.</li><li class="footnote" id="footnote-Wilson"><a class="tag is-link" href="#citeref-Wilson">Wilson</a>Wilson, A. G., Hu, Z., Salakhutdinov, R. R., &amp; Xing, E. P. (2016). <a href="https://proceedings.neurips.cc/paper/2016/hash/bcc0d400288793e8bdcd7c19a8ac0c2b-Abstract.html">Stochastic variational deep kernel learning.</a> Advances in Neural Information Processing Systems, 29.</li><li class="footnote" id="footnote-Ober"><a class="tag is-link" href="#citeref-Ober">Ober</a>Ober, S. W., Rasmussen, C. E., &amp; van der Wilk, M. (2021, December). <a href="https://proceedings.mlr.press/v161/ober21a.html">The promises and pitfalls of deep kernel learning.</a> In Uncertainty in Artificial Intelligence (pp. 1206-1216). PMLR.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../1-mauna-loa/">« Mauna Loa time series example</a><a class="docs-footer-nextpage" href="../3-parametric-heteroscedastic/">Parametric Heteroscedastic Model »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 12 October 2026 13:10">Monday 12 October 2026</span>. Using Julia version 1.10.12.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</details><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-Calandra"><a class="tag is-link" href="#citeref-Calandra">Calandra</a>Calandra, R., Peters, J., Rasmussen, C. E., &amp; Deisenroth, M. P. (2016, July). <a href="https://ieeexplore.ieee.org/abstract/document/7727626">Manifold Gaussian processes for regression.</a> In 2016 International Joint Conference on Neural Networks (IJCNN) (pp. 3338-3345). IEEE.</li><li class="footnote" id="footnote-Wilson"><a class="tag is-link" href="#citeref-Wilson">Wilson</a>Wilson, A. G., Hu, Z., Salakhutdinov, R. R., &amp; Xing, E. P. (2016). <a href="https://proceedings.neurips.cc/paper/2016/hash/bcc0d400288793e8bdcd7c19a8ac0c2b-Abstract.html">Stochastic variational deep kernel learning.</a> Advances in Neural Information Processing Systems, 29.</li><li class="footnote" id="footnote-Ober"><a class="tag is-link" href="#citeref-Ober">Ober</a>Ober, S. W., Rasmussen, C. E., &amp; van der Wilk, M. (2021, December). <a href="https://proceedings.mlr.press/v161/ober21a.html">The promises and pitfalls of deep kernel learning.</a> In Uncertainty in Artificial Intelligence (pp. 1206-1216). PMLR.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../1-mauna-loa/">« Mauna Loa time series example</a><a class="docs-footer-nextpage" href="../3-parametric-heteroscedastic/">Parametric Heteroscedastic Model »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 12 October 2026 13:25">Monday 12 October 2026</span>. Using Julia version 1.10.12.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

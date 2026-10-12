@@ -398,7 +398,7 @@ result = optimize(
     Iterations:    10
     f(x) calls:    13
     ∇f(x) calls:   11
-</code></pre><p>The optimal model parameters are:</p><pre><code class="language-julia hljs">θ_final = unflatten(result.minimizer)</code></pre><pre><code class="nohighlight hljs">(s = 0.38514398683095374, l = 2.3342748073767914, σ² = 0.08082582089918736)</code></pre><p>We compute the posterior GP with these optimal model parameters:</p><pre><code class="language-julia hljs">fx_final = build_gpx(θ_final, x)
+</code></pre><p>The optimal model parameters are:</p><pre><code class="language-julia hljs">θ_final = unflatten(result.minimizer)</code></pre><pre><code class="nohighlight hljs">(s = 0.3851439868309567, l = 2.3342748073767967, σ² = 0.08082582089918738)</code></pre><p>We compute the posterior GP with these optimal model parameters:</p><pre><code class="language-julia hljs">fx_final = build_gpx(θ_final, x)
 f_post = posterior(fx_final, y);</code></pre><p>We visualize the results with <a href="https://github.com/JuliaGaussianProcesses/AbstractGPsMakie.jl">AbstractGPsMakie</a>:</p><pre><code class="language-julia hljs">using CairoMakie.Makie.ColorSchemes: Set1_4
 
 with_theme(
@@ -451,12 +451,12 @@ Build Info:
   Official https://julialang.org/ release
 Platform Info:
   OS: Linux &#40;x86_64-linux-gnu&#41;
-  CPU: 4 × AMD EPYC 9V45 96-Core Processor
+  CPU: 4 × Intel&#40;R&#41; Xeon&#40;R&#41; 6973P-C
   WORD_SIZE: 64
   LIBM: libopenlibm
-  LLVM: libLLVM-15.0.7 &#40;ORCJIT, generic&#41;
+  LLVM: libLLVM-15.0.7 &#40;ORCJIT, icelake-client&#41;
 Threads: 1 default, 0 interactive, 1 GC &#40;on 4 virtual cores&#41;
 Environment:
   JULIA_LOAD_PATH &#61; :/home/runner/.julia/packages/JuliaGPsDocs/7M86H/src
 </pre>
-</details><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../2-deep-kernel-learning/">« Deep Kernel Learning with Lux</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 12 October 2026 13:10">Monday 12 October 2026</span>. Using Julia version 1.10.12.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</details><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../2-deep-kernel-learning/">« Deep Kernel Learning with Lux</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 12 October 2026 13:25">Monday 12 October 2026</span>. Using Julia version 1.10.12.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

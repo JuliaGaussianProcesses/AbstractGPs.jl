@@ -1333,9 +1333,9 @@ version = "2.6.5"
 
 [[deps.StridedViews]]
 deps = ["LinearAlgebra", "PrecompileTools"]
-git-tree-sha1 = "c0407c7c4f7f1b0387b92ed7e94e82bd070fba46"
+git-tree-sha1 = "80fa91ffc826ca885eb23e3551427b2de6a8ebc9"
 uuid = "4db3bf67-4bd7-4b4e-b153-31dc3fb37143"
-version = "0.5.3"
+version = "0.5.4"
 
     [deps.StridedViews.extensions]
     StridedViewsAMDGPUExt = "AMDGPU"
