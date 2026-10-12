@@ -1,6 +1,6 @@
 name = "AbstractGPs"
 uuid = "99985d1d-32ba-4be9-9821-2ec096f28918"
-version = "0.5.26"
+version = "0.5.25"
 authors = ["JuliaGaussianProcesses Team"]
 
 [deps]
